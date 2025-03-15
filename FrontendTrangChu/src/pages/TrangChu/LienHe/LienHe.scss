@@ -1,0 +1,109 @@
+.contact-container {
+  padding-bottom: 100px;
+  background-color: #f9f9f9;
+
+  .contact-header {
+    display: flex;
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    margin-bottom: 30px;
+    height: 200px;
+    background-color: #b3e0ea;
+    h2 {
+      font-size: 28px;
+      color: #101010;
+    }
+    p {
+      font-size: 16px;
+      color: #151414;
+    }
+  }
+  .contact-content {
+    display: flex;
+    //justify-content: space-between;
+    align-items: center; // Căn giữa theo chiều dọc
+    margin: 0 50px;
+  }
+  
+  .contact-left {
+    margin-left: 50px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; // Căn giữa theo chiều dọc
+  }
+
+    .contact-info {
+      margin-bottom: 20px;
+      p {
+        font-size: 18px;
+        color: #111111;
+        margin: 5px 0;
+      }
+    }
+
+    .contact-form {
+      width: 90%;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      
+      h3 {
+        margin-bottom: 20px;
+        color: #0e0f11;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        input, textarea {
+          width: 95%;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+          font-size: 16px;
+        }
+
+        textarea {
+          resize: none;
+          height: 120px;
+        }
+
+        button {
+          background-color: #247270;
+          color: white;
+          padding: 10px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          &:hover {
+            background-color: #6440cd;
+          }
+        }
+      }
+    }
+
+    .contact-map {
+      flex: 1;
+      display: flex;
+      justify-content: center; // Căn giữa theo chiều ngang
+      align-items: center; // Căn giữa theo chiều dọc
+    }
+    
+    .contact-map iframe {
+      width: 90%;
+      height: 400px; // Điều chỉnh chiều cao theo mong muốn
+      border-radius: 8px;
+    }
+
+  @media (max-width: 768px) {
+    .contact-content {
+      flex-direction: column;
+    }
+  }
+}
