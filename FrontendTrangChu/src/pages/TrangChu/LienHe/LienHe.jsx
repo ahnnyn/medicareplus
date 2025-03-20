@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import "./LienHe.scss";
 import emailjs from "@emailjs/browser";
 import Swal from "sweetalert2";
-import Header from "../../../components/TrangChu/Header/HeaderViewDoctor";
+import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
 import Footer from "../../../components/TrangChu/Footer/Footer";
 
 function LienHe() {
@@ -42,7 +42,7 @@ function LienHe() {
 
   return (
     <>
-      <Header />
+      <HeaderViewDoctor />
       <div className="contact-container">
         <div className="contact-header">
           <h2>Liên hệ</h2>
