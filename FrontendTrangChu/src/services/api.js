@@ -1,16 +1,16 @@
 import axios from "../utils/axios-customize";
-export const callLogin = (email, password) => {
-    const URL_BACKEND = '/api/user.php'
+export const callLogin = (username, matKhau) => {
+    const URL_BACKEND = '/api/user.ph?action=login'
     const data = {
-        email, password
+        username, matKhau
     }
     return axios.post(URL_BACKEND, data)
 }
 
-export const callLoginBenhNhan = (email, password) => {
-    const URL_BACKEND = '/api/user.php'
+export const callLoginBenhNhan = (username, matKhau) => {
+    const URL_BACKEND = '/api/user.php?action=login'
     const data = {
-        email, password
+        username, matKhau
     }
     return axios.post(URL_BACKEND, data)
 }

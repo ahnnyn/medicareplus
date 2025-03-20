@@ -1,7 +1,8 @@
-import { Button, Col, Divider, Form, Input, message, Modal, notification, Radio, Row } from "antd";
+import { Button, Col, Divider, Form, Input, message, Modal, notification, Radio, Row, DatePicker, Upload  } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { callRegisterBenhNhan } from "../../../services/api";
+import { UploadOutlined } from "@ant-design/icons";
 
 const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
 
@@ -89,8 +90,8 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                     <Col md={12} sm={12} xs={24}>
                         <Form.Item
                             labelCol={{span: 24}}
-                            label="Họ"
-                            name="lastName"
+                            label="Họ tên"
+                            name="hoTen"
                             rules={[
                                 {
                                     required: true,
@@ -111,8 +112,8 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                     <Col md={12} sm={12} xs={24}>
                         <Form.Item
                             labelCol={{span: 24}}
-                            label="Tên"
-                            name="firstName"
+                            label="Username"
+                            name="userame"
                             rules={[
                                 {
                                     required: true,
@@ -212,6 +213,44 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                             hasFeedback
                         >
                             <Input />
+                        </Form.Item>                          
+                    </Col>
+                </Row>
+
+                <Row gutter={[20,20]}>
+                    <Col md={12} sm={12} xs={24}>
+                        <Form.Item
+                            labelCol={{span: 24}}
+                            label="Ngày sinh"
+                            name="ngaySinh"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập đầy đủ thông tin!',
+                                },                                    
+                            ]}
+                            hasFeedback
+                        >
+                            <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+                        </Form.Item>
+                    </Col>
+
+                    <Col md={12} sm={12} xs={24}>
+                        <Form.Item
+                            labelCol={{span: 24}}
+                            label="Hình ảnh"
+                            name="file"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập đầy đủ thông tin!',
+                                },
+                            ]}
+                            hasFeedback
+                        >
+                            <Upload beforeUpload={() => false} listType="picture">
+                                <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                            </Upload>
                         </Form.Item>                          
                     </Col>
                 </Row>

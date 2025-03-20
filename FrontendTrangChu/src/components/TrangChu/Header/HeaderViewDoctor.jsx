@@ -53,7 +53,7 @@ const HeaderViewDoctor = () => {
 
       const itemss = [
         {
-          key: 'loginn',
+          key: 'login',
           label: <label style={{display: "flex", cursor: "pointer"}} onClick={() => setOpenModalLogin(true)}><LuLogIn size={20}/> &nbsp; Đăng nhập</label>,
         } 
       
