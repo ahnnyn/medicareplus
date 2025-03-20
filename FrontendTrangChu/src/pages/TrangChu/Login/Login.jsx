@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../../redux/account/accountSlice";
 import { handleLoginSuccess } from "../../../utils/axios-customize";
 import { handleQuenPassword } from "../../../services/apiChuyenKhoaBacSi";
+import './style.scss';
 
 const LoginPage = (props) => {
 
@@ -90,10 +91,10 @@ const LoginPage = (props) => {
 
     const onFinish = async (values) => {
         console.log("kết quả values: ", values);
-        const { email, password } = values
+        const { username, matKhau } = values
 
         setIsLoading(true)
-        const res = await callLoginBenhNhan(email, password)
+        const res = await callLoginBenhNhan(username, matKhau)
         console.log("res login: ", res);
 
         if (res.data) {
@@ -104,7 +105,7 @@ const LoginPage = (props) => {
 
             if (remember) {
                 // Nếu người dùng chọn "Ghi nhớ tài khoản", lưu thông tin vào localStorage
-                localStorage.setItem("rememberedAccountBenhNhan", JSON.stringify({ email, password }));
+                localStorage.setItem("rememberedAccountBenhNhan", JSON.stringify({ username, matKhau }));
             } else {
                 // Nếu không chọn, xóa dữ liệu đã lưu (nếu có)
                 localStorage.removeItem("rememberedAccountBenhNhan");
@@ -157,6 +158,7 @@ const LoginPage = (props) => {
 
     return (
         <Modal
+            className="login-modal"
             title="Đăng Nhập Cho Bệnh Nhân"
             style={{
                 top: 100,
@@ -177,16 +179,16 @@ const LoginPage = (props) => {
                 onFinish={onFinish}
             >
                 <Form.Item
-                    label="Email"
-                    name="email"
+                    label="Username"
+                    name="username"
                     rules={[
                         {
                             required: true,
                             message: 'Vui lòng nhập đầy đủ thông tin!',
                         },
                         {
-                            type: "email",
-                            message: 'Vui lòng nhập đúng định dạng địa chỉ email',
+                            type: "text",
+                            message: 'Vui lòng nhập đúng định dạng username',
                         },
 
                     ]}
@@ -197,7 +199,7 @@ const LoginPage = (props) => {
 
                 <Form.Item
                     label="Password"
-                    name="password"
+                    name="matKhau"
                     rules={[
                         {
                             required: true,
@@ -218,32 +220,33 @@ const LoginPage = (props) => {
                     }} />
                 </Form.Item>
 
+                <Form.Item>
+                    <div className="login-option">
+                        <Checkbox
+                            className="remember-me"
+                            checked={remember}
+                            onChange={(e) => setRemember(e.target.checked)}
+                        >Ghi nhớ tài khoản</Checkbox>
+
+                        {/* <Link onClick={() => setOpenQuenMK(true)}>Quên mật khẩu</Link> */}
+                        <a className="forgot-password" onClick={() => setOpenQuenMK(true)}>Quên mật khẩu</a>
+                    </div>
+                    
+                </Form.Item>
+
                 <Form.Item >
-                    <div style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center"
-                    }}>
+                    <div className="login-button-container">
                         <Button loading={isLoading}
+                            className="login-button"
                             type="primary"
                             onClick={() => formLogin.submit()}>
                             Đăng nhập
                         </Button>
-                        {/* <Link onClick={() => setOpenQuenMK(true)}>Quên mật khẩu</Link> */}
-                        <a onClick={() => setOpenQuenMK(true)}>Quên mật khẩu</a>
+                        
 
                     </div>
                 </Form.Item>
-
-                <Form.Item
-                    name="remember"
-                    valuePropName="checked"
-                >
-                    <Checkbox
-                        checked={remember}
-                        onChange={(e) => setRemember(e.target.checked)}
-                    >Ghi nhớ tài khoản</Checkbox>
-                </Form.Item>
+                
             </Form>
             <Divider />
             <div style={{ textAlign: "center" }}>
