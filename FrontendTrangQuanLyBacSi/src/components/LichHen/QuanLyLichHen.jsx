@@ -158,79 +158,7 @@ const QuanLyLichHen = () => {
             },
             sorter: true,
         },
-        // {
-        //     title: (
-        //         <span style={{ justifyContent: "center", display: "flex" }}>
-        //             Trạng thái
-        //         </span>
-        //     ),
-        //     key: "status",
-        //     dataIndex: "status",
-        //     render: (text, record) => {
-        //         const getStatusTagForTinhTrangDonHang = (status) => {
-        //             if (status === "Không Hủy") {
-        //                 return {
-        //                     color: "green",
-        //                     icon: <CheckCircleOutlined />,
-        //                 }; // khong huy
-        //             }
-        //             return {
-        //                 color: "red",
-        //                 icon: <ExclamationCircleOutlined />,
-        //             }; // da huy
-        //         };
 
-        //         const getStatusTagForTinhTrangThanhToan = (status) => {
-        //             return status === "Chưa đặt lịch"
-        //                 ? { color: "red", icon: <ExclamationCircleOutlined /> }
-        //                 : { color: "green", icon: <CheckCircleOutlined /> }; // "Đã Thanh Toán"
-        //         };
-        //         const getStatusTagForTrangThaiXacNhan = (status) => {
-        //             return status === "Chờ xác nhận"
-        //                 ? { color: "orange", icon: <ExclamationCircleOutlined /> }
-        //                 : { color: "green", icon: <CheckCircleOutlined /> }; // "Đã xác nhận"
-        //         };
-
-        //         const donHangTag = getStatusTagForTinhTrangDonHang(
-        //             record.trangThaiHuyDon
-        //         );
-        //         const thanhToanTag = getStatusTagForTinhTrangThanhToan(
-        //             record.trangThai
-        //         );
-        //         const trangThaiXacNhan = getStatusTagForTrangThaiXacNhan(
-        //             record.trangThaiXacNhan
-        //         );
-        //         return (
-        //             <div style={{ display: "flex", justifyContent: "center" }}>
-        //                 {record.trangThaiHuyDon === "Không Hủy" ? (
-        //                     <>
-        //                         <Tag
-        //                             color={thanhToanTag.color}
-        //                             icon={thanhToanTag.icon}
-        //                         >
-        //                             {/* {record.trangThai} */}
-        //                             Không Hủy
-        //                         </Tag>
-
-        //                         {/* <Tag
-        //                             color={trangThaiXacNhan.color}
-        //                             icon={trangThaiXacNhan.icon}
-        //                         >
-        //                             {record.trangThaiXacNhan}
-        //                         </Tag> */}
-        //                     </>
-        //                 ) : (
-        //                     <Tag
-        //                         color={donHangTag.color}
-        //                         icon={donHangTag.icon}
-        //                     >
-        //                         {record.trangThaiHuyDon}
-        //                     </Tag>
-        //                 )}
-        //             </div>
-        //         );
-        //     },
-        // },
         {
             title: (
                 <span style={{ justifyContent: "center", display: "flex" }}>
@@ -349,25 +277,7 @@ const QuanLyLichHen = () => {
                 );
             },
         },
-        // {
-        //     title: "Thông tin",
-        //     dataIndex: "total",
-        //     key: "total",
-        //     render: (text, record) => {
-        //         return (
-        //             <>
-        //                 <span>Đã đặt lịch: {record.tenGioKham} </span> <br />
-        //                 <span>Ngày: {record.ngayKhamBenh} </span> <br />
-        //                 <span>
-        //                     Tổng{" "}
-        //                     <span style={{ color: "red" }}>
-        //                         {Math.ceil(record.giaKham).toLocaleString()} VNĐ
-        //                     </span>{" "}
-        //                 </span>
-        //             </>
-        //         );
-        //     },
-        // },
+ 
         {
             title: "Chức năng",
             key: "action",
@@ -499,63 +409,6 @@ const QuanLyLichHen = () => {
                             />
                         </>) : ''}
                     </>}
-
-
-                    {/* <Tooltip
-                        title="Xem chi tiết lịch hẹn này"
-                        color={"green"}
-                        key={"green"}
-                    >
-                        <FaEye
-                            size={23}
-                            style={{
-                                color: "green",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                                fontSize: "18px",
-                            }}
-                            onClick={() => {
-                                console.log("record: ", record);
-                                setOpenViewDH(true);
-                                setDataViewDH(record);
-                            }}
-                        />
-                    </Tooltip>
-
-                    {record.trangThaiHuyDon === 'Không Hủy' ? (<>
-                        {record.trangThaiXacNhan ? <>
-                            <Tooltip
-                                title="Cập nhật ghi chú bệnh án"
-                                color="green"
-                                key="green"
-                            >
-                                <RiEdit2Fill
-                                    size={23}
-                                    onClick={() => {
-                                        console.log("record", record);
-
-                                        setIsModalOpen(true)
-                                        setDataBenhNhan(record)
-                                    }}
-                                    style={{
-                                        color: "orange",
-                                        fontWeight: "bold",
-                                        cursor: "pointer",
-                                        fontSize: "18px",
-                                    }} />
-                            </Tooltip>
-                        </> : ''}
-
-                        <Switch
-                            loading={loadingXacNhanOrder}
-                            checked={record.trangThaiXacNhan}  // Kiểm tra nếu trạng thái là "Đã xác nhận" để bật switch
-                            onChange={(checked) => onChangeCheck(checked, record)}
-                            checkedChildren="Đã xác nhận"
-                            unCheckedChildren="Chờ xác nhận"
-                        />
-                    </>) : ''} */}
-
-
                 </Space>
             ),
         },
@@ -719,11 +572,6 @@ const QuanLyLichHen = () => {
                     setDataViewDH={setDataViewDH}
                 />
 
-                {/* <ModalEdit
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                dataBenhNhan={dataBenhNhan}
-                /> */}
 
                 <Modal
                     title={`Chỉnh sửa lịch khám bệnh cho bệnh nhân ${dataBenhNhan?.patientName}`}
@@ -747,14 +595,7 @@ const QuanLyLichHen = () => {
                                     layout="vertical"
                                     label="Chi tiết bệnh án"
                                     name="benhAn"
-                                // rules={[
-                                //     {
-                                //         required: true,
-                                //         message: 'Vui lòng nhập đầy đủ thông tinị!',
-                                //     },                                        
-                                // ]}
                                 >
-                                    {/* <Input.TextArea row={5} style={{ height: "100px" }} /> */}
                                     <CKEditor
                                         editor={ClassicEditor}
                                         config={{

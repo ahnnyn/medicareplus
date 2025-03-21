@@ -1,13 +1,4 @@
-// import { configureStore } from '@reduxjs/toolkit';
-// import accountReducer from '../redux/account/accountSlice';
-// import appReducer from '../redux/app/appSlice';
 
-// export const store = configureStore({
-//   reducer: {
-//     app: appReducer,
-//     account: accountReducer
-//   },
-// });
 
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import accountReducer from '../redux/account/accountSlice';

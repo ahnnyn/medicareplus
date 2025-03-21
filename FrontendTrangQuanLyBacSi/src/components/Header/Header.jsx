@@ -33,15 +33,6 @@ const Header = () => {
                             </div>
                             </div>
                             <div className="accont-wishlist-cart-area-header">
-                            {/* <a href="/doctor" className="btn-border-only account">
-                                <i className="fa-light fa-user" />
-                                <span>Account</span>
-                            </a> */}
-                            {/* <a href="wishlist.html" className="btn-border-only wishlist">
-                                <i className="fa-regular fa-heart" />
-                                <span className="text">Wishlist</span>
-                                <span className="number">2</span>
-                            </a>                            */}
                             </div>
                         </div>
                         </div>

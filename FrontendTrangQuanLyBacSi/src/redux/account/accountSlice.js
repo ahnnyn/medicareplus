@@ -1,73 +1,32 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
-const isAuthenticatedFromStorage = localStorage.getItem('isAuthenticated') === 'true';
-const userFromStorage = JSON.parse(localStorage.getItem('user')) || {};
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    isAuthenticated: isAuthenticatedFromStorage,
+    isAuthenticated: !!localStorage.getItem('access_tokenDoctor'),
     isLoading: true,
-    user: userFromStorage
+    user: JSON.parse(localStorage.getItem('user')) || {},
+    token: localStorage.getItem('access_tokenDoctor') || null,
 };
 
-
-export const accountSlide = createSlice({
-    name: 'accountDoctor',
+const accountDoctorSlice = createSlice({
+    name: "accountDoctor",
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        doLoginAction: (state, action) => {   
-            console.log("action: ", action);
-            console.log("action.payload: ", action.payload);
-                     
+        doLoginAction: (state, action) => {
             state.isAuthenticated = true;
-            state.isLoading = false;
-            state.user = action.payload
-
-            // Lưu thông tin vào localStorage
-            localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('user', JSON.stringify(action.payload));
+            state.token = action.payload.token;
+            state.user = action.payload.user;
+            localStorage.setItem('access_tokenDoctor', action.payload.token);
+            localStorage.setItem('user', JSON.stringify(action.payload.user)); // Chuỗi hóa lại đúng cách
         },
-        doGetAccountAction: (state, action) => {
-            state.isAuthenticated = true;
-            state.isLoading = false;
-            state.user = action.payload.user
-        },
-        doLogoutAction: (state, action) => {
-            localStorage.removeItem('access_tokenDoctor');
-            localStorage.removeItem('isAuthenticated');
-            // localStorage.setItem('isAuthenticated', 'false');
+        doLogoutAction: (state) => {
             state.isAuthenticated = false;
-            state.user = {
-                email: "",
-                phone: "",
-                firstName: "",
-                lastName: "",
-                address: "",
-                role: "",
-                image: "",
-                id: ""
-            }
-            // Lưu thông tin vào localStorage
-            localStorage.setItem('user', JSON.stringify({
-                email: "",
-                phone: "",
-                firstName: "",
-                lastName: "",
-                address: "",
-                role: "",
-                image: "",
-                id: ""
-            }));
-        },
-
-
-    },    
-    extraReducers: (builder) => {
-
-    },
+            state.token = null;
+            state.user = {};
+            localStorage.removeItem('access_tokenDoctor');
+            localStorage.removeItem('user');
+        }
+    }
 });
 
-export const { doLoginAction, doGetAccountAction, doLogoutAction } = accountSlide.actions;
-
-
-export default accountSlide.reducer;
+export const { doLoginAction, doLogoutAction } = accountDoctorSlice.actions;
+export default accountDoctorSlice.reducer;

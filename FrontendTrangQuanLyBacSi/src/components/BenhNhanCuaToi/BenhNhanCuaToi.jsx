@@ -83,37 +83,7 @@ const BenhNhanCuaToi = () => {
             ),
             width: 50
         },
-        // {
-        //     title: <span style={{textAlign: "center"}}>Chi tiết đã khám</span>,
-        //     dataIndex: "ttLich",
-        //     key: "ttLich",            
-        //     render: (text, record) => {
-        //         return (
-        //             <>
-        //             <ul>
-        //             {record?.patientDetails?.map(item => {
-        //                 return (
-        //                     <>
-        //                         <li key={item.ngayKhamBenh + item.tenGioKham}>
-        //                             <strong>Ngày khám:</strong> {item.ngayKhamBenh} <br/>
-        //                             <strong>Giờ khám:</strong> {item.tenGioKham} <br/>
-        //                             <strong>Lí do khám:</strong> {item.lidokham || ''}    <br/>                            
-        //                             <strong>Bệnh án:</strong> &nbsp;
-        //                             <span style={{ whiteSpace: "pre-wrap", maxWidth: "500px" }}>
-        //                                 {item.benhAn || 'Chưa có bệnh án'}
-        //                             </span>
-        //                         </li>
-        //                         <Divider/>
-        //                     </>
-        //                     )
-        //                 })}
-        //             </ul>                    
-        //             </>
-        //         );
-        //     },
-        //     width: "500px"
-        //     // sorter: true,
-        // },                        
+                       
         {
             title: "Chức năng",
             key: "action",
@@ -186,13 +156,6 @@ const BenhNhanCuaToi = () => {
         <Col xs={24} sm={12} md={24} span={24}>
         <Table 
             onChange={onChange}
-            // pagination={{
-            //     current: current,
-            //     pageSize: pageSize,
-            //     showSizeChanger: true,
-            //     total: total,
-            //     showTotal: (total, range) => { return (<div> {range[0]}-{range[1]} trên {total} lịch hẹn</div>) }
-            // }}
             pagination={false}  // Tắt phân trang mặc định của Table
             loading={loadingOrder} 
             columns={columns} 

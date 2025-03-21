@@ -1,6 +1,6 @@
 import axios from "../utils/axios-customize";
 export const callLogin = (username, matKhau) => {
-    const URL_BACKEND = '/api/user.ph?action=login'
+    const URL_BACKEND = '/api/user.php?action=login'
     const data = {
         username, matKhau
     }

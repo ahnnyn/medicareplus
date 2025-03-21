@@ -79,12 +79,6 @@ const ModalEdit = (props) => {
                             layout="vertical"
                             label="Chi tiết bệnh án"
                             name="benhAn"
-                        // rules={[
-                        //     {
-                        //         required: true,
-                        //         message: 'Vui lòng nhập đầy đủ thông tinị!',
-                        //     },                                        
-                        // ]}
                         >
                             <Input.TextArea row={5} style={{ height: "100px" }} />
                         </Form.Item>

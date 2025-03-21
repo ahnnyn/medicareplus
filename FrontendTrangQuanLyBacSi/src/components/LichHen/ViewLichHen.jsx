@@ -74,7 +74,6 @@ const ViewLichHen = (props) => {
         {
             key: 'diachipk',
             label: 'Địa chỉ phòng khám',
-            // children: <Badge status="processing" text={`${dataViewDH?._idDoctor?.phongKhamId?.address}`} />,
             children: <div>
                 <Card
                     hoverable
@@ -83,17 +82,7 @@ const ViewLichHen = (props) => {
                 >
                     <Meta title={` Phòng khám: ${dataViewDH?._idDoctor?.phongKhamId?.name}`} description={`${dataViewDH?._idDoctor?.phongKhamId?.address}`} />
                 </Card>
-            {/* <Collapse
-                style={{marginTop: "30px"}}
-                size="large"
-                items={[
-                    {
-                    key: 'description',
-                    label: 'Xem mô tả chi tiết phòng khám',
-                    children: <div className="truncate"  dangerouslySetInnerHTML={{ __html: dataViewDH?._idDoctor?.phongKhamId?.description }} />,
-                    },
-                ]}
-            /> */}
+          
             </div>,
             span: 3,
           },  

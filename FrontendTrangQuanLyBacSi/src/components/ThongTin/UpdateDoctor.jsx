@@ -126,17 +126,7 @@ const UpdateDoctor = (props) => {
             console.log("res upload: ", res);            
             if (res) {
                 setImageUrl(res.url); // URL của hình ảnh từ server
-                // // Thêm file mới vào fileList
-                // setFileList(prevFileList => [
-                //     ...prevFileList,
-                //     {
-                //         uid: file.uid, // Duy trì uid
-                //         name: file.name,
-                //         status: 'done',
-                //         url: res.url, // URL của hình ảnh từ server
-                //     },
-                // ]);
-                // Cập nhật fileList với file mới 
+                
                 setFileList([ // Đặt lại fileList chỉ chứa file mới
                     {
                         uid: file.uid,
@@ -385,22 +375,7 @@ const UpdateDoctor = (props) => {
                                     label="Hình ảnh"
                                     name="image"                            
                                 >
-                                    {/* <Upload
-                                            name="file" // Tên trùng với multer
-                                            listType="picture-card"
-                                            className="avatar-uploader"
-                                            maxCount={1}
-                                            multiple={false}
-                                            customRequest={handleUploadFileImage}
-                                            beforeUpload={beforeUpload}
-                                            onChange={handleChange}
-                                            onRemove={handleRemoveFile}
-                                        >
-                                            <div>
-                                                {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                                                <div style={{ marginTop: 8 }}>Upload</div>
-                                            </div>
-                                    </Upload> */}
+
                                     <Upload
                                         name="file"
                                         listType="picture-card"
@@ -419,19 +394,6 @@ const UpdateDoctor = (props) => {
                                             <div style={{ marginTop: 8 }}>Upload</div>
                                         </div>
                                     </Upload>
-
-                                    {/* {fileList.length > 0 && (
-                                        <div onClick={() => {
-                                            setImageUrl(fileList[0].url); // Lấy URL của hình ảnh
-                                            setIsModalVisible(true); // Mở modal
-                                        }}>
-                                            <img
-                                                src={fileList[0].url}
-                                                alt={fileList[0].name}
-                                                style={{ width: '100px', cursor: 'pointer' }} // Style cho ảnh
-                                            />
-                                        </div>
-                                    )} */}
 
                                     <Modal
                                         visible={isModalVisible}
