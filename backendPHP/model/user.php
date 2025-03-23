@@ -7,7 +7,7 @@ use Firebase\JWT\JWT;
 class mUser {
     private $secret_key = "your_secret_key"; // Thay bằng key bảo mật của bạn
 
-    public function login($username, $matKhau) {
+    public function layThongTin($username, $matKhau) {
         $db = new connectdatabase();
         $pdo = $db->connect();
 

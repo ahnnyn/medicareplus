@@ -8,7 +8,7 @@ export const callLogin = (username, matKhau) => {
 }
 
 export const callLoginBenhNhan = (username, matKhau) => {
-    const URL_BACKEND = '/api/user.php?action=login'
+    const URL_BACKEND = '/api/benhnhan.php?action=login'
     const data = {
         username, matKhau
     }

@@ -54,7 +54,7 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 if ($requestMethod === 'POST' && isset($_GET['action']) && $_GET['action'] === 'login') {
     $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode($p->layThongTin($data['username'], $data['password']));
+    echo json_encode($p->layThongTin($data['username'], $data['matKhau']));
 } elseif ($requestMethod === 'POST' && isset($_GET['action']) && $_GET['action'] === 'currentUser') {
     $user = verifyJWT();
     if ($user) {

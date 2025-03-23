@@ -8,8 +8,8 @@ class cUser {
         $this->userModel = new mUser();
     }
 
-    public function login($username, $matKhau) {
-        return $this->userModel->login($username, $matKhau);
+    public function layThongTin($username, $matKhau) {
+        return $this->userModel->layThongTin($username, $matKhau);
     }
     public function logout() {
         session_destroy();
