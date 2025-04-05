@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { doLogoutAction } from '../../../redux/account/accountSlice';
 import { UserOutlined } from '@ant-design/icons';
 import ModalDoiMK from '../ModalDoiMK/ModalDoiMK';
+import UpdateBenhNhan from '../ThongTin/UpdateBenhNhan';
 import { RiAccountCircleFill } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { MdLogin } from "react-icons/md";
@@ -25,6 +26,7 @@ import './header.scss';
 const HeaderViewDoctor = () => {
     const navigate = useNavigate()
 
+    const [openUpdateBenhNhan, setOpenModalThongTinCaNhan] = useState(false);
     const [openModalDoiMK, setOpenModalDoiMK] = useState(false);
     const [openModalLogin, setOpenModalLogin] = useState(false);
     const dispatch = useDispatch()
@@ -33,19 +35,24 @@ const HeaderViewDoctor = () => {
     console.log("isAuthenticated: ", isAuthenticated);
 
     const items = [
+  
         {
-          key: '1',
-          label: <label style={{display: "flex", cursor: "pointer"}} onClick={() => setOpenModalDoiMK(true)}><RiAccountCircleFill size={20}/> &nbsp; Tài khoản của tôi</label>,
-        },        
+            key: '1',
+            label: <label style={{display: "flex", cursor: "pointer"}} onClick={() => setOpenModalThongTinCaNhan(true)}><RiAccountCircleFill size={20}/> &nbsp; Tài khoản của tôi</label>,
+        },      
         {
             key: '2',
             label: <label style={{display: "flex", cursor: "pointer"}} onClick={() => handleRedirectLichHen(acc._id)}><IoIosTimer size={20}/> &nbsp; Lịch hẹn</label>,
         },
         {
+           key: '3',
+           label: <label style={{display: "flex", cursor: "pointer"}} onClick={() => setOpenModalDoiMK(true)}><RiAccountCircleFill size={20}/> &nbsp; Đổi mật khẩu</label>,
+         },
+        {
             key: 'cauhoi',
         }, 
         {
-          key: '4',
+          key: '5',
           danger: true,
           label: <label style={{display: "flex", cursor: "pointer"}} onClick={() => handleLogout()}><FiLogOut size={20}/> &nbsp; Đăng xuất</label>,
         }
@@ -137,7 +144,10 @@ const HeaderViewDoctor = () => {
                 openModalLogin={openModalLogin}
                 setOpenModalLogin={setOpenModalLogin}
             />
-
+            <UpdateBenhNhan
+                openUpdateBenhNhan = {openUpdateBenhNhan}
+                setOpenModalThongTinCaNhan = {setOpenModalThongTinCaNhan}
+            />
             <ModalDoiMK
             openModalDoiMK={openModalDoiMK}
             setOpenModalDoiMK={setOpenModalDoiMK}

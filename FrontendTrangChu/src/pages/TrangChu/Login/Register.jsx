@@ -11,31 +11,36 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const onFinish = async (values) => {
-        const {email, password, firstName, lastName, address, phone, gender} = values
-        console.log('Success:', email, password, firstName, lastName, address, phone, gender);
-        
-        // Giả sử giá trị 'gender' là 'other', bạn có thể xử lý khác biệt ở đây
-        // const genderText = values.gender === true ? 'Nam' : values.gender === false ? 'Nữ' : 'Bê Đê';
-        // message.success(`Bạn vừa chọn giới tính là: ${genderText}`);
-
         setIsLoading(true)
-        const res = await callRegisterBenhNhan(email, password, firstName, lastName, address, phone, gender)
-        console.log("res: ", res);
-        if(res.data){
-            message.success(res.message)
-            formRegister.resetFields()
-        //   navigate("/admin/login-admin")
-            setOpenRegisterKH(false)
-        } else {
-            notification.error({ 
-                message: "Đăng ký không thành công!",
-                description:
-                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-                duration: 5
-            })
+        try{
+            const res = await callRegisterBenhNhan( values.email, values.hoTen, values.soDienThoai, values.username, values.matKhau)
+            console.log("API Response: ", res);
+            if(res.success){
+                message.success(res.message)
+                formRegister.resetFields()
+            
+                setOpenRegisterKH(false)
+                notification.success({
+                    message: "Đăng ký thành công!",
+                    duration: 3,
+                });
+                    // Chuyển hướng sau 2 giây
+                setTimeout(() => {
+                    navigate("/");
+                    }, 2000);
+            } else {
+                notification.error({ 
+                    message: "Đăng ký không thành công!",
+                    description: res.message || "Thông tin đăng ký không đúng.",
+                    duration: 5,
+                });
+            }
+        }catch(error){
+            notification.error({ message: "Lỗi hệ thống", description: error.message });
+        }finally {
+            setIsLoading(false);
         }
-        setIsLoading(false)
-    }
+    };
 
     const onFinishFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);
@@ -44,12 +49,12 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
     // Hàm để tạo mật khẩu ngẫu nhiên
     const generateRandomPassword = (length) => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
-        let password = '';
+        let matKhau = '';
         for (let i = 0; i < length; i++) {
             const randomIndex = Math.floor(Math.random() * characters.length);
-            password += characters[randomIndex];
+            matKhau += characters[randomIndex];
         }
-        return password;
+        return matKhau;
     };
 
     const handleCancel = () => {
@@ -112,30 +117,6 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                     <Col md={12} sm={12} xs={24}>
                         <Form.Item
                             labelCol={{span: 24}}
-                            label="Username"
-                            name="userame"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập đầy đủ thông tin!',
-                                },
-                                {
-                                    required: false,
-                                    pattern: new RegExp(/^[A-Za-zÀ-ỹ\s]+$/),
-                                    message: 'Không được nhập số!',
-                                },
-                            ]}
-                            hasFeedback
-                        >
-                            <Input />
-                        </Form.Item>                            
-                    </Col>
-                </Row>                    
-
-                <Row gutter={[20,20]}>
-                    <Col md={12} sm={12} xs={24}>
-                        <Form.Item
-                            labelCol={{span: 24}}
                             label="Email"
                             name="email"
                             rules={[
@@ -151,6 +132,30 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                             hasFeedback
                         >
                             <Input />
+                        </Form.Item>              
+                    </Col>
+                </Row>                    
+
+                <Row gutter={[20,20]}>
+                    <Col md={12} sm={12} xs={24}>
+                        <Form.Item
+                            labelCol={{span: 24}}
+                            label="Username"
+                            name="username"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập đầy đủ thông tin!',
+                                },
+                                {
+                                    required: false,
+                                    pattern: new RegExp(/^[A-Za-zÀ-ỹ\s]+$/),
+                                    message: 'Không được nhập số!',
+                                },
+                            ]}
+                            hasFeedback
+                        >
+                            <Input />
                         </Form.Item>
                     </Col>
 
@@ -158,7 +163,7 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                         <Form.Item
                             labelCol={{span: 24}}
                             label="Password"
-                            name="password"
+                            name="matKhau"
                             rules={[
                                 {
                                     required: true,
@@ -181,25 +186,8 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                     <Col md={12} sm={12} xs={24}>
                         <Form.Item
                             labelCol={{span: 24}}
-                            label="Địa chỉ"
-                            name="address"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập đầy đủ thông tin!',
-                                },                                    
-                            ]}
-                            hasFeedback
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
-
-                    <Col md={12} sm={12} xs={24}>
-                        <Form.Item
-                            labelCol={{span: 24}}
                             label="Số Điện Thoại"
-                            name="phone"
+                            name="soDienThoai"
                             rules={[
                                 {
                                     required: true,
@@ -216,63 +204,7 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                         </Form.Item>                          
                     </Col>
                 </Row>
-
-                <Row gutter={[20,20]}>
-                    <Col md={12} sm={12} xs={24}>
-                        <Form.Item
-                            labelCol={{span: 24}}
-                            label="Ngày sinh"
-                            name="ngaySinh"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập đầy đủ thông tin!',
-                                },                                    
-                            ]}
-                            hasFeedback
-                        >
-                            <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col md={12} sm={12} xs={24}>
-                        <Form.Item
-                            labelCol={{span: 24}}
-                            label="Hình ảnh"
-                            name="file"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập đầy đủ thông tin!',
-                                },
-                            ]}
-                            hasFeedback
-                        >
-                            <Upload beforeUpload={() => false} listType="picture">
-                                <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
-                            </Upload>
-                        </Form.Item>                          
-                    </Col>
-                </Row>
-
-                <Row>
-                    <Col md={24}>
-                        <Form.Item
-                            label="Giới tính"
-                            name="gender"
-                            rules={[{ required: true, message: 'Vui lòng chọn một tùy chọn!' }]}
-                        >
-                        <Radio.Group style={{marginLeft: "30px"}}>
-                            <Radio value={true}>Nam</Radio>
-                            <Radio value={false}>Nữ</Radio>
-                            {/* <Radio value="undefined">Khác</Radio> */}
-                        </Radio.Group>
-                        </Form.Item>
-                    </Col>
-                </Row>     
-
-                
-                
+                 
                 <Form.Item>
                     <div style={{textAlign: "center"}}>
                         <Button type="primary" onClick={() => formRegister.submit()} loading={isLoading}> Đăng ký tài khoản</Button>
@@ -282,7 +214,7 @@ const RegisterPage = ({setOpenRegisterKH, openRegisterKH}) => {
                             // form.getFieldsValue()
                             const randomPassword = generateRandomPassword(10); // Sinh mật khẩu với độ dài 10 ký tự
                             formRegister.setFieldsValue({
-                                password: randomPassword,
+                                matKhau: randomPassword,
                             })
                         }}>Tự tạo mật khẩu</Button>
                     </div>

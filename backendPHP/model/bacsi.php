@@ -165,8 +165,27 @@
             } else {
                 return ["error" => "Không thể kết nối database"];
             }
-        }
-        
-         
+        }    
+        // Tìm kiếm bác sĩ trong cơ sở dữ liệu
+        public function searchBacSi($name) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    // Sử dụng LIKE để tìm kiếm tên bác sĩ theo từ khóa
+                    $query = $pdo->prepare("SELECT * FROM bacsi WHERE hoTen LIKE :name");
+                    $searchTerm = "%$name%";  // Thêm dấu % vào đầu và cuối từ khóa để tìm kiếm phần tử chứa tên bác sĩ
+                    $query->bindParam(":name", $searchTerm);
+                    $query->execute();
+                    
+                    $data = $query->fetchAll(PDO::FETCH_ASSOC);
+                    return $data;
+                } catch (PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }  
     }
 ?>

@@ -30,6 +30,14 @@ if (isset($_GET["action"])) {
                 echo json_encode(["error" => "Thiếu mã khoa"]);
             }
             break;
+            case "search":
+                if (isset($_GET["tenkhoa"])) {
+                    $tenkhoa = $_GET["tenkhoa"];
+                    $p->search($tenkhoa);
+                } else {
+                    echo json_encode(["error" => "Thiếu tên chuyên khoa để tìm kiếm"]);
+                }
+                break;
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }

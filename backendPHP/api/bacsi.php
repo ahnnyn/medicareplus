@@ -78,11 +78,17 @@ if (isset($_GET["action"])) {
                     echo json_encode(["status" => false, "error" => "Thiếu thông tin bác sĩ"]);
                 }
                 break;
-            
-
-        default:
-             echo json_encode(["error" => "Thao tác không hợp lệ"]);
-    }
+            case "search":
+                if (isset($_GET["hoTen"])) {
+                    $tenBacSi = $_GET["hoTen"];
+                    $p->search($tenBacSi);
+                } else {
+                    echo json_encode(["error" => "Thiếu tên bác sĩ để tìm kiếm"]);
+                }
+                break;
+            default:
+                echo json_encode(["error" => "Thao tác không hợp lệ"]);
+        }
 } else {
     echo json_encode(["error" => "Thiếu tham số action"]);
 }

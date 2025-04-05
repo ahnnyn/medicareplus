@@ -88,7 +88,5 @@
                 return ["status" => false, "error" => "Không thể kết nối CSDL"];
             }
         }
-        
-        
     }
 ?>

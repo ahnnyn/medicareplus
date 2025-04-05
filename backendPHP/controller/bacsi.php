@@ -114,6 +114,27 @@
                 echo json_encode(["status" => false, "error" => $result['error']]);
             }
         }
-        
+        public function search() {
+            // Kiểm tra xem có tham số 'hoTen' không
+            if (isset($_GET['hoTen']) && !empty($_GET['hoTen'])) {
+                $tenBacSi = $_GET['hoTen'];  // Lấy giá trị tên bác sĩ từ query string
+
+                $p = new mBacSi();
+                // Gọi phương thức tìm kiếm bác sĩ theo tên và truyền tham số vào
+                $result = $p->searchBacSi($tenBacSi);  
+
+                // Kiểm tra nếu có lỗi trong quá trình tìm kiếm
+                if (isset($result['error'])) {
+                    echo json_encode($result);  // Nếu có lỗi, trả về lỗi
+                    return;
+                }
+
+                // Trả về kết quả tìm kiếm dưới dạng JSON
+                echo json_encode(["data" => $result]);  
+            } else {
+                // Nếu không có tham số tenkhoa, trả về lỗi
+                echo json_encode(["error" => "Thiếu tên bác sĩ để tìm kiếm"]);
+            }
+        }
     }
 ?>

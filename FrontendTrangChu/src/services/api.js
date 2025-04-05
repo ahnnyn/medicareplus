@@ -8,7 +8,7 @@ export const callLogin = (username, matKhau) => {
 }
 
 export const callLoginBenhNhan = (username, matKhau) => {
-    const URL_BACKEND = '/api/user.php?action=login'
+    const URL_BACKEND = '/api/benhnhan.php?action=login'
     const data = {
         username, matKhau
     }
@@ -23,10 +23,10 @@ export const callRegister = (email, password, firstName, lastName, address, phon
     return axios.post(URL_BACKEND, data)
 }
 
-export const callRegisterBenhNhan = (email, password, firstName, lastName, address, phone, gender) => {
-    const URL_BACKEND = '/api/user.php'
+export const callRegisterBenhNhan = (email, hoTen, soDienThoai, username, matKhau) => {
+    const URL_BACKEND = '/api/benhnhan.php?action=register'
     const data = {
-        email, password, firstName, lastName, address, phone, gender
+        email, hoTen, soDienThoai, username, matKhau
     }
     return axios.post(URL_BACKEND, data)
 }
@@ -42,10 +42,10 @@ export const callLogoutBenhNhan = () => {
 }
 
 
-export const fetchOneAccKH = (id) => {
-    const URL_BACKEND = `/api/user.php`    
-    return axios.get(URL_BACKEND)
-}
+export const fetchOneAccKH = (maBenhNhan) => {
+    const URL_BACKEND = `/api/benhnhan.php?action=getThongTinBenhNhan&maBenhNhan=${maBenhNhan}`;
+    return axios.get(URL_BACKEND);
+};
 
 export const doiThongTinKH = (_idAcc, lastName, firstName, email, phone, address, passwordMoi, image) => {
     return axios.put('/api/user.php', {

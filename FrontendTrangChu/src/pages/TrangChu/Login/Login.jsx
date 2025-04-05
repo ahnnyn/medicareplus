@@ -63,98 +63,67 @@ const LoginPage = (props) => {
         }
     };
 
-    // Kiểm tra access_token khi component load
-    // useEffect(() => {
-    //     const accessToken = localStorage.getItem("access_tokenBenhNhan");
-    //     if (accessToken) {
-    //         // Nếu đã có token, điều hướng đến trang 
-    //         navigate("/");
-    //         // window.location.reload();
-    //     }
-    // }, [navigate]);
-
-    // Khi trang load, kiểm tra xem có dữ liệu trong localStorage không
     useEffect(() => {
         const rememberedAccountBenhNhan = localStorage.getItem("rememberedAccountBenhNhan");
         if (rememberedAccountBenhNhan) {
             const account = JSON.parse(rememberedAccountBenhNhan);
-            console.log("JSON.parse(rememberedAccountBenhNhan): ", JSON.parse(rememberedAccountBenhNhan));
-
+        
             formLogin.setFieldsValue({
-                email: account.email,
-                password: account.password,
+                username: account.username,
+                matKhau: account.matKhau,
                 remember: true,
             });
             setRemember(true);
         }
     }, [formLogin]);
 
+
+
     const onFinish = async (values) => {
-        console.log("kết quả values: ", values);
-        const { username, matKhau } = values
+        setIsLoading(true);
+        try{
+            const res = await callLoginBenhNhan(values.username, values.matKhau)
+            console.log("API Response:", res);
+    
+            if (res.success && res.token) {
+                dispatch(doLoginAction({user: res.user, token: res.token}));
+                
+    
+                if (remember) {
+                    // Nếu người dùng chọn "Ghi nhớ tài khoản", lưu thông tin vào localStorage
+                    localStorage.setItem("rememberedAccountBenhNhan", JSON.stringify({ username: values.username, matKhau: values.matKhau }));
+                } else {
+                    // Nếu không chọn, xóa dữ liệu đã lưu (nếu có)
+                    localStorage.removeItem("rememberedAccountBenhNhan");
+                }
+                formLogin.resetFields()
 
-        setIsLoading(true)
-        const res = await callLoginBenhNhan(username, matKhau)
-        console.log("res login: ", res);
-
-        if (res.data) {
-            localStorage.setItem("access_tokenBenhNhan", res.access_token)
-            dispatch(doLoginAction(res.data))
-            console.log("dispatch(doLoginAction(res.data)): ", dispatch(doLoginAction(res.data)));
-            message.success("Đăng nhập thành công")
-
-            if (remember) {
-                // Nếu người dùng chọn "Ghi nhớ tài khoản", lưu thông tin vào localStorage
-                localStorage.setItem("rememberedAccountBenhNhan", JSON.stringify({ username, matKhau }));
+                setOpenModalLogin(false)
+                notification.success({
+                    message: "Đăng nhập thành công!",
+                    duration: 3,
+                  });
+            
+                  // Chuyển hướng sau 2 giây
+                  setTimeout(() => {
+                    navigate("/");
+                  }, 2000);
             } else {
-                // Nếu không chọn, xóa dữ liệu đã lưu (nếu có)
-                localStorage.removeItem("rememberedAccountBenhNhan");
+                notification.error({
+                    message: "Đăng nhập không thành công!",
+                    description: res.message || "Thông tin đăng nhập không đúng.",
+                    duration: 5,
+                });
             }
-
-            // navigate("/")
-            formLogin.resetFields()
-            setOpenModalLogin(false)
-            // handleLoginSuccess(res.access_token);
-        } else {
-            notification.error({
-                message: "Có lỗi xảy ra",
-                description:
-                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-                duration: 5
-            })
-        }
-
-        // if(res.data){
-        //     localStorage.setItem("access_token", res.access_token)
-        //     localStorage.setItem("lastName", res.data.lastName);
-        //     localStorage.setItem("firstName", res.data.firstName);
-        //     message.success("Đăng nhập thành công!")
-
-        //     if (remember) {
-        //         // Nếu người dùng chọn "Ghi nhớ tài khoản", lưu thông tin vào localStorage
-        //         localStorage.setItem("rememberedAccount", JSON.stringify({ email, password }));
-        //     } else {
-        //         // Nếu không chọn, xóa dữ liệu đã lưu (nếu có)
-        //         localStorage.removeItem("rememberedAccount");
-        //     }
-
-        //     navigate("/")
-
-        // } else {
-        //     notification.error({ 
-        //         message: "Đăng nhập không thành công!",
-        //         description:
-        //             res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-        //         duration: 5
-        //     })
-        // }
-        setIsLoading(false)
-    }
-
+        }catch(error){
+            notification.error({ message: "Lỗi hệ thống", description: error.message });
+        }finally {
+            setIsLoading(false);
+          }
+    };
     const handleCancel = () => {
         setOpenModalLogin(false)
     }
-
 
     return (
         <Modal

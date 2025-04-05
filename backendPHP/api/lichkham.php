@@ -27,7 +27,6 @@ if (isset($_GET["action"])) {
                 echo json_encode(["status" => false, "error" => "Thiếu hoặc sai tham số"]);
             }
             break;
-          
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }
