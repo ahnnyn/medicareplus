@@ -228,7 +228,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                                                     <Avatar 
                                                     style={{cursor: "pointer"}}
                                                     onClick={() => handleRedirectBacSi(item.maBacSi)}
-                                                    src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${item?.image}`} 
+                                                    src={`${import.meta.env.VITE_BACKEND_URL}/public/bacsi/${item?.hinhAnh}`} 
                                                     size={80} icon={<UserOutlined />} />                                    
                                                 </Col>
                                                 <Col span={19}>

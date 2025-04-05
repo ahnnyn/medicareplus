@@ -46,8 +46,42 @@ if (isset($_GET["action"])) {
                 echo json_encode(["error" => "Thiếu mã bác sĩ hoặc ngày khám"]);
             }
             break;
+            case 'update-thongtin-bacsi':
+                $data = json_decode(file_get_contents("php://input"), true);
+            
+                // Kiểm tra xem tất cả tham số quan trọng có đủ không
+                if (
+                    isset($data['maBacSi']) && isset($data['hoTen']) && 
+                    isset($data['gioiTinh']) && isset($data['soDienThoai']) && 
+                    isset($data['email']) && isset($data['diaChi']) && 
+                    isset($data['giaKham']) && isset($data['hinhAnh']) && 
+                    isset($data['maKhoa'])
+                ) {
+                    // Nếu moTa không được truyền vào, mặc định là rỗng
+                    $moTa = isset($data['moTa']) ? $data['moTa'] : '';
+            
+                    // Gọi controller để cập nhật thông tin bác sĩ
+                    $p = new mBacSi();
+                    $result = $p->capNhatThongTinBacSi(
+                        $data['maBacSi'], $data['hoTen'], $data['gioiTinh'], 
+                        $data['soDienThoai'], $data['email'], $data['diaChi'], 
+                        $data['giaKham'], $data['hinhAnh'], $moTa, $data['maKhoa']
+                    );
+            
+                    // Kiểm tra kết quả từ việc cập nhật thông tin bác sĩ
+                    if (isset($result['success'])) {
+                        echo json_encode(["status" => true, "message" => "Cập nhật thông tin bác sĩ thành công!"]);
+                    } else {
+                        echo json_encode(["status" => false, "error" => "Cập nhật thông tin bác sĩ thất bại!"]);
+                    }
+                } else {
+                    echo json_encode(["status" => false, "error" => "Thiếu thông tin bác sĩ"]);
+                }
+                break;
+            
+
         default:
-            echo json_encode(["error" => "Thao tác không hợp lệ"]);
+             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }
 } else {
     echo json_encode(["error" => "Thiếu tham số action"]);

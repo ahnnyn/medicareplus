@@ -1,7 +1,7 @@
 import axios from "../utils/axios-customize"
 
-export const findAllLichHenByDoctor = (query) => {
-    const URL_BACKEND = `/api/doctor/find-all-order-by-doctor?${query}`    
+export const findAllLichKhamByBacSi = (maBacSi) => {
+    const URL_BACKEND = `/api/lichkham.php?action=lich-kham-by-bac-si&maBacSi=${maBacSi}`    
     return axios.get(URL_BACKEND)
 }
 

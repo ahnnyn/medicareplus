@@ -1,199 +1,183 @@
-import { Button, Col, Divider, Form, Input, message, notification, Row } from "antd"
-import { useEffect, useState } from "react"
-import { FaSave } from "react-icons/fa"
-import { useDispatch, useSelector } from "react-redux"
-import { useNavigate } from "react-router-dom"
-import bcrypt from 'bcryptjs-react';
-import { fetchAllDoctorByID } from "../../services/apiDoctor"
-import { doiThongTinDoctor } from "../../services/loginAPI"
-import { doLogoutAction } from "../../redux/account/accountSlice"
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  message,
+  notification,
+  Row,
+} from "antd";
+import { useEffect, useState } from "react";
+import { FaSave } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import bcrypt from "bcryptjs-react";
+import { fetchBacSiByMaBS } from "../../services/apiDoctor";
+import { doiThongTinDoctor } from "../../services/loginAPI";
+import { doLogoutAction } from "../../redux/account/accountSlice";
 
 const ModalDoiMK = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [formDoiMK] = Form.useForm();
+  const [dataAccBS, setDataAccBS] = useState(null);
+  const user = useSelector((state) => state.accountDoctor.user);
+  console.log("dataAccBS: ", dataAccBS);
 
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const [formDoiMK] = Form.useForm()    
-    const [dataAccKH, setDataAccKH] = useState(null);
-    const acc = useSelector(state => state.accountDoctor.user)
-
-    console.log("dataAccKH: ", dataAccKH);
-
-    const timDoctorById = async () => {
-        let query = `_id=${acc?._id}`
-        const res = await fetchAllDoctorByID(query)
-        if(res && res.data) {
-            setDataAccKH(res.data)
-        }
+  const fetchDoctorInfo = async (maBacSi) => {
+    let res = await fetchBacSiByMaBS(maBacSi);
+    console.log("API Response:", res); // Kiểm tra dữ liệu trả về từ API
+    if (res && res.data) {
+      setDataAccBS(res.data);
     }
+  };
 
-    useEffect(() => {
-        timDoctorById()
-    },[acc?._id])
+  useEffect(() => {
+    if (user?.maBacSi) {
+      fetchDoctorInfo(user.maBacSi);
+    }
+  }, [user]);
 
+  const onFinishDoiMK = async (values) => {
+    console.log("🔄 Gửi request đổi mật khẩu đến API...", values);
 
-    const onFinishDoiMK = async (values) => {
-
-        const {
-            _idAcc, lastName, firstName, email, password, passwordMoi
-        } = values
-        console.log("password: ", password);
-        console.log("lastName, firstName, email, passwordMoi: ", lastName, firstName, email, passwordMoi);
-
-        const matKhauCu = dataAccKH?.password
-        console.log("mk cu: ", matKhauCu);
+    try {
+        const res = await doiThongTinDoctor(values.idAcc, values.idBS, values.username, values.password, values.passwordMoi);
         
-        const isMatch = await bcrypt.compare(password, matKhauCu); // So sánh password nhập vào với mật khẩu đã mã hóa        
+        console.log("📥 API Full Response:", res); // Kiểm tra phản hồi API
 
-        if (isMatch) {
-            console.log("Mật khẩu cũ chính xác. Cập nhật mật khẩu mới...");
-
-            const res = await doiThongTinDoctor(_idAcc, lastName, firstName, email, passwordMoi)
-            if(res && res.data) {
-                message.success(res.message)
-                dispatch(doLogoutAction())
-                navigate("/login-doctor");
-                message.success('Yêu cầu đăng nhập lại!')
-            } else {
-                notification.error({ 
-                    message: "Đổi thông tin thất bại!",
-                    description: res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-                    duration: 5,
-                });
-            }
-
-        } else {
+        if (!res) {
+            console.error("❌ API không trả về dữ liệu!");
             notification.error({
-                message: "Mật khẩu cũ không chính xác",
-                description: "Vui lòng nhập lại mật khẩu cũ đúng."
+                message: "Lỗi hệ thống",
+                description: "API không phản hồi hoặc bị lỗi.",
+            });
+            return;
+        }
+
+        if (res.success) {
+            message.success("✅ Đổi mật khẩu thành công!");
+            dispatch(doLogoutAction());
+            navigate("/login-doctor");
+        } else {
+            console.error("❌ API không trả về success:", res);
+            notification.error({
+                message: "❌ Đổi mật khẩu thất bại!",
+                description: res?.message || "Có lỗi xảy ra, vui lòng thử lại!",
             });
         }
+    } catch (error) {
+        console.error("❌ Lỗi khi gọi API:", error);
 
+        notification.error({
+            message: "Lỗi hệ thống",
+            description: error.message || "Không thể kết nối đến máy chủ.",
+        });
     }
+};
 
+  useEffect(() => {
+    if (dataAccBS) {
+      const init = {
+        idBS: dataAccBS?.maBacSi,
+        idAcc: dataAccBS?.maTaiKhoan,
+        username: user.username
+      };
+      console.log("init: ", init);
+      formDoiMK.setFieldsValue(init);
+    }
+    return () => {
+      formDoiMK.resetFields();
+    };
+  }, [dataAccBS]);
 
-    useEffect(() => {
-        if (dataAccKH) {                              
-            const init = {
-                _idAcc: dataAccKH?._id,                
-                firstName: dataAccKH?.firstName,                
-                lastName: dataAccKH?.lastName,                
-                email: dataAccKH?.email,                                            
-            }
-            console.log("init: ", init);
-            formDoiMK.setFieldsValue(init);            
-        }
-        return () => {
-            formDoiMK.resetFields();
-        }
-    },[dataAccKH])    
-
-    return (        
-        <Form
-            form={formDoiMK}
-            layout="vertical"
-            onFinish={onFinishDoiMK}                 
-        >
-            {/* <Divider /> */}
-            <Row gutter={[20,10]}>
-                <Col span={24} md={24} sm={24} xs={24}> 
-                <Form.Item name="_idAcc" hidden><Input hidden /></Form.Item>                                        
-                </Col>
-                <Col span={12} md={12} sm={24} xs={24}>
-                    <Form.Item
-                        labelCol={{span: 24}}
-                        label="Họ"
-                        name="lastName"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập đầy đủ thông tin!',
-                            },
-                            {
-                                required: false,
-                                pattern: new RegExp(/^[A-Za-zÀ-ỹ\s]+$/),
-                                message: 'Không được nhập số!',
-                            },
-                        ]}
-                        hasFeedback
-                    >
-                        <Input placeholder="Nhập họ của bạn" />
-                    </Form.Item>
-                </Col>
-                <Col span={12} md={12} sm={24} xs={24}>
-                    <Form.Item
-                        labelCol={{span: 24}}
-                        label="Tên"
-                        name="firstName"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập đầy đủ thông tin!',
-                            },
-                            {
-                                required: false,
-                                pattern: new RegExp(/^[A-Za-zÀ-ỹ\s]+$/),
-                                message: 'Không được nhập số!',
-                            },
-                        ]}
-                        hasFeedback
-                    >
-                        <Input placeholder="Nhập tên của bạn" />
-                    </Form.Item>
-                </Col>
-                <Col span={24} md={24} sm={24} xs={24}>
-                    <Form.Item
-                        label="Email"                                        
-                        name="email"                                                
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập đầy đủ thông tin!',
-                            },
-                            {
-                                type: "email",
-                                message: 'Vui lòng nhập đúng định dạng địa chỉ email',
-                            },
-
-                        ]}
-                        hasFeedback
-                    ><Input disabled placeholder="Nhập email của bạn" />
-                    </Form.Item>
-                </Col>               
-                <Col span={12} md={12} sm={24} xs={24}>
-                    <Form.Item
-                        label="Mật khẩu cũ"
-                        name="password"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập đầy đủ thông tin!',
-                            },                                                    
-                        ]}
-                        hasFeedback
-                    >
-                        <Input.Password placeholder='Nhập mật khẩu cũ' />
-                    </Form.Item> 
-                </Col>
-                <Col span={12} md={12} sm={24} xs={24}>
-                    <Form.Item
-                        label="Mật khẩu mới"
-                        name="passwordMoi"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Vui lòng nhập đầy đủ thông tin!',
-                            },                                                    
-                        ]}
-                        hasFeedback
-                    >
-                        <Input.Password placeholder='Nhập mật khẩu muốn đổi mới' />
-                    </Form.Item> 
-                </Col>
-                <Col span={24} style={{display: "flex", justifyContent: "center"}}>
-                    <Button onClick={() => formDoiMK.submit()} type="primary" size="large" icon={<FaSave size={25} />}>Đổi thông tin</Button>
-                </Col>
-            </Row>
-        </Form> 
-    )
-}
-export default ModalDoiMK
+  return (
+    
+    <Form form={formDoiMK} layout="vertical" onFinish={onFinishDoiMK}>
+      <Row>
+          <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
+                    <span style={{ fontWeight: "500", color: "navy" }}>ĐỔI MẬT KHẨU</span>
+          </Col>
+      </Row>
+      {/* <Divider /> */}
+      <Row gutter={[20, 10]}>
+        <Col span={24} md={24} sm={24} xs={24}>
+          <Form.Item name="idBS" hidden>
+            <Input hidden />
+          </Form.Item>
+          <Form.Item name="idAcc" hidden>
+            <Input hidden />
+          </Form.Item>
+        </Col>
+        <Col span={12} md={12} sm={24} xs={24}>
+          <Form.Item
+            labelCol={{ span: 24 }}
+            label="Tên đăng nhập"
+            name="username"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập đầy đủ thông tin!",
+              },
+              {
+                min: 6,
+                message: "Tên đăng nhập phải có ít nhất 6 ký tự!",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input placeholder="Nhập tên đăng nhập của bạn" />
+          </Form.Item>
+        </Col>
+        <Col span={12} md={12} sm={24} xs={24}>
+         
+        </Col>
+        
+        <Col span={12} md={12} sm={24} xs={24}>
+          <Form.Item
+            label="Mật khẩu cũ"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập đầy đủ thông tin!",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password placeholder="Nhập mật khẩu cũ" />
+          </Form.Item>
+        </Col>
+        
+        <Col span={12} md={12} sm={24} xs={24}>
+          <Form.Item
+            label="Mật khẩu mới"
+            name="passwordMoi"
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập đầy đủ thông tin!",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password placeholder="Nhập mật khẩu muốn đổi mới" />
+          </Form.Item>
+        </Col>
+        <Col span={24} style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            onClick={() => formDoiMK.submit()}
+            type="primary"
+            size="large"
+            icon={<FaSave size={25} />}
+            style={{ width: "200px", height: "50px" }} // Thay đổi kích thước tại đây
+          >
+            Đổi mật khẩu
+          </Button>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+export default ModalDoiMK;

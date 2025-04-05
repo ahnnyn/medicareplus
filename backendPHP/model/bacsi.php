@@ -7,7 +7,9 @@
             $pdo = $p->connect();
             if ($pdo) {
                 try {
-                    $query = $pdo->query("SELECT * FROM bacsi bs JOIN khoa k on bs.maKhoa = k.maKhoa");
+                    $query = $pdo->query("SELECT bs.maBacSi, bs.hoTen, bs.gioiTinh, bs.ngaySinh, bs.soDienThoai, bs.email, bs.diaChi, bs.giaKham,
+                                                    bs.hinhAnh, bs.moTa, bs.maKhoa, bs.maTaiKhoan, k.tenKhoa
+                             FROM bacsi bs JOIN khoa k on bs.maKhoa = k.maKhoa");
                     $data = $query->fetchAll(PDO::FETCH_ASSOC);
                     return $data;
                 } catch (PDOException $e) {
@@ -58,7 +60,8 @@
                 return ["error" => "Không thể kết nối database"];
             }
             try {
-                $query = $pdo->prepare("SELECT * FROM bacsi bs join khoa k on bs.maKhoa = k.maKhoa WHERE bs.maBacSi = :id");
+                $query = $pdo->prepare("SELECT bs.maBacSi, bs.hoTen, bs.gioiTinh, bs.ngaySinh, bs.soDienThoai, bs.email, bs.diaChi, bs.giaKham, bs.hinhAnh, bs.moTa, bs.maKhoa, k.tenKhoa,tk.maTaiKhoan, tk.username, tk.matKhau
+                                        FROM bacsi bs join khoa k on bs.maKhoa = k.maKhoa join taiKhoan tk on bs.maTaiKhoan = tk.maTaiKhoan WHERE bs.maBacSi = :id");
                 $query->bindParam(":id", $id, PDO::PARAM_INT);
                 $query->execute();
                 $result = $query->fetch(PDO::FETCH_ASSOC);
@@ -102,6 +105,68 @@
                 return ["error" => "Không thể kết nối database"];
             }
         }
+
+        public function capNhatThongTinBacSi($maBacSi, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    // Check if `maBacSi` is correctly received
+                    error_log("Doctor ID: " . $maBacSi);
+                    
+                    // If moTa is empty or null, set it as NULL
+                    $moTa = ($moTa === '' || $moTa === null) ? null : $moTa;
+                    
+                    // Prepare the SQL query
+                    $queryStr = "
+                        UPDATE bacsi
+                        SET hoTen = :hoTen, 
+                            gioiTinh = :gioiTinh, 
+                            soDienThoai = :soDienThoai, 
+                            email = :email,
+                            diaChi = :diaChi, 
+                            giaKham = :giaKham,
+                            hinhAnh = :hinhAnh, 
+                            maKhoa = :maKhoa
+                    ";
+                    
+                    // Add moTa to the query only if it's not null
+                    if ($moTa !== null) {
+                        $queryStr .= ", moTa = :moTa";
+                    }
+            
+                    $queryStr .= " WHERE maBacSi = :maBacSi";
+            
+                    $query = $pdo->prepare($queryStr);
+            
+                    // Bind parameters
+                    $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
+                    $query->bindParam(":hoTen", $hoTen, PDO::PARAM_STR);
+                    $query->bindParam(":gioiTinh", $gioiTinh, PDO::PARAM_STR);
+                    $query->bindParam(":soDienThoai", $soDienThoai, PDO::PARAM_STR);
+                    $query->bindParam(":email", $email, PDO::PARAM_STR);
+                    $query->bindParam(":diaChi", $diaChi, PDO::PARAM_STR);
+                    $query->bindParam(":giaKham", $giaKham, PDO::PARAM_STR);
+                    $query->bindParam(":hinhAnh", $hinhAnh, PDO::PARAM_STR);
+                    $query->bindParam(":maKhoa", $maKhoa, PDO::PARAM_INT);
+            
+                    // Bind moTa if it's not null
+                    if ($moTa !== null) {
+                        $query->bindParam(":moTa", $moTa, PDO::PARAM_STR);
+                    }
+            
+                    // Execute the query
+                    $query->execute();
+                    
+                    return ["success" => "Cập nhật thông tin bác sĩ thành công"];
+                } catch (PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }
         
+         
     }
 ?>

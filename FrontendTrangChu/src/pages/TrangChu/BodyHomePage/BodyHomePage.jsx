@@ -22,133 +22,147 @@ const BodyHomePage = () => {
             await listChuyenKhoa();
             await listBacSi();
         };
-    
+
         fetchData();
-    }, [])
+    }, []);
 
     const items_toandien = [
-        {
-            icon: <FaClinicMedical size={40} color="blue" />,
-            txtP: "Khám chuyên khoa"
-        },
-        {
-            icon: <FiVideo size={40} color="blue" />,
-            txtP: "Khám từ xa"
-        }
+        { icon: <FaClinicMedical size={40} color="blue" />, txtP: "Khám chuyên khoa" },
+        { icon: <FiVideo size={40} color="blue" />, txtP: "Khám từ xa" }
     ];
 
-    // Lấy danh sách chuyên khoa từ PHP API
     const listChuyenKhoa = async () => {
         setLoadingCard(true);
         try {
-            const response = await fetchAllChuyenKhoa(); // Gọi API từ PHP
-            if (response && response.data) {
+            const response = await fetchAllChuyenKhoa();
+            console.log("Dữ liệu chuyên khoa:", response);
+            if (response?.data) {
                 setDataChuyenKhoa(response.data);
+                console.log("Dữ liệu chuyên khoa:", response.data);
             }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách chuyên khoa:", error);
+        } finally {
+            setLoadingCard(false);
         }
-        setLoadingCard(false);
     };
 
-    // Format danh sách chuyên khoa
-    const items_ChuyenKhoa = dataChuyenKhoa.map(chuyenKhoa => ({
-        id: chuyenKhoa.maKhoa, // ID của chuyên khoa
-        //src: `${import.meta.env.VITE_BACKEND_URL}/uploads/${chuyenKhoa.image}`, // Đường dẫn hình ảnh
-        txtP: chuyenKhoa.tenKhoa // Tên chuyên khoa
-    }));
-
-    // Điều hướng đến trang chi tiết chuyên khoa
-    const handleRedirectChuyenKhoa = (idChuyenKhoa) => {
-        navigate(`/user/view-chuyen-khoa-kham?maKhoa=${idChuyenKhoa}`);
-    };
-
-
-    //lấy danh sách bác sĩ từ PHP
     const listBacSi = async () => {
         try {
-            const response = await fetchAllBacSi(); // Gọi API từ PHP
-            if (response && response.data) {
-                setDataBacSi(response.data);
+            const response = await fetchAllBacSi();
+            console.log("Dữ liệu bác sĩ:", response);
+            if (response?.data) {
+                setDataBacSi(response.data); // CHỈ .data là đủ
             }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách bác sĩ:", error);
         }
     };
 
-    //Format danh sách bác sĩ
-    const items_BacSi = dataBacSi.map(bacSi => ({
-        id: bacSi.maBacSi, // ID của bác sĩ
-       // src: `${import.meta.env.VITE_BACKEND_URL}/uploads/${bacSi.hinhAnh}`, // Đường dẫn hình ảnh
-        txtP: bacSi.hoTen// Tên bác sĩ
-       // txtH3: bacSi.chuyenKhoa, // Chuyên khoa
+    const items_ChuyenKhoa = dataChuyenKhoa.map((chuyenKhoa) => ({
+        id: chuyenKhoa.maKhoa,
+        hinhAnh: chuyenKhoa.hinhAnh, // Nếu có `hinhAnh`, hoặc fallback về ảnh mặc đ��nh
+        src: `${import.meta.env.VITE_BACKEND_URL}/public/chuyenkhoa/${chuyenKhoa.hinhAnh}`,
+        txtP: chuyenKhoa.tenKhoa
+        // Có thể thêm `src` nếu bạn muốn hiển thị ảnh chuyên khoa
     }));
 
-    //Điều hướng đến trang chi tiết bác sĩ
+    const items_BacSi = dataBacSi.map((bacSi) => ({
+        id: bacSi.maBacSi,
+        hinhAnh: bacSi.hinhAnh,
+        src: `${import.meta.env.VITE_BACKEND_URL}/public/bacsi/${bacSi.hinhAnh}`,
+        txtP: bacSi.hoTen,
+        txtB: bacSi.tenKhoa || "Chuyên khoa chưa rõ" // nếu có `tenKhoa`, hoặc fallback
+    }));
+
+    const handleRedirectChuyenKhoa = (idChuyenKhoa) => {
+        navigate(`/user/view-chuyen-khoa-kham?maKhoa=${idChuyenKhoa}`);
+    };
+
     const handleRedirectBacSi = (idBacSi) => {
         navigate(`/view-doctor?maBacSi=${idBacSi}`);
     };
 
     return (
         <>
-            <div className="danh-cho-ban">                
-                <Row className="ben-trong" >
-                    <span style={{fontWeight: "500", fontSize: "4vh", width: "100%", padding: "4vh 0"}}>Dịch vụ</span>                    
+            <div className="danh-cho-ban">
+                <Row className="ben-trong">
+                    <span style={{ fontWeight: 500, fontSize: "4vh", width: "100%", padding: "4vh 0" }}>
+                        Dịch vụ
+                    </span>
                     {items_toandien.map((item, index) => (
-                        <Col key={index} md={12} sm={24} xs={24} style={{marginBottom: "5vh"}}>
-                            <HinhChuNhat icon={item.icon} txtP={item.txtP}/>
+                        <Col key={index} md={12} sm={24} xs={24} style={{ marginBottom: "5vh" }}>
+                            <HinhChuNhat icon={item.icon} txtP={item.txtP} />
                         </Col>
-                    ))}               
-                </Row>                        
-            </div>
-
-            <div className="danh-cho-ban">                
-                <Row className="ben-trong" >
-                    <div style={{display: "flex", width: "100%", justifyContent: "space-between" }}>
-                        <span style={{fontWeight: "500", fontSize: "4vh", padding: "4vh 0"}}>Chuyên khoa</span>                    
-                        <span style={{
-                            fontWeight: "500", 
-                            fontSize: "3vh", 
-                            backgroundColor: "blue", 
-                            height: "50px", 
-                            lineHeight: "45px",
-                            borderRadius: "15px",
-                            textAlign: "center",
-                            backgroundColor: "#d0edf7",
-                            color: "rgb(45 145 179)",
-                            marginTop: "10px",
-                            cursor: "pointer",
-                            padding: "3px 10px"}}
-                            onClick={() => navigate('/user/chuyen-khoa-kham')}
-                        >Xem thêm</span>    
-                    </div>                     
-                    <HinhVuongSlider items={items_ChuyenKhoa} width={300} height={250} loadingCard={loadingCard} urlDoctor={handleRedirectChuyenKhoa} />                     
-                </Row>                        
+                    ))}
+                </Row>
             </div>
 
             <div className="danh-cho-ban">
                 <Row className="ben-trong">
-                    <div style={{display: "flex", width: "100%", justifyContent: "space-between" }}>
-                        <span style={{fontWeight: "500", fontSize: "4vh", padding: "4vh 0"}}>Bác sĩ nổi bật</span>                    
-                        <span style={{
-                            fontWeight: "500", 
-                            fontSize: "3vh", 
-                            backgroundColor: "blue", 
-                            height: "50px", 
-                            lineHeight: "45px",
-                            borderRadius: "15px",
-                            textAlign: "center",
-                            backgroundColor: "#d0edf7",
-                            color: "rgb(45 145 179)",
-                            marginTop: "10px",
-                            cursor: "pointer",
-                            padding: "3px 10px"}}
-                            onClick={() => navigate('/user/bac-si-noi-bat')}
-                        >Xem thêm</span>    
-                    </div> 
-                    <HinhVuongSlider items={items_BacSi} width={300} height={250} loadingCard={loadingCard} urlDoctor={handleRedirectBacSi} />              
+                    <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
+                        <span style={{ fontWeight: 500, fontSize: "4vh", padding: "4vh 0" }}>Chuyên khoa</span>
+                        <span
+                            style={{
+                                fontWeight: 500,
+                                fontSize: "3vh",
+                                height: "50px",
+                                lineHeight: "45px",
+                                borderRadius: "15px",
+                                textAlign: "center",
+                                backgroundColor: "#d0edf7",
+                                color: "rgb(45 145 179)",
+                                marginTop: "10px",
+                                cursor: "pointer",
+                                padding: "3px 10px"
+                            }}
+                            onClick={() => navigate("/user/chuyen-khoa-kham")}
+                        >
+                            Xem thêm
+                        </span>
+                    </div>
+                    <HinhVuongSlider
+                        items={items_ChuyenKhoa}
+                        style={{ width: '100%', height: '300px' }}
+                        loadingCard={loadingCard}
+                        urlDoctor={handleRedirectChuyenKhoa}
+                        type="specialty"
+                    />
                 </Row>
-            </div> 
+            </div>
+
+            <div className="danh-cho-ban">
+                <Row className="ben-trong">
+                    <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
+                        <span style={{ fontWeight: 500, fontSize: "4vh", padding: "4vh 0" }}>Bác sĩ nổi bật</span>
+                        <span
+                            style={{
+                                fontWeight: 500,
+                                fontSize: "3vh",
+                                height: "50px",
+                                lineHeight: "45px",
+                                borderRadius: "15px",
+                                textAlign: "center",
+                                backgroundColor: "#d0edf7",
+                                color: "rgb(45 145 179)",
+                                marginTop: "10px",
+                                cursor: "pointer",
+                                padding: "3px 10px"
+                            }}
+                            onClick={() => navigate("/user/bac-si-noi-bat")}
+                        >
+                            Xem thêm
+                        </span>
+                    </div>
+                    <HinhVuongSlider
+                        items={items_BacSi}
+                        style={{ width: '100%', height: '300px' }}
+                        loadingCard={loadingCard}
+                        urlDoctor={handleRedirectBacSi}
+                        type="doctor"
+                    />
+                </Row>
+            </div>
         </>
     );
 };

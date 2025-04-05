@@ -18,6 +18,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../redux/account/accountSlice";
 import { handleLoginDoctor, handleQuenPassword } from "../../services/loginAPI";
+import bcrypt from 'bcryptjs-react';
 
 const Login = () => {
   const [form] = Form.useForm();
@@ -47,49 +48,45 @@ const Login = () => {
   const onFinish = async (values) => {
     setIsLoading(true);
     try {
-      const res = await handleLoginDoctor(values.username, values.password);
-      console.log("API Response:", res);
-  
-      if (res.success && res.token) {
-        dispatch(doLoginAction({ user: res.user, token: res.token }));
-  
-        if (remember) {
-          localStorage.setItem(
-            "rememberedDoctor",
-            JSON.stringify({ username: values.username, password: values.password })
-          );
-        } else {
-          localStorage.removeItem("rememberedDoctor");
-        }
-        
-        form.resetFields();
-  
-        // Hiển thị thông báo thành công
-        notification.success({
-          message: "Đăng nhập thành công!",
-          description: `Chào mừng ${res.user.fullName || "bác sĩ"} quay lại.`,
-          duration: 3,
-        });
-  
-        // Chuyển hướng sau 2 giây
-        setTimeout(() => {
-          navigate("/doctor");
-        }, 2000);
-      } else {
-        notification.error({
-          message: "Đăng nhập không thành công!",
-          description: res.message || "Thông tin đăng nhập không đúng.",
-          duration: 5,
-        });
-      }
-    } catch (error) {
-      notification.error({ message: "Lỗi hệ thống", description: error.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
+        const res = await handleLoginDoctor(values.username, values.password);
+        console.log("API Response:", res);
 
+        if (res.success && res.token) {
+            dispatch(doLoginAction({ user: res.user, token: res.token }));
+
+            if (remember) {
+                localStorage.setItem(
+                    "rememberedDoctor",
+                    JSON.stringify({ username: values.username, password: values.password })
+                );
+            } else {
+                localStorage.removeItem("rememberedDoctor");
+            }
+
+            form.resetFields();
+
+            notification.success({
+                message: "Đăng nhập thành công!",
+                description: `Chào mừng ${res.user.fullName || "bác sĩ"} quay lại.`,
+                duration: 3,
+            });
+
+            setTimeout(() => {
+                navigate("/doctor");
+            }, 2000);
+        } else {
+            notification.error({
+                message: "Đăng nhập không thành công!",
+                description: res.message || "Thông tin đăng nhập không đúng.",
+                duration: 5,
+            });
+        }
+    } catch (error) {
+        notification.error({ message: "Lỗi hệ thống", description: error.message });
+    } finally {
+        setIsLoading(false);
+    }
+};
 
   const handleLayMK = async (values) => {
     const email_doimk = values.email;

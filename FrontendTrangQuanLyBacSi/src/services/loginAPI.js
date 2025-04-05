@@ -11,11 +11,22 @@ export const handleLogouDoctort = () => {
     return axios.post(URL_BACKEND)
 }
 
-export const doiThongTinDoctor = (_idAcc, lastName, firstName, email, passwordMoi) => {
-    return axios.put('/api/user.php?action=doi-mat-khau', {
-        _idAcc, lastName, firstName, email, passwordMoi
-    })
-}
+export const doiThongTinDoctor = async (idAcc, idBS, username, password, passwordMoi) => {
+    try {
+        const response = await axios.post('/api/user.php?action=doi-mat-khau', {
+            idAcc, idBS, username, password, passwordMoi
+        });
+
+        console.log("📥 API Full Response:", response);
+        return response;
+    } catch (error) {
+        console.error("❌ Lỗi khi gửi request:", error);
+        return {
+            success: false,
+            message: error.response?.message || "Không thể kết nối API"
+        };
+    }
+};
 
 export const handleQuenPassword = (email_doimk) => {
     const URL_BACKEND = '/api/user.php?action=quen-mat-khau'       

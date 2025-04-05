@@ -30,7 +30,7 @@ const ChuyenKhoa = () => {
             query += `&name=${encodeURIComponent(dataSearch)}`;
         }
         const res = await fetchAllChuyenKhoa(query)
-        console.log("res all doctor: ", res);
+        console.log("res all chuyen khoa: ", res);
         if(res && res.data) {
             setDataAllDoctor(res.data)
         }
@@ -71,7 +71,7 @@ const ChuyenKhoa = () => {
                                     <Col span={3}>
                                         <Avatar  
                                         style={{border: "1px solid green"}}
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${item?.image}`} 
+                                        src={`${import.meta.env.VITE_BACKEND_URL}/public/chuyenkhoa/${item?.hinhAnh}`} 
                                         shape="square" 
                                         size={120} 
                                         icon={<UserOutlined />} />

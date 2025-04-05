@@ -6,7 +6,7 @@ import { FaEye } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import React from "react";
 import { RiEdit2Fill } from "react-icons/ri";
-import { updateTTBN, xacNhanLich } from "../../services/apiDoctor";
+import { updateThongTinlichKham } from "../../services/apiDoctor";
 
 const ModalEdit = (props) => {
 

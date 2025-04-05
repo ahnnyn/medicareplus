@@ -101,5 +101,19 @@
             echo json_encode(["data" => $khungGioList]);
             
         }
+
+        public function updateThongTinBacSi($maBacSi, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa) {
+            // Call the model to update the doctor's information
+            $p = new mBacSi();
+            $result = $p->capNhatThongTinBacSi($maBacSi, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa);
+            
+            // Check if the result indicates success or failure
+            if (isset($result['success'])) {
+                echo json_encode(["status" => true, "message" => $result['success']]);
+            } else {
+                echo json_encode(["status" => false, "error" => $result['error']]);
+            }
+        }
+        
     }
 ?>

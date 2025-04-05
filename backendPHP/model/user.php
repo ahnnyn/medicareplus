@@ -7,50 +7,97 @@ use Firebase\JWT\JWT;
 class mUser {
     private $secret_key = "your_secret_key"; // Thay bằng key bảo mật của bạn
 
-    public function login($username, $matKhau) {
+    public function layThongTinBacSi($username, $matKhau) {
         $db = new connectdatabase();
         $pdo = $db->connect();
-
+    
         if ($pdo) {
             try {
-                // Sử dụng Prepared Statement để tránh SQL Injection
-                $stmt = $pdo->prepare("SELECT * FROM taikhoan WHERE username = :username AND matKhau = :matKhau");
+                // Use Prepared Statement to prevent SQL Injection
+                $stmt = $pdo->prepare("SELECT tk.*, bs.* FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan WHERE tk.username = :username");
                 $stmt->bindParam(':username', $username);
-                $stmt->bindParam(':matKhau', $matKhau);
                 $stmt->execute();
                 
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-                if ($user) {
-                    // Xóa mật khẩu trước khi trả về để bảo mật
+                if ($user && password_verify($matKhau, $user['matKhau'])) {
+                    // Remove the password from the user data before returning
                     unset($user['matKhau']);
-
-                    // Tạo payload cho JWT
+    
+                    // Create payload for JWT
                     $payload = [
                         "iat" => time(),
-                        "exp" => time() + 3600, // Token hết hạn sau 1 giờ
+                        "exp" => time() + 3600, // Token expires after 1 hour
                         "data" => [
                             "maTaiKhoan" => $user['maTaiKhoan'],
-                            "username" => $user['username']
+                            "username" => $user['username'],
                         ]
                     ];
-
-                    // Tạo token JWT
+    
+                    // Generate JWT token
                     $jwt = JWT::encode($payload, $this->secret_key, 'HS256');
-
+    
                     return [
                         "success" => true,
                         "message" => "Đăng nhập thành công",
-                        "user" => $user, // Trả về object thay vì JSON string
+                        "user" => $user,
                         "token" => $jwt
                     ];
+                } else {
+                    return ["success" => false, "message" => "Sai tài khoản hoặc mật khẩu"];
                 }
-                return ["success" => false, "message" => "Sai tài khoản hoặc mật khẩu"];
             } catch (PDOException $e) {
                 return ["success" => false, "message" => "Lỗi hệ thống", "error" => $e->getMessage()];
             }
+        } else {
+            return ["success" => false, "message" => "Lỗi kết nối CSDL"];
         }
-        return ["success" => false, "message" => "Lỗi kết nối CSDL"];
+    }
+    
+
+    public function capNhatMatKhauBacSi($maTaiKhoan, $maBacSi, $username, $matKhauCu, $matKhauMoi) {
+        $db = new connectdatabase();
+        $pdo = $db->connect();
+    
+        if (!$pdo) {
+            return ["success" => false, "message" => "Lỗi kết nối CSDL"];
+        }
+    
+        try {
+            // Lấy mật khẩu từ DB
+            $stmt = $pdo->prepare("SELECT matKhau FROM taikhoan WHERE maTaiKhoan = :maTaiKhoan");
+            $stmt->bindParam(':maTaiKhoan', $maTaiKhoan, PDO::PARAM_INT);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if (!$user) {
+                return ["success" => false, "message" => "Không tìm thấy tài khoản"];
+            }
+    
+            // Kiểm tra mật khẩu cũ
+            if (!password_verify($matKhauCu, $user['matKhau'])) {
+                return ["success" => false, "message" => "Sai mật khẩu cũ"];
+            }
+    
+            // Hash mật khẩu mới
+            $hashMatKhauMoi = password_hash($matKhauMoi, PASSWORD_BCRYPT, ["cost" => 12]);
+    
+            // Cập nhật mật khẩu mới
+            $stmt = $pdo->prepare("UPDATE taikhoan SET username = :username, matKhau = :matKhauMoi WHERE maTaiKhoan = :maTaiKhoan");
+            $stmt->bindParam(':maTaiKhoan', $maTaiKhoan, PDO::PARAM_INT);
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':matKhauMoi', $hashMatKhauMoi, PDO::PARAM_STR);
+            $stmt->execute();
+    
+            if ($stmt->rowCount() > 0) {
+                return ["success" => true, "message" => "Cập nhật mật khẩu thành công"];
+            } else {
+                return ["success" => false, "message" => "Không có thay đổi hoặc lỗi xảy ra"];
+            }
+        } catch (PDOException $e) {
+            error_log("Lỗi cập nhật mật khẩu: " . $e->getMessage());
+            return ["success" => false, "message" => "Đã xảy ra lỗi, vui lòng thử lại"];
+        }
     }
 }
 ?>

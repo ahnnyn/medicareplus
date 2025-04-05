@@ -80,7 +80,7 @@ const BacSiNoiBat = () => {
                                     <Col span={3}>
                                         <Avatar  
                                         style={{border: "1px solid green"}}
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${item?.hinhAnh}`} 
+                                        src={`${import.meta.env.VITE_BACKEND_URL}/public/bacsi/${item?.hinhAnh}`} 
                                         shape="square" 
                                         size={120} 
                                         icon={<UserOutlined />} />

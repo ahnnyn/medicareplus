@@ -1,595 +1,237 @@
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import { Button, Checkbox, Col, Divider, Form, Input, InputNumber, message, Modal, notification, Radio, Row, Select, Upload } from "antd";
+import { Button, Checkbox, Col, Divider, Form, Input, InputNumber, message, Modal, notification, Radio, Row, Upload } from "antd";
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { fetchAllChucVu, fetchAllChuyenKhoa, fetchAllPhongKham, updateDoctor } from "../../services/apiDoctor";
-import { callUploadDoctorImg } from "../../services/doctorAPI";
+import { fetchBacSiByMaBS, fetchAllChuyenKhoa, updateDoctor, callUploadDoctorImg } from "../../services/apiDoctor";
 import { FaSave } from "react-icons/fa";
 import './scss.scss'
 
-const UpdateDoctor = (props) => {
-
-    const {
-        dataUpdateDoctor, setDataUpdateDoctor,        
-    } = props
-
-    const [form] = Form.useForm()
+const UpdateDoctor = () => {
+    const [form] = Form.useForm();
     const editorRef = useRef(null);
     const [isSubmit, setIsSubmit] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [dataChucVu, setDataChucVu] = useState([])
-    const [dataPhongKham, setDataPhongKham] = useState([])
-    const [dataChuyenKhoa, setDataChuyenKhoa] = useState([])   
-    const [genderDoctor, setGenderDoctor] = useState(true);
-    const [initForm, setInitForm] = useState(null);
+    const [dataChuyenKhoa, setDataChuyenKhoa] = useState([]);
+    const [dataUpdateDoctor, setDataUpdateDoctor] = useState({});
     const [fileList, setFileList] = useState([]);
+    const [imageUrl, setImageUrl] = useState("");
+    const [genderDoctor, setGenderDoctor] = useState(null);
+    const user = useSelector((state) => state.accountDoctor.user);
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [imageUrl, setImageUrl] = useState('');
+    useEffect(() => {
+        if (user?.maBacSi) {
+            fetchDoctorInfo(user.maBacSi);
+            fetchAllChuyenKhoaDoctor();
+        }
+    }, [user]);
+
+    const fetchDoctorInfo = async (maBacSi) => {
+        let res = await fetchBacSiByMaBS(maBacSi);
+        console.log("API bacsi:", res); // Kiểm tra dữ liệu trả về từ API
+        if (res && res.data) {
+            setDataUpdateDoctor(res.data);
+        }
+        console.log("Data Update Doctor:", dataUpdateDoctor); // Kiểm tra dữ liệu cập nhật bác sĩ
+        console.log("Data Update Doctor ID:", dataUpdateDoctor.maBacSi); // Kiểm tra ID bác sĩ
+    };
+
+    useEffect(() => {
+        if (dataUpdateDoctor.maBacSi) {
+            const chuyenKhoaId = dataUpdateDoctor.maKhoa;
     
-    useEffect(() => {
-        fetchAllChucVuDoctor()
-        fetchAllPhongKhamDoctor()
-        fetchAllChuyenKhoaDoctor()
-    }, [])
-
-    useEffect(() => {
-        if (dataUpdateDoctor?._id) {       
-            const chucVuId = Array.isArray(dataUpdateDoctor.chucVuId) 
-                            ? dataUpdateDoctor.chucVuId.map(item => item._id) // Nếu là mảng, lấy tất cả _id
-                            : [dataUpdateDoctor.chucVuId._id]; // Nếu không, lấy _id từ đối tượng
-
-            const chuyenKhoaId = Array.isArray(dataUpdateDoctor.chuyenKhoaId) 
-                            ? dataUpdateDoctor.chuyenKhoaId.map(item => item._id) // Nếu là mảng, lấy tất cả _id
-                            : [dataUpdateDoctor.chuyenKhoaId._id]; // Nếu không, lấy _id từ đối tượng
-
-            // Tạo danh sách file cho Upload
-            if (dataUpdateDoctor.image) {
-
-                console.log(`ảnh: ${import.meta.env.VITE_BACKEND_URL}/api/doctor/upload/${dataUpdateDoctor.image}`);
-                
-                
-                setFileList([
-                    {
-                        uid: '-1', // uid phải là một chuỗi duy nhất
-                        name: dataUpdateDoctor.image, // Tên file
-                        status: 'done', // Trạng thái
-                        url: `${import.meta.env.VITE_BACKEND_URL}/uploads/${dataUpdateDoctor.image}`, // Đường dẫn đến hình ảnh
-                    },
-                ]);
+            if (dataUpdateDoctor.hinhAnh) {
+                setFileList([{
+                    uid: "-1",
+                    name: dataUpdateDoctor.hinhAnh,
+                    status: "done",
+                    url: `${import.meta.env.VITE_BACKEND_URL}/public/bacsi/${dataUpdateDoctor.hinhAnh}`,
+                }]);
+                setImageUrl(dataUpdateDoctor.hinhAnh);
             }
-
-            const init = {
-                _id: dataUpdateDoctor._id,
-                firstName: dataUpdateDoctor.firstName,
-                lastName: dataUpdateDoctor.lastName,
-                address: dataUpdateDoctor.address,
+    
+            // Ensure form.setFieldsValue is only called once the dataUpdateDoctor is populated
+            form.setFieldsValue({
+                idbacsi: dataUpdateDoctor.maBacSi,   // Ensure doctor ID is set correctly
+                fullName: dataUpdateDoctor.hoTen,
+                gender: dataUpdateDoctor.gioiTinh,
+                phoneNumber: dataUpdateDoctor.soDienThoai,
                 email: dataUpdateDoctor.email,
-                password: dataUpdateDoctor.password,
-                phoneNumber: dataUpdateDoctor.phoneNumber,
-                gender: dataUpdateDoctor.gender,
-                mota: dataUpdateDoctor.mota || '',
-                chucVuId: chucVuId,
-                giaKhamNuocNgoai: dataUpdateDoctor.giaKhamNuocNgoai,
-                giaKhamVN: dataUpdateDoctor.giaKhamVN,
-                chuyenKhoaId: chuyenKhoaId,
-                phongKhamId: dataUpdateDoctor.phongKhamId._id, 
-                image: dataUpdateDoctor.image                        
-            }
-            console.log("init: ", init);
-            
-            setInitForm(init);  
-            setImageUrl(dataUpdateDoctor.image)          
-            form.setFieldsValue(init);
+                address: dataUpdateDoctor.diaChi,
+                giaKham: dataUpdateDoctor.giaKham,
+                mota: dataUpdateDoctor.moTa || "",
+                chuyenKhoaId,
+            });
+    
+            setGenderDoctor(dataUpdateDoctor.gender);
+    
             if (editorRef.current) {
-                editorRef.current.setData(dataUpdateDoctor.mota || ''); // Set giá trị cho CKEditor
+                editorRef.current.setData(dataUpdateDoctor.moTa || "");
             }
         }
-        return () => {
-            form.resetFields();
-        }
-    },[dataUpdateDoctor])
+    }, [dataUpdateDoctor, form]);  // Add `form` to the dependency array to ensure `form.setFieldsValue` works correctly
+    
 
-    console.log("dataUpdateDoctor: ", dataUpdateDoctor);
-    console.log("imageUrl: ", imageUrl);
-   
-
-    const fetchAllChucVuDoctor = async () => {
-        let query = `page=1&limit=1000`
-        let res = await fetchAllChucVu(query)
-        if(res && res.data) {
-            setDataChucVu(res.data)
-        }
-    }
-    const fetchAllPhongKhamDoctor = async () => {
-        let query = `page=1&limit=1000`
-        let res = await fetchAllPhongKham(query)
-        if(res && res.data) {
-            setDataPhongKham(res.data)
-        }
-    }
     const fetchAllChuyenKhoaDoctor = async () => {
-        let query = `page=1&limit=1000`
-        let res = await fetchAllChuyenKhoa(query)
-        if(res && res.data) {
-            setDataChuyenKhoa(res.data)
-        }
-    }
-
-    // upload ảnh    
-    const handleUploadFileImage = async ({ file, onSuccess, onError }) => {
-
-        setLoading(true);
-        try {
-            const res = await callUploadDoctorImg(file);
-            console.log("res upload: ", res);            
-            if (res) {
-                setImageUrl(res.url); // URL của hình ảnh từ server
-                
-                setFileList([ // Đặt lại fileList chỉ chứa file mới
-                    {
-                        uid: file.uid,
-                        name: file.name,
-                        status: 'done',
-                        url: res.url, // URL của hình ảnh từ server
-                    },
-                ]);
-                onSuccess(file);
-                // setDataImage()
-                message.success('Upload thành công');
-            } else {
-                onError('Đã có lỗi khi upload file');
-            }            
-        } catch (error) {
-            console.error(error);
-            message.error('Upload thất bại');
-            onError(error);
-        } finally {
-            setLoading(false);
+        let res = await fetchAllChuyenKhoa();
+        console.log("API Response:", res); // Kiểm tra dữ liệu trả về từ API
+        if (res && res.data) {
+            setDataChuyenKhoa(res.data);
         }
     };
 
+    const handleUploadFileImage = async ({ file }) => {
+        setLoading(true);
+        try {
+            const res = await callUploadDoctorImg(file);
+            console.log("Upload Response:", res); // Kiểm tra dữ liệu trả về từ API
+            console.log("File Name:", res.filename); // Log the file name to the console
+            console.log("File url:", res.url); // Log the file type to the console
+            console.log("File success:", res.success); // Log the file size to the console
+            console.log("File Status:", res.status); // Log the file status to the console
+    
+            if (res.success) {    
+                const imageUrl = `${import.meta.env.VITE_BACKEND_URL}${res.url}`;
+    
+                setImageUrl(imageUrl);  // Store the filename for future reference
+                setFileList([{ 
+                    uid: "-1", 
+                    name: file.name, 
+                    status: "done", 
+                    url: imageUrl  // Use the absolute URL for image preview
+                }]);
+                console.log("imgURL:", imageUrl); // Log the image URL to the console
+                message.success("Tải ảnh lên thành công!");
+            } else {
+                throw new Error(res.message || "Tải ảnh lên thất bại!");
+            }
+        } catch (error) {
+            message.error(error.message || "Lỗi khi tải ảnh lên!");
+        }
+        setLoading(false);
+    };
+    
+    
     const beforeUpload = (file) => {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
         if (!isJpgOrPng) {
-            message.error('Bạn chỉ có thể tải lên hình ảnh JPG/PNG!');
+            message.error("Bạn chỉ có thể tải lên hình ảnh JPG/PNG!");
         }
         return isJpgOrPng;
     };
 
-    const handleChange = (info) => {
-        if (info.file.status === 'done') {
-            message.success(`upload file ${info.file.name} thành công`);
-        } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} upload file thất bại!`);
-        }
-    };
-
     const handleRemoveFile = (file) => {
-        // setFileList(prevFileList => prevFileList.filter(item => item.uid !== file.uid)); // Loại bỏ file
-        setFileList([]); // Reset fileList khi xóa file
-        setImageUrl(''); // Reset URL khi xóa file
+        setFileList([]);
+        setImageUrl("");
         message.success(`${file.name} đã được xóa`);
     };
 
     const handleUpdateDoctor = async (values) => {
-
-        const { _id, email, password, firstName, lastName, address, phoneNumber, 
-            chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota, thoiGianKhamId, giaKhamVN, giaKhamNuocNgoai, } = values
-
-            console.log("mota: ", mota);
-            
+        console.log("Form Values:", values);
+        console.log("Doctor ID:", values.id);  // Ensure doctor ID is correct
+    
         if (!imageUrl) {
-            notification.error({
-                message: 'Lỗi validate',
-                description: 'Vui lòng upload hình ảnh'
-            })
+            notification.error({ message: "Lỗi", description: "Vui lòng upload hình ảnh" });
             return;
         }
-
-        const hinhAnh = imageUrl.split('/').pop(); // Lấy tên file từ URL
-        console.log("hinhanh: ", hinhAnh);
-        console.log("_id: ", _id);
+    
+        const hinhAnh = imageUrl.split("/").pop(); // Extract filename from the image URL
+        setIsSubmit(true);
+    
+        // Logging the data being passed to updateDoctor
+        console.log("Updating Doctor with data:", {
+            id: values.idbacsi, 
+            fullName: values.fullName, 
+            gender: values.gender, 
+            phoneNumber: values.phoneNumber,
+            email: values.email, 
+            address: values.address, 
+            giaKham: values.giaKham, 
+            hinhAnh: hinhAnh, 
+            mota: values.mota, 
+            chuyenKhoaId: values.chuyenKhoaId
+        });
+    
+        try {
+        const res = await updateDoctor(
+            values.idbacsi, values.fullName, values.gender, values.phoneNumber, 
+            values.email, values.address, values.giaKham, hinhAnh, values.mota || '', values.chuyenKhoaId
+        );
         
-        setIsSubmit(true)
-        const res = await updateDoctor( _id, email, firstName, lastName, address, phoneNumber, 
-        chucVuId, gender, hinhAnh, chuyenKhoaId, phongKhamId, roleId, mota, giaKhamVN, giaKhamNuocNgoai)
-
-        if(res){
+        if (res.status) {
             message.success(res.message);
-            handleCancel()
-            setImageUrl('')
+            fetchDoctorInfo(user.maBacSi); // Refresh the doctor info
         } else {
-            notification.error({
-                message: 'Đã có lỗi xảy ra',
-                description: res.message
-            })
+            notification.error({ message: "Lỗi", description: res.error });
         }
-        
-        setIsSubmit(false)
+    } catch (error) {
+        console.error("Error updating doctor:", error);
+        notification.error({ message: "Lỗi", description: "Có lỗi xảy ra, vui lòng thử lại!" });
     }
-
-    const handleCancel = () => {
-        setOpenUpdateDoctor(false);
-        form.resetFields()
+        
+        if (res.status) {
+            message.success(res.message);
+            fetchDoctorInfo(user.maBacSi);
+        } else {
+            notification.error({ message: "Lỗi", description: res.error });
+        }
+    
+        setIsSubmit(false);
     };
-
-    const handlePreview = async (file) => {
-        setImageUrl(fileList[0].url); // Lấy URL của hình ảnh
-        setIsModalVisible(true); // Mở modal
-    };
-
+ 
     return (
-            <Row>
-                <Col span={24}>
-                    <Form
-                        form={form}
-                        name="basic"        
-                        layout="vertical"                
-                        style={{
-                            maxWidth: "100%",
-                        }}
-                        initialValues={{
-                            remember: true,
-                        }}
-                        onFinish={handleUpdateDoctor}
-                        // autoComplete="off"
-                        loading={isSubmit}
-                    >
-                        <Row gutter={[20,5]}>
-                            <Col hidden>
-                                <Form.Item  hidden name="_id"><Input /></Form.Item>
-                                <Form.Item  hidden name="password"><Input /></Form.Item>
-                            </Col>
-
-                            <Col span={5} md={5} sm={5} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Họ"
-                                    name="lastName"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập họ hiển thị!',
-                                        },
-                                        {
-                                            required: false,
-                                            pattern: new RegExp(/^[A-Za-zÀ-ỹ\s]+$/),
-                                            message: 'Không được nhập số!',
-                                        },
-                                    ]}
+        
+        <Row>
+            <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
+                <span style={{ fontWeight: "500", color: "navy" }}>THÔNG TIN CÁ NHÂN</span>
+            </Col>
+            <Col span={24}>
+                <Form form={form} name="bacsi" layout="vertical" onFinish={handleUpdateDoctor}>
+                    <Row gutter={[20, 5]}>
+                        <Col span={2}><Form.Item label="MBS" name="idbacsi" style={{display: 'none'}}></Form.Item></Col>
+                    </Row>
+                    <Row gutter={[20, 5]}>
+                        <Col span={5}><Form.Item label="Họ tên" name="fullName" rules={[{ required: true, message: 'Vui lòng nhập tên hiển thị!' }]}><Input /></Form.Item></Col>
+                        <Col span={5}><Form.Item label="Số điện thoại" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}><Input /></Form.Item></Col>
+                        <Col span={6}><Form.Item label="Giới tính" name="gender"><Radio.Group value={genderDoctor} onChange={(e) => setGenderDoctor(e.target.value)}><Radio value={"0"}>Nam</Radio><Radio value={"1"}>Nữ</Radio><Radio value={"2"}>Khác</Radio></Radio.Group></Form.Item></Col>
+                    </Row>
+                    <Row gutter={[20, 5]}>
+                        <Col span={6}>
+                            <Form.Item label="Hình ảnh" name="image">
+                                <Upload
+                                    listType="picture-card"
+                                    maxCount={1}
+                                    customRequest={handleUploadFileImage}
+                                    beforeUpload={beforeUpload}
+                                    onRemove={handleRemoveFile}
+                                    fileList={fileList}
                                 >
-                                <Input />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={5} md={5} sm={5} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Tên"
-                                    name="firstName"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập tên hiển thị!',
-                                        },
-                                        {
-                                            required: false,
-                                            pattern: new RegExp(/^[A-Za-zÀ-ỹ\s]+$/),
-                                            message: 'Không được nhập số!',
-                                        },
-                                    ]}
-                                >
-                                <Input />
-                                </Form.Item>
-                            </Col>                            
-
-                            <Col span={5} md={5} sm={5} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Số điện thoại"
-                                    name="phoneNumber"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập đầy đủ thông tin!',
-                                        },
-                                        {
-                                            pattern: /^0\d{9}$/,
-                                            message: 'Số điện thoại phải có 10 chữ số và bẳt đầu bằng số 0, không chứa kí tự!',
-                                        },
-                                    ]}
-                                >
-                                <Input />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={4} md={4} sm={4} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Giới tính"
-                                    name="gender"    
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn giới tính!',
-                                        },                                        
-                                    ]}                                
-                                >
-                                    <Radio.Group 
-                                        onChange={(e) => {
-                                            const genderValue = e.target.value; // true hoặc false
-                                            setGenderDoctor(genderValue); // Cập nhật trạng thái
-                                            form.setFieldsValue({ gender: genderValue }); // Cập nhật giá trị trong form
-                                        }} value={genderDoctor}
-                                    >
-                                        <Radio value={true}>Nam</Radio>
-                                        <Radio value={false}>Nữ</Radio>                                        
-                                    </Radio.Group>                       
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                        
-                        <Row gutter={[20,5]}>
-                            <Col span={12} md={12} sm={12} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Địa chỉ Email"
-                                    name="email"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập đầy đủ thông tin!',
-                                        },
-                                        {
-                                            type: "email",
-                                            message: 'Vui lòng nhập đúng định dạng địa chỉ email',
-                                        },
-                                    ]}
-                                >
-                                <Input disabled />
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={12} md={12} sm={12} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Địa chỉ"
-                                    name="address"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập đầy đủ thông tin!',
-                                        },                                        
-                                    ]}
-                                >
-                                <Input  />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-
-                        <Row gutter={[30,5]}>
-                            <Col span={6} md={6} sm={6} xs={24} >
-                                <Form.Item
-                                    label="Hình ảnh"
-                                    name="image"                            
-                                >
-
-                                    <Upload
-                                        name="file"
-                                        listType="picture-card"
-                                        className="avatar-uploader"
-                                        maxCount={1}
-                                        multiple={false}
-                                        customRequest={handleUploadFileImage}
-                                        beforeUpload={beforeUpload}
-                                        onChange={handleChange}
-                                        onRemove={handleRemoveFile}
-                                        fileList={fileList} // Gán danh sách file
-                                        onPreview={handlePreview}
-                                    >
-                                        <div>
-                                            {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                                            <div style={{ marginTop: 8 }}>Upload</div>
-                                        </div>
-                                    </Upload>
-
-                                    <Modal
-                                        visible={isModalVisible}
-                                        footer={null}
-                                        title="Xem Hình Ảnh"
-                                        onCancel={() => setIsModalVisible(false)}
-                                    >
-                                        <img alt="Uploaded" style={{ width: '100%' }} src={imageUrl} />
-                                    </Modal>
-
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={18} md={18} sm={18} xs={24} >
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Phòng khám"
-                                    name="phongKhamId"    
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn phòng khám!',
-                                        },                                        
-                                    ]}                                
-                                >
-                                    <Select
-                                        showSearch
-                                        style={{ width: "100%" }}
-                                        placeholder="Chọn phòng khám"
-                                        optionFilterProp="label"
-                                        filterSort={(optionA, optionB) =>
-                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                        }
-                                        options={dataPhongKham.map(phongKham => ({
-                                            value: phongKham._id, // Sử dụng _id làm giá trị
-                                            label: `${phongKham.name} ( ${phongKham.address} )`, // Hiển thị name và address
-                                        }))}
-                                    />                               
-                                </Form.Item>
-                            </Col>  
-
-                            <Col span={12} md={12} sm={12} xs={24}>
-                                <Form.Item
-                                    label="Giá khám cho người Việt"
-                                    name="giaKhamVN"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập Giá khám cho người Việt!',
-                                        },
-                                    ]}
-                                >
-                                   <InputNumber 
-                                   style={{width: "100%"}}
-                                    formatter={value => 
-                                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                                    }
-                                    addonAfter={"VNĐ"} 
-                                    min={1} />
-                                </Form.Item>       
-                            </Col>
-
-                            <Col span={12} md={12} sm={12} xs={24}>
-                                <Form.Item
-                                    label="Giá khám cho người Nước Ngoài"
-                                    name="giaKhamNuocNgoai"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập Giá khám cho người Nước Ngoài!',
-                                        },
-                                    ]}
-                                >
-                                   <InputNumber 
-                                   style={{width: "100%"}}
-                                    formatter={value => 
-                                        `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                                    }
-                                    addonAfter={"VNĐ"} 
-                                    min={1} />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-
-                        <Row gutter={[20,5]}>
-                            <Col span={24} md={24} sm={24} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Chức vụ"
-                                    name="chucVuId"    
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn ít nhất 1 chức vụ!',
-                                        },                                        
-                                    ]}                                
-                                >
-                                    <Checkbox.Group>
-                                        {dataChucVu.map((chucVu) => (
-                                            <Checkbox 
-                                                style={{
-                                                    margin: "10px"
-                                                }}
-                                                key={chucVu._id}
-                                                value={chucVu._id}
-                                            >
-                                                {chucVu.name}
-                                            </Checkbox>
-                                        ))}
-                                    </Checkbox.Group>                                    
-                                </Form.Item>
-                            </Col>
-
-                            <Col span={24} md={24} sm={24} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Chuyên khoa"
-                                    name="chuyenKhoaId"    
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng chọn ít nhất 1 Chuyên khoa!',
-                                        },                                        
-                                    ]}                                
-                                >
-                                    <Checkbox.Group>
-                                        {dataChuyenKhoa.map((chuyenKhoa) => (
-                                            <Checkbox 
-                                                style={{
-                                                    margin: "10px"
-                                                }}
-                                                key={chuyenKhoa._id}
-                                                value={chuyenKhoa._id}
-                                            >
-                                                {chuyenKhoa.name}
-                                            </Checkbox>
-                                        ))}
-                                    </Checkbox.Group>                                    
-                                </Form.Item>
-                            </Col>                            
-                        </Row>         
-
-                        <Row>
-                            <Col span={24} md={24} sm={24} xs={24}>
-                                <Form.Item
-                                    layout="vertical"
-                                    label="Mô tả"
-                                    name="mota"    
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Vui lòng nhập 1 chút mô tả!',
-                                        },                                        
-                                    ]}                                
-                                >
-                                    <CKEditor
-                                        editor={ClassicEditor}                                        
-                                        config={{
-                                            toolbar: [
-                                                'heading', '|',
-                                                'bold', 'italic', 'underline', '|',
-                                                'fontColor', 'fontFamily', '|', // Thêm màu chữ và kiểu chữ
-                                                'link', 'bulletedList', 'numberedList', '|',
-                                                'insertTable', '|',
-                                                'imageUpload', 'blockQuote', 'undo', 'redo'
-                                            ],
-                                            // Other configurations
-                                            ckfinder: {
-                                                uploadUrl: `${import.meta.env.VITE_BACKEND_URL}/api/doctor/upload/`, // Đường dẫn đến handler upload  -- van dang loi
-                                            },
-                                        }}
-                                        data={form.getFieldValue('mota') || ''} // Thiết lập giá trị từ form
-                                        onInit={(editor) => {
-                                            editorRef.current = editor; // Gán ref khi CKEditor khởi tạo
-                                        }}
-                                        onChange={(event, editor) => {
-                                            const data = editor.getData();
-                                            form.setFieldsValue({ mota: data }); // Cập nhật giá trị cho form
-                                            console.log({ data }); // Lấy dữ liệu khi có thay đổi
-                                        }}
-                                        style={{
-                                            height: '400px', // Đặt chiều cao cho CKEditor
-                                        }}
-                                    />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-
-                        <Col span={24} style={{display: "flex", justifyContent: "center"}}>
-                            <Button onClick={() => form.submit()} type="primary" size="large" icon={<FaSave size={25} />}>Đổi thông tin</Button>
+                                    <div>{loading ? <LoadingOutlined /> : <PlusOutlined />} Upload</div>
+                                </Upload>
+                            </Form.Item>
                         </Col>
-
-                        <Divider />
-                    </Form>
-                </Col>
-            </Row>
-    )
-}
-export default UpdateDoctor
+                    </Row>
+                    <Row gutter={[20, 5]}>
+                        <Col span={12}><Form.Item label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập email!' }]}><Input /></Form.Item></Col>
+                        <Col span={12}><Form.Item label="Địa chỉ liên hệ" name="address" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}><Input /></Form.Item></Col>
+                    </Row>
+                    <Row gutter={[20, 5]}>
+                        <Col span={12}><Form.Item label="Giá khám" name="giaKham" rules={[{ required: true, message: 'Vui lòng nhập Giá khám!' }]}><InputNumber style={{ width: "100%" }} min={1} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} addonAfter={"VNĐ"} /></Form.Item></Col>
+                        <Col span={12}><Form.Item label="Chuyên khoa" name="chuyenKhoaId"><Radio.Group>{dataChuyenKhoa.map((ck) => (<Radio key={ck.maKhoa} value={ck.maKhoa}>{ck.tenKhoa}</Radio>))}</Radio.Group></Form.Item></Col>
+                    </Row>
+                    <Row><Col span={24}><Form.Item label="Mô tả" name="mota">
+                                            <CKEditor
+                                                editor={ClassicEditor}
+                                                data={form.getFieldValue('mota') || ''}
+                                                onChange={(event, editor) => form.setFieldsValue({ mota: editor.getData() })}
+                                            />
+                                        </Form.Item></Col></Row>
+                    <Col span={24} style={{ display: "flex", justifyContent: "center" }}><Button onClick={() => form.submit()} type="primary" size="large" icon={<FaSave size={25} />}>Đổi thông tin</Button></Col>
+                    <Divider />
+                </Form>
+            </Col>
+        </Row>
+    );
+};
+export default UpdateDoctor;
