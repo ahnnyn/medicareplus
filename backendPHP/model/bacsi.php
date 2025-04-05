@@ -58,7 +58,8 @@
                 return ["error" => "Không thể kết nối database"];
             }
             try {
-                $query = $pdo->prepare("SELECT * FROM bacsi bs join khoa k on bs.maKhoa = k.maKhoa WHERE bs.maBacSi = :id");
+                $query = $pdo->prepare("SELECT bs.maBacSi, bs.hoTen, bs.gioiTinh, bs.ngaySinh, bs.soDienThoai, bs.email, bs.diaChi, bs.giaKham, bs.hinhAnh, bs.moTa, bs.maKhoa, k.tenKhoa,tk.maTaiKhoan, tk.username, tk.matKhau
+                                        FROM bacsi bs join khoa k on bs.maKhoa = k.maKhoa join taiKhoan tk on bs.maTaiKhoan = tk.maTaiKhoan WHERE bs.maBacSi = :id");
                 $query->bindParam(":id", $id, PDO::PARAM_INT);
                 $query->execute();
                 $result = $query->fetch(PDO::FETCH_ASSOC);
@@ -102,6 +103,64 @@
                 return ["error" => "Không thể kết nối database"];
             }
         }
-        
+
+        public function capNhatThongTinBacSi($maBacSi, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa){
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    $query = $pdo->prepare("
+                        UPDATE bacsi
+                        SET hoTen = :hoTen, 
+                            gioiTinh = :gioiTinh, 
+                            soDienThoai = :soDienThoai, 
+                            email = :email,
+                            diaChi = :diaChi, 
+                            giaKham = :giaKham,
+                            hinhAnh = :hinhAnh, 
+                            moTa = :moTa, 
+                            maKhoa = :maKhoa
+                        WHERE maBacSi = :maBacSi
+                    ");
+                    $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
+                    $query->bindParam(":hoTen", $hoTen, PDO::PARAM_STR);
+                    $query->bindParam(":gioiTinh", $gioiTinh, PDO::PARAM_STR);
+                    $query->bindParam(":soDienThoai", $soDienThoai, PDO::PARAM_STR);
+                    $query->bindParam(":email", $email, PDO::PARAM_STR);
+                    $query->bindParam(":diaChi", $diaChi, PDO::PARAM_STR);
+                    $query->bindParam(":giaKham", $giaKham, PDO::PARAM_STR);
+                    $query->bindParam(":hinhAnh", $hinhAnh, PDO::PARAM_STR);
+                    $query->bindParam(":moTa", $moTa, PDO::PARAM_STR);
+                    $query->bindParam(":maKhoa", $maKhoa, PDO::PARAM_INT);
+                    $query->execute();
+                    return ["success" => "Cập nhật thông tin bác sĩ thành công"];
+                } catch (PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }    
+        // Tìm kiếm bác sĩ trong cơ sở dữ liệu
+        public function searchBacSi($name) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    // Sử dụng LIKE để tìm kiếm tên bác sĩ theo từ khóa
+                    $query = $pdo->prepare("SELECT * FROM bacsi WHERE hoTen LIKE :name");
+                    $searchTerm = "%$name%";  // Thêm dấu % vào đầu và cuối từ khóa để tìm kiếm phần tử chứa tên bác sĩ
+                    $query->bindParam(":name", $searchTerm);
+                    $query->execute();
+                    
+                    $data = $query->fetchAll(PDO::FETCH_ASSOC);
+                    return $data;
+                } catch (PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }  
     }
 ?>

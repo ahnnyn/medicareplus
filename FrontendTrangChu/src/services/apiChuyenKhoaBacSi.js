@@ -1,22 +1,33 @@
 import axios from "../utils/axios-customize";
 
 // CHUYÊN KHOA //
-export const fetchAllChuyenKhoa = async () => {
-    const URL_BACKEND = `/api/chuyenkhoa.php?action=getAllChuyenKhoa`;
-    return axios.get(URL_BACKEND)
-}
+export const fetchAllChuyenKhoa = async (query = '') => {
+    let URL_BACKEND = `/api/chuyenkhoa.php?action=getAllChuyenKhoa`;
+    if (query) {
+        URL_BACKEND += `&name=${encodeURIComponent(query)}`;
+    }
+    return axios.get(URL_BACKEND);
+};
+
 
 export const fetchChuyenKhoaByID = (maKhoa) => {
     const URL_BACKEND = `/api/chuyenkhoa.php?action=getChuyenKhoaById&maKhoa=${maKhoa}`
     return axios.get(URL_BACKEND)
 }
+export const findChuyenKhoaByTen = (query) => {
+    const URL_BACKEND = `/api/chuyenkhoa.php?action=search&${query}`;
+    return axios.get(URL_BACKEND);
+};
 
 // BÁC SĨ //
 export const fetchAllBacSi = async () => {
     const URL_BACKEND = `/api/bacsi.php?action=getAllDoctors`;
     return axios.get(URL_BACKEND)
 };
-
+export const findBacSiByTen = (query) => {
+    const URL_BACKEND = `/api/bacsi.php?action=search&${query}`  
+    return axios.get(URL_BACKEND)  
+}
 export const updateBacSi = (maBacSi, email, firstName, lastName, address, phoneNumber, chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota, giaKhamVN, giaKhamNuocNgoai) => {
     return axios.put('/api/bacsi.php', {
         _id, email, firstName, lastName, address, phoneNumber, chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota, giaKhamVN, giaKhamNuocNgoai
@@ -162,7 +173,7 @@ export const getAllCauHoi = (query) => {
 }
 
 export const handleQuenPassword = (email_doimk) => {
-    const URL_BACKEND = '/api/bacsi.php'
+    const URL_BACKEND = '/api/benhnhan.php?action=quenMatKhau'
     return axios.post(URL_BACKEND, { email_doimk })
 }
 

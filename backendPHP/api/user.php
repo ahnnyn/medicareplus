@@ -1,5 +1,5 @@
 <?php
-require_once("../vendor/autoload.php"); // Thêm dòng này
+require_once("../vendor/autoload.php"); // Load thư viện JWT
 require_once("../controller/user.php");
 
 use Firebase\JWT\JWT;
@@ -52,18 +52,62 @@ $p = new cUser();
 header('Content-Type: application/json');
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
-if ($requestMethod === 'POST' && isset($_GET['action']) && $_GET['action'] === 'login') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode($p->layThongTin($data['username'], $data['password']));
-} elseif ($requestMethod === 'POST' && isset($_GET['action']) && $_GET['action'] === 'currentUser') {
-    $user = verifyJWT();
-    if ($user) {
-        echo json_encode(["success" => true, "user" => $user, "message"=>"Đăng nhập thành công!"]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Token không hợp lệ"]);
+// Debug kiểm tra action
+error_log("Action nhận được: " . ($_GET['action'] ?? 'Không có action'));
+
+// Xử lý các action API
+if ($requestMethod === 'POST' && isset($_GET['action'])) {
+    $action = $_GET['action'];
+
+    if ($action === 'login') {
+        $data = json_decode(file_get_contents("php://input"), true);
+        echo json_encode($p->getThongTinBacSi($data['username'], $data['password']));
+
+    } elseif ($action === 'currentUser') {
+        $user = verifyJWT();
+        if ($user) {
+            echo json_encode(["success" => true, "user" => $user, "message" => "Đăng nhập thành công!"]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Token không hợp lệ"]);
+        }
+
+    } elseif ($action === 'doi-mat-khau') {
+        header("Content-Type: application/json"); // Đảm bảo API trả về JSON
+    
+        $data = json_decode(file_get_contents("php://input"), true);
+    
+        error_log("🔍 Dữ liệu nhận được từ React: " . json_encode($data));
+    
+        $idAcc = $data["idAcc"] ?? null;
+        $idBS = $data["idBS"] ?? null;
+        $username = $data["username"] ?? null;
+        $password = $data["password"] ?? null;
+        $passwordMoi = $data["passwordMoi"] ?? null;
+    
+        if (!$idAcc || !$idBS || !$username || !$password || !$passwordMoi) {
+            echo json_encode(["success" => false, "message" => "Thiếu thông tin đầu vào"]);
+            exit;
+        }
+    
+        $result = $p->updateMatKhauBacSi($idAcc, $idBS, $username, $password, $passwordMoi);
+    
+        if (is_array($result) && isset($result["success"])) {
+            echo json_encode($result);
+        } else {
+            echo json_encode(["success" => false, "message" => "Lỗi xử lý dữ liệu"]);
+        }
+        exit;
+    }elseif ($action === 'logout') {
+        $result = $p->logout();
+    
+        // Đảm bảo header là JSON
+        header('Content-Type: application/json');
+        echo json_encode($result);
+        exit; // Dừng script để tránh in thêm dữ liệu không mong muốn
     }
+
 } else {
-    echo json_encode(['success' => false, 'message' => 'Đăng xuất thành công!']);
+    echo json_encode(["success" => false, "message" => "Phương thức không hợp lệ"]);
 }
 
 ?>

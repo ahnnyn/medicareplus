@@ -1,6 +1,7 @@
 <?php
-require_once("../vendor/autoload.php"); // Thêm dòng này
-require_once("../controller/user.php");
+require_once("../vendor/autoload.php");
+require_once("../controller/userbenhnhan.php");
+require_once("../controller/benhnhan.php");
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -14,11 +15,11 @@ $allowed_origins = [
     'http://localhost:3001',
 ];
 
-// Lấy origin từ request
-if (!empty($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
+// Xử lý CORS
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
     header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
     header("Access-Control-Allow-Credentials: true");
-    header("Access-Control-Allow-Methods: POST, OPTIONS");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Access-Control-Allow-Headers: Content-Type, Authorization");
 }
 
@@ -47,23 +48,54 @@ function verifyJWT() {
     }
 }
 
-// Khởi tạo đối tượng user controller
+// Khởi tạo đối tượng User Controller
 $p = new cUser();
+$pd = new cBenhNhan();
 header('Content-Type: application/json');
-$requestMethod = $_SERVER["REQUEST_METHOD"];
+// $requestMethod = $_SERVER["REQUEST_METHOD"];
 
-if ($requestMethod === 'POST' && isset($_GET['action']) && $_GET['action'] === 'login') {
+if (isset($_GET['action'])) {
     $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode($p->layThongTin($data['username'], $data['matKhau']));
-} elseif ($requestMethod === 'POST' && isset($_GET['action']) && $_GET['action'] === 'currentUser') {
-    $user = verifyJWT();
-    if ($user) {
-        echo json_encode(["success" => true, "user" => $user, "message"=>"Đăng nhập thành công!"]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Token không hợp lệ"]);
+
+    switch ($_GET['action']) {
+        case 'login':
+            echo json_encode($p->layThongTinBenhNhan($data['username'], $data['matKhau']));
+            break;
+
+        case 'register':
+            echo json_encode($p->luuThongTinBenhNhan($data['email'], $data['hoTen'], $data['soDienThoai'], $data['username'], $data['matKhau']));
+            break;
+
+        case 'currentUser':
+            $user = verifyJWT();
+            if ($user) {
+                echo json_encode(["success" => true, "user" => $user, "message" => "Đăng nhập thành công!"]);
+            } else {
+                echo json_encode(["success" => false, "message" => "Token không hợp lệ"]);
+            }
+            break;
+
+            case 'getThongTinBenhNhan':
+                if (isset($_GET['maBenhNhan'])) {
+                    $pd->layThongTinCaNhanBenhNhan($_GET['maBenhNhan']);
+                }else {
+                    echo json_encode(["error" => "Thiếu hoặc sai mã bệnh nhân"]);
+                }
+                break;
+            case 'quenMatKhau':
+                $email = $_GET["email_doimk"] ?? '';
+
+                if (empty($email)) {
+                    echo json_encode(["success" => false, "message" => "Vui lòng nhập email"]);
+                    exit;
+                }
+                $pd->quenMatKhau($email);
+                break;
+        default:
+            echo json_encode(['success' => false, 'message' => 'Action không hợp lệ!']);
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Đăng xuất thành công!']);
+    echo json_encode(['success' => false, 'message' => 'Phương thức không hợp lệ!']);
 }
 
 ?>

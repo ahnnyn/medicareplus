@@ -46,6 +46,37 @@ if (isset($_GET["action"])) {
                 echo json_encode(["error" => "Thiếu mã bác sĩ hoặc ngày khám"]);
             }
             break;
+        case 'update-thongtin-bacsi':
+             // Nhận dữ liệu từ React
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    // Kiểm tra xem tất cả tham số có đủ không
+    if (
+        isset($data['maBacSi']) && isset($data['hoTen']) && 
+        isset($data['gioiTinh']) && isset($data['soDienThoai']) && 
+        isset($data['email']) && isset($data['diaChi']) && 
+        isset($data['giaKham']) && isset($data['hinhAnh']) && 
+        isset($data['moTa']) && isset($data['maKhoa'])
+    ) {
+        $result = $p->updateThongTinBacSi(
+            $data['maBacSi'], $data['hoTen'], $data['gioiTinh'], 
+            $data['soDienThoai'], $data['email'], $data['diaChi'], 
+            $data['giaKham'], $data['hinhAnh'], $data['moTa'], 
+            $data['maKhoa']
+        );
+        echo json_encode(["message" => "Cập nhật thành công!", "status" => true]);
+    } else {
+        echo json_encode(["error" => "Thiếu thông tin bác sĩ", "status" => false]);
+    }
+    break;
+        case "search":
+            if (isset($_GET["hoTen"])) {
+                $tenBacSi = $_GET["hoTen"];
+                $p->search($tenBacSi);
+            } else {
+                echo json_encode(["error" => "Thiếu tên bác sĩ để tìm kiếm"]);
+            }
+            break;
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }
