@@ -25,9 +25,9 @@ export const fetchAllBacSi = async () => {
     return axios.get(URL_BACKEND)
 };
 export const findBacSiByTen = (query) => {
-    const URL_BACKEND = `/api/bacsi.php?action=search&${query}`  
-    return axios.get(URL_BACKEND)  
-}
+    const URL_BACKEND = `/api/bacsi.php?action=search&${query}`;
+    return axios.get(URL_BACKEND);
+  };
 export const updateBacSi = (maBacSi, email, firstName, lastName, address, phoneNumber, chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota, giaKhamVN, giaKhamNuocNgoai) => {
     return axios.put('/api/bacsi.php', {
         _id, email, firstName, lastName, address, phoneNumber, chucVuId, gender, image, chuyenKhoaId, phongKhamId, roleId, mota, giaKhamVN, giaKhamNuocNgoai

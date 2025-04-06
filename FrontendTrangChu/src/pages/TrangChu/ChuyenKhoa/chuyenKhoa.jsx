@@ -1,15 +1,14 @@
-import { Avatar, Button, Col, Row } from "antd"
-import Footer from "../../../components/TrangChu/Footer/Footer"
-import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor"
-import '../LichHen/lichhen.scss'
-import { IoHomeSharp } from "react-icons/io5"
-import { UserOutlined } from "@ant-design/icons"
-import { MdAccessTimeFilled } from "react-icons/md"
-import { BsCalendar2Date } from "react-icons/bs"
-import { useEffect, useState } from "react"
-import { fetchAllChuyenKhoa } from "../../../services/apiChuyenKhoaBacSi"
-import { useNavigate } from "react-router-dom"
-import SearchComponent from "../../../components/TrangChu/SearchComponent/SearchComponent"
+import { Avatar, Button, Col, Row } from "antd";
+import Footer from "../../../components/TrangChu/Footer/Footer";
+import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
+import "../LichHen/lichhen.scss";
+import { IoHomeSharp } from "react-icons/io5";
+import { UserOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import { findChuyenKhoaByTen } from "../../../services/apiChuyenKhoaBacSi";
+import { fetchAllChuyenKhoa } from "../../../services/apiChuyenKhoaBacSi"; // Đảm bảo hàm này được nhập khẩu đúng
+import { useNavigate } from "react-router-dom";
+import SearchComponent from "../../../components/TrangChu/SearchComponent/SearchComponent";
 
 
 
@@ -20,21 +19,31 @@ const ChuyenKhoa = () => {
     const [dataSearch, setDataSearch] = useState('')
     
     useEffect(() => {
-        fetchListDoctor()
+        fetchListDoctor(dataSearch)
     }, [dataSearch])
 
-    const fetchListDoctor = async () => {
+    const fetchListDoctor = async (searchQuery = "") => {
+        try {
+            let res;
+            if (searchQuery) {
+                // Nếu có tìm kiếm, tìm chuyên khoa theo tên
+                res = await findChuyenKhoaByTen(`tenkhoa=${encodeURIComponent(searchQuery)}`);
+            } else {
+                // Nếu không có tìm kiếm, lấy tất cả chuyên khoa
+                res = await fetchAllChuyenKhoa(""); // Truyền chuỗi rỗng để lấy tất cả chuyên khoa
+            }
 
-        let query = 'page=1&limit=1000'
-        if (dataSearch) {
-            query += `&name=${encodeURIComponent(dataSearch)}`;
+            console.log("res all doctor: ", res);
+            if (res && res.data) {
+                setDataAllDoctor(res.data); // Cập nhật dữ liệu chuyên khoa
+            } else {
+                setDataAllDoctor([]); // Nếu không có dữ liệu, gán mảng rỗng
+            }
+        } catch (error) {
+            console.error("Lỗi khi gọi API:", error);
+            setDataAllDoctor([]); // Nếu có lỗi, gán mảng rỗng
         }
-        const res = await fetchAllChuyenKhoa(query)
-        console.log("res all chuyen khoa: ", res);
-        if(res && res.data) {
-            setDataAllDoctor(res.data)
-        }
-    }
+    };
 
     const handleRedirectChuyenKhoa = (item) => {
         navigate(`/user/view-chuyen-khoa-kham?maKhoa=${item}`)

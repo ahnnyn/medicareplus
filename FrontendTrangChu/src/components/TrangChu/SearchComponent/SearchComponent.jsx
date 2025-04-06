@@ -1,33 +1,39 @@
-import { Input } from "antd";
-import { useState } from "react";
+import { Input } from 'antd';
+import { useState, useRef } from 'react';
 const { Search } = Input;
 
-const SearchComponent = ({ placeholder, onSearch }) => {
+const SearchComponent = ({ onSearch, placeholder }) => {
   const [searchValue, setSearchValue] = useState('');
-  let searchTimeout;
+  const searchTimeout = useRef(null);
 
-  const handleSearchChange = (value) => {
+  const handleChange = (e) => {
+    const value = e.target.value;
     setSearchValue(value);
 
-    // Clear timeout before setting a new one
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
     }
 
-    // Set new timeout
-    searchTimeout = setTimeout(() => {
-      onSearch(value); // Call onSearch after delay
-    }, 300); // Delay 300ms
+    searchTimeout.current = setTimeout(() => {
+      onSearch(value.trim());
+    }, 300);
+  };
+
+  const handleEnterSearch = () => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    onSearch(searchValue.trim());
   };
 
   return (
     <Search
       placeholder={placeholder}
-      allowClear
       enterButton="Tìm kiếm"
       size="large"
-      onChange={(e) => handleSearchChange(e.target.value)} // Call search function when typing
-      onSearch={() => onSearch(searchValue)} // Call onSearch when the user hits Enter
+      value={searchValue}
+      onChange={handleChange}
+      onSearch={handleEnterSearch}
     />
   );
 };
