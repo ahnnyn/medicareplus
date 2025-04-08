@@ -25,16 +25,39 @@ if (isset($_GET["action"])) {
         
             $maHoSo = $data['idHoSo'] ?? null;
             $maBacSi = $data['idBS'] ?? null;
+            $maLichKham = $data['idLK'] ?? null;
             $tenBN = $data['hoTen'] ?? null;
             $ngayKham = $data['ngayKham'] ?? null;
+            $khungGio = $data['khungGio'] ?? null;
             $tienSu = $data['tienSu'] ?? null;
             $chuanDoan = $data['chuanDoan'] ?? null;
             $lyDoKham = $data['lyDoKham'] ?? null;
         
-            $result = $p->taoPhieuKhamMoi($maHoSo, $maBacSi, $tenBN, $ngayKham, $tienSu, $chuanDoan, $lyDoKham);
+            $result = $p->taoPhieuKhamMoi($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham);
             echo json_encode($result);
             break;
+        case "lay-thong-tin-phieu-kham":
+            $data = json_decode(file_get_contents("php://input"), true);
         
+            $maLichKham = $data['idLK'];
+            $ngayKham = $data['ngayKham'];
+            $khungGio = $data['khungGio'];
+        
+            $result = $p->getThongTinPhieuKham($maLichKham, $ngayKham, $khungGio);
+            echo json_encode($result);
+            break;
+
+        case "cap-nhat-thong-tin-phieu-kham":
+            $data = json_decode(file_get_contents("php://input"), true);
+        
+            $maPhieuKham = $data['idPhieuKham'];
+            $tienSu = $data['tienSu'];
+            $chuanDoan = $data['chuanDoan'];
+            $lyDoKham = $data['lyDoKham'];
+        
+            $result = $p->updateThongTinPhieuKham($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham);
+            echo json_encode($result);
+            break;
         
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);

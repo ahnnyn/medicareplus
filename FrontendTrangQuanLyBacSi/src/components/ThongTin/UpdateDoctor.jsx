@@ -227,7 +227,7 @@ const UpdateDoctor = () => {
                                                 onChange={(event, editor) => form.setFieldsValue({ mota: editor.getData() })}
                                             />
                                         </Form.Item></Col></Row>
-                    <Col span={24} style={{ display: "flex", justifyContent: "center" }}><Button onClick={() => form.submit()} type="primary" size="large" icon={<FaSave size={25} />}>Đổi thông tin</Button></Col>
+                    <Col span={24} style={{ display: "flex", justifyContent: "center" }}><Button onClick={() => form.submit()} type="primary" size="large" icon={<FaSave size={25} />}  style={{ width: "200px", height: "50px", background:"#2A95BF"}}>Đổi thông tin</Button></Col>
                     <Divider />
                 </Form>
             </Col>

@@ -43,14 +43,22 @@ const QuanLyLichLamViec = () => {
     
    
     useEffect(() => {
-        fetchDoctorTimes();
-    }, [form.getFieldValue('maBacSi'), form.getFieldValue('date')]);
+        const doctorId = form.getFieldValue('maBacSi');
+        const date = form.getFieldValue('date');
+        if (doctorId && date) {
+          fetchDoctorTimes();
+        }
+      }, [form, form.getFieldValue('maBacSi'), form.getFieldValue('date')]);
 
     useEffect(() => {
         // Reset selected times khi thay đổi bác sĩ hoặc ngày khám
         form.setFieldsValue({ time: undefined }); // Clear the time field in the form
         setSelectedTimes([]); // Reset selected times
     }, [form]);
+
+    useEffect(() => {
+        console.log("dataLichLamViec updated: ", dataLichLamViec);
+      }, [dataLichLamViec]);
 
     const fetchKhungGioOfCa = async () => {
         try {
@@ -114,8 +122,8 @@ const QuanLyLichLamViec = () => {
                 // Check if the response is valid and contains the expected data
                 if (res && Array.isArray(res)) {
                     // Update the available time slots data in state
-                    setDataLichLamViec(res);
-                    
+                    setDataLichLamViec(res);    
+                    console.log("dataLichLamViec: ", dataLichLamViec);                
                     // Update the "maLichLamViec" form field with the IDs of available time slots
                     form.setFieldsValue({
                         maLichLamViec: res.map(item => item.maLichLamViec)
@@ -141,16 +149,14 @@ const QuanLyLichLamViec = () => {
     
 
     const handleTimeSelect = (timeId) => {
-        // Cập nhật danh sách khung giờ đã chọn
-        const newSelectedTimes = selectedTimes.includes(timeId)
-            ? selectedTimes.filter(id => id !== timeId) // Nếu đã chọn thì bỏ chọn
-            : [...selectedTimes, timeId]; // Nếu chưa chọn thì thêm vào danh sách đã chọn
-
-        setSelectedTimes(newSelectedTimes);
-
-        // Cập nhật giá trị trong form
-        form.setFieldsValue({ time: newSelectedTimes });
-    };
+        const updatedTimes = selectedTimes.includes(timeId)
+          ? selectedTimes.filter(id => id !== timeId)
+          : [...selectedTimes, timeId];
+      
+        setSelectedTimes(updatedTimes);
+        form.setFieldsValue({ time: updatedTimes }); // Cập nhật đúng giá trị mới
+      };
+      
 
     const handleDoctorChange = (doctorId) => {
         setCurrentDoctorId(doctorId); // Cập nhật bác sĩ hiện tại
@@ -194,65 +200,64 @@ const QuanLyLichLamViec = () => {
         console.log(date, dateString);
     }
 
-    console.log("dataDoctor: ", dataDoctor);
-
-    const data1 = (Array.isArray(dataDoctor.thoiGianKham) && dataDoctor.thoiGianKham.length > 0) ? dataDoctor.thoiGianKham.map((item, index) => (
-        {
-            key: index,
-            date: item.date,
-            times: item.thoiGianId?.map((itemm) => itemm.tenGio)
-        }
-    )) : [];
     // console.log("data ne: ", data);
 
     const columns = [
         {
           title: 'Giờ khám',
           dataIndex: 'time',
-          key: 'time',          
+          key: 'time',
         },
-        ...(Array.isArray(dataDoctor.thoiGianKham) && dataDoctor.thoiGianKham.length > 0
-          ? dataDoctor.thoiGianKham.map((item) => ({
-              title: moment(item.date, 'YYYY-MM-DD').format('DD/MM/YYYY'),
-              dataIndex: item.date,
-              key: item.date,
-              render: (times) =>
-                times && times.length > 0 ? (
-                  <div>
-                    {times.map((time, index) => (
-                      <div key={index}>
-                        <Badge color={'hsl(102, 53%, 61%)'} text={time.tenGio} />
-                      </div>
-                    ))}
-                  </div>
-                ) : null, // Nếu không có times, không render gì
-            }))
-          : []),
+        ...Array.from(new Set(dataLichLamViec.map(item => item.ngayLamViec))).map((ngay) => ({
+          title: moment(ngay, 'YYYY-MM-DD').format('DD/MM/YYYY'),
+          dataIndex: ngay,
+          key: ngay,
+          render: (value) =>
+            value ? (
+              <div>
+                {value.map((item, index) => (
+                  <Badge key={index} color="hsl(102, 53%, 61%)" text={item.khungGio} />
+                ))}
+              </div>
+            ) : null,
+        }))
       ];
+      
       
       // Chuẩn bị dữ liệu cho các hàng
       const data = (() => {
-        if (!Array.isArray(dataDoctor?.thoiGianKham)) return [];
-        
-        // Chuyển đổi tên giờ từ định dạng 'HH:MM-HH:MM' thành dạng thời gian có thể so sánh
-        const parseTime = (timeStr) => {
-          const [start, end] = timeStr.split('-');
-          const [startHour, startMinute] = start.split(':');
-          const [endHour, endMinute] = end.split(':');
-          const startTime = new Date();
-          startTime.setHours(parseInt(startHour), parseInt(startMinute), 0, 0);
-          const endTime = new Date();
-          endTime.setHours(parseInt(endHour), parseInt(endMinute), 0, 0);
-          return { startTime, endTime };
-        };
+        if (!Array.isArray(dataLichLamViec)) return [];
+      
+        const allTimeSlots = Array.from(new Set(dataLichLamViec.map(item => item.khungGio))).sort();
+        const allDates = Array.from(new Set(dataLichLamViec.map(item => item.ngayLamViec)));
+      
+        const tableData = allTimeSlots.map((khungGio, index) => {
+          const row = { key: index, time: khungGio };
+          
+          allDates.forEach(date => {
+            const matchingItems = dataLichLamViec.filter(
+              item => item.ngayLamViec === date && item.khungGio === khungGio
+            );
+            if (matchingItems.length > 0) {
+              row[date] = matchingItems.map(item => ({
+                khungGio: item.khungGio,
+              }));
+            }
+          });
+      
+          return row;
+        });
+      
+        return tableData;
       })();
+      
       
       
       return (
         <>
             <Row>
                 <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
-                    <span style={{ fontWeight: "500", color: "navy" }}>KẾ HOẠCH KHÁM BỆNH CỦA TÔI</span>
+                    <span style={{ fontWeight: "500", color: "navy" }}>QUẢN LÝ LỊCH LÀM VIỆC</span>
                 </Col>
             </Row>
             <Divider />
@@ -329,10 +334,10 @@ const QuanLyLichLamViec = () => {
                         </Form.Item>
     
                         <Row gutter={[20, 20]}>
-                            <Col span={24}>
+                            <Col span={24} style={{ display: "flex", justifyContent: "center" }}>
                                 <Form.Item>
-                                    <div style={{ textAlign: "center" }}>
-                                        <Button type="primary" htmlType="submit">Lưu lại</Button>
+                                    <div style={{ textAlign: "center", width: "200px", height: "50px" }}>
+                                        <Button type="primary" htmlType="submit" style={{ width: "200px", height: "50px", background:"#2A95BF", fontSize:"18px"}}>LƯU LẠI</Button>
                                     </div>
                                 </Form.Item>
                             </Col>
@@ -347,7 +352,7 @@ const QuanLyLichLamViec = () => {
                             dataSource={data}
                             bordered
                             pagination={false}
-                            style={{ width: '100%', margin: '20px ', textAlign: 'center' }}
+                            style={{ width: '100%', margin: '20px ', textAlign: 'center', fontSize: '20px' }}
                         />
                     </div>
                 </Col>

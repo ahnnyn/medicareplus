@@ -171,9 +171,9 @@ const ModalDoiMK = () => {
             type="primary"
             size="large"
             icon={<FaSave size={25} />}
-            style={{ width: "200px", height: "50px" }} // Thay đổi kích thước tại đây
+            style={{ width: "200px", height: "50px", background:"#2A95BF"}} // Thay đổi kích thước tại đây
           >
-            Đổi mật khẩu
+            ĐỔI MẬT KHẨU
           </Button>
         </Col>
       </Row>

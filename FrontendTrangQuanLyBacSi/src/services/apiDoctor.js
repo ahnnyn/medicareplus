@@ -298,12 +298,14 @@ export const updateThongTinlichKham = (maBacSi, maLichKham, trangThai) => {
   return axios.put(`/api/lichkham.php?action=update-trang-thai-lich-kham&maBacSi=${maBacSi}&maLichKham=${maLichKham}&trangThai=${trangThai}`);
 };
 
-export const taoPhieuKhamBenh = (idHoSo, idBS, hoTen, ngayKham, tienSu, chuanDoan, lyDoKham) => {
+export const taoPhieuKhamBenh = (idHoSo, idBS, idLK, hoTen, ngayKham, khungGio, tienSu, chuanDoan, lyDoKham) => {
   return axios.post('/api/phieukhambenh.php?action=tao-phieu-kham', {
     idHoSo,
     idBS,
+    idLK,
     hoTen,
     ngayKham,
+    khungGio,
     tienSu,
     chuanDoan,
     lyDoKham
@@ -312,5 +314,38 @@ export const taoPhieuKhamBenh = (idHoSo, idBS, hoTen, ngayKham, tienSu, chuanDoa
       'Content-Type': 'application/json' // Đảm bảo gửi với Content-Type là application/json
     }
   });
+};
+
+export const fetchLayTTPhieuKhamBenh = (idLK,ngayKham, khungGio) => {
+  return axios.post(
+    '/api/phieukhambenh.php?action=lay-thong-tin-phieu-kham',
+    {
+      idLK,
+      ngayKham,
+      khungGio
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+};
+
+export const updateTTPhieuKhamBenh = (idPhieuKham, tienSu, chuanDoan, lyDoKham) => {
+  return axios.post(
+    '/api/phieukhambenh.php?action=cap-nhat-thong-tin-phieu-kham',
+    {
+      idPhieuKham,
+      tienSu,
+      chuanDoan,
+      lyDoKham
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  );
 };
 

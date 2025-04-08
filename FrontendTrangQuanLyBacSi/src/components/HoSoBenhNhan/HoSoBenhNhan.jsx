@@ -81,7 +81,7 @@ const HoSoBenhNhan = () => {
             render: (_, __, index) => (
                 <span>{index + 1 + (current - 1) * pageSize}</span>
             ),
-            width: 50,
+            width: 100,
         },
         {
             title: "Bệnh nhân",
@@ -101,7 +101,7 @@ const HoSoBenhNhan = () => {
             render: (_, record) => (
                 <span style={{ fontWeight: "bold" }}>{record.soLanDaKham} lần</span>
             ),
-            width: 50,
+            width: 200,
         },
         {
             title: "Chức năng",
@@ -122,11 +122,18 @@ const HoSoBenhNhan = () => {
 
     return (
         <Row gutter={[20, 10]}>
-            <Col xs={24} sm={12} md={24}>
-            <SearchComponent
+          <Col xs={24} style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: '800px', maxWidth: '100%' }}>
+                <SearchComponent
                 onSearch={handleSearch}
+                style={{
+                    width: '100%',
+                    height: '38px',
+                    marginBottom: '20px'
+                }}
                 placeholder="Tìm bệnh nhân theo tên, email hoặc số điện thoại"
-            />
+                />
+            </div>
             </Col>
             <Col xs={24} sm={12} md={24}>
                 <Table
