@@ -2,4 +2,11 @@
 
 body {
   font-family: 'Poppins', sans-serif;
+  height: 100%;
+  overflow: auto;
 }
+body::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* Chrome/Safari/Opera */
+}                 
+

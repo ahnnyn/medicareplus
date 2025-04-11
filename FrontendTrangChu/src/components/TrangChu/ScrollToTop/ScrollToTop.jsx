@@ -6,7 +6,7 @@ const ScrollToTop = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 300) {
+            if (window.scrollY > 100) {
                 setShowButton(true);
             } else {
                 setShowButton(false);
@@ -43,7 +43,7 @@ const ScrollToTop = () => {
                 transition: "all 0.3s ease-in-out",
                 transform: showButton ? "scale(1)" : "scale(0.8)",
                 opacity: showButton ? "1" : "0",
-                zIndex: "1000",
+                zIndex: "999999",
                 width: "50px",
                 height: "50px",
             }}

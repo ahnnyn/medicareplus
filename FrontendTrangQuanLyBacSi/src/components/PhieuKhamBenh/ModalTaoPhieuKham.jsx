@@ -222,7 +222,7 @@ return (
     <Form form={formPhieuKham} layout="vertical" onFinish={onFinishTaoPhieuKham}>
       <Row>
         <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
-          <span style={{ fontWeight: "500", color: "navy" }}>TẠO PHIẾU KHÁM</span>
+          <span style={{ fontWeight: "500", color: "navy" }}>PHIẾU KHÁM BỆNH</span>
         </Col>
       </Row>
       <Row gutter={[20, 10]}>

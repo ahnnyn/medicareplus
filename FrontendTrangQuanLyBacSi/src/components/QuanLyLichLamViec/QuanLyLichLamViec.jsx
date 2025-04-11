@@ -276,7 +276,7 @@ const QuanLyLichLamViec = () => {
                         onFinish={handleSubmit}
                         autoComplete="off"
                     >
-                        <Form.Item name="maLichLamViec" label="Mã lịch làm việc" style={{ display: 'none' }}>
+                        <Form.Item name="maLichLamViec" style={{ display: 'none' }}>
                             <Select
                                 placeholder="Chọn mã lịch làm việc"
                                 options={dataLichLamViec.map(item => ({ value: item.maLichLamViec, label: item.tenLichLamViec }))}

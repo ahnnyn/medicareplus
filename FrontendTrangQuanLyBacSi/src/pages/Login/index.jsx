@@ -228,77 +228,78 @@ const Login = () => {
         </div>
       </div>
 
-      <Modal
-  title={null}
-  centered
-  open={openQuenMK}
-  onOk={() => formLayMK.submit()}
-  okText={null}
-  cancelText={null}
-  width={500}
-  footer={null}
-  maskClosable={false}
-  onCancel={() => {
-    setOpenQuenMK(false);
-    formLayMK.resetFields();
-  }}
-  className="custom-forgot-modal"
->
-  <div className="forgot-password-wrapper">
-    <h2 className="forgot-title">🔐 Lấy lại mật khẩu</h2>
-    <p className="forgot-subtitle">Vui lòng nhập email đã đăng ký để lấy lại mật khẩu.</p>
-
-    <Form
-      form={formLayMK}
-      layout="vertical"
-      onFinish={handleLayMK}
-      className="forgot-password-form"
-    >
-      <Form.Item
-        label="Địa chỉ Email"
-        name="email"
-        rules={[
-          {
-            required: true,
-            message: "Vui lòng nhập email!",
-          },
-          {
-            type: "email",
-            message: "Email không hợp lệ!",
-          },
-        ]}
-        hasFeedback
-      >
-        <Input placeholder="nhapemail@example.com" />
-      </Form.Item>
-
-      <div className="forgot-form-actions">
-        <Button
-          onClick={() => {
-            setOpenQuenMK(false);
-            formLayMK.resetFields();
-          }}
-          className="cancel-btn"
-        >
-          Hủy
-        </Button>
-
-        <Button
-          type="primary"
-          loading={isLoadingDoiMK}
-          onClick={() => formLayMK.submit()}
-          className="submit-btn"
-        >
-          Gửi yêu cầu
-        </Button>
-      </div>
-    </Form>
-  </div>
-</Modal>
-
-
-
       <Footer />
+
+      <Modal
+        title={null}
+        centered
+        open={openQuenMK}
+        onOk={() => formLayMK.submit()}
+        okText={null}
+        cancelText={null}
+        width={500}
+        footer={null}
+        maskClosable={false}
+        onCancel={() => {
+          setOpenQuenMK(false);
+          formLayMK.resetFields();
+        }}
+        className="custom-forgot-modal"
+      >
+        <div className="forgot-password-wrapper">
+          <h2 className="forgot-title">🔐 Lấy lại mật khẩu</h2>
+          <p className="forgot-subtitle">Vui lòng nhập email đã đăng ký để lấy lại mật khẩu.</p>
+
+          <Form
+            form={formLayMK}
+            layout="vertical"
+            onFinish={handleLayMK}
+            className="forgot-password-form"
+          >
+            <Form.Item
+              label="Địa chỉ Email"
+              name="email"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng nhập email!",
+                },
+                {
+                  type: "email",
+                  message: "Email không hợp lệ!",
+                },
+              ]}
+              hasFeedback
+            >
+              <Input placeholder="nhapemail@example.com" />
+            </Form.Item>
+
+            <div className="forgot-form-actions">
+              <Button
+                onClick={() => {
+                  setOpenQuenMK(false);
+                  formLayMK.resetFields();
+                }}
+                className="cancel-btn"
+              >
+                Hủy
+              </Button>
+
+              <Button
+                type="primary"
+                loading={isLoadingDoiMK}
+                onClick={() => formLayMK.submit()}
+                className="submit-btn"
+              >
+                Gửi yêu cầu
+              </Button>
+            </div>
+          </Form>
+        </div>
+      </Modal>
+
+
+
     </>
   );
 };

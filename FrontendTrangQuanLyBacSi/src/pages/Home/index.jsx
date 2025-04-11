@@ -46,9 +46,10 @@ const Home = () => {
     return (
         <>
             <Header />
-            <div className="account-tab-area-start rts-section-gap">
+            {/*<div className="account-tab-area-start rts-section-gap">*/}
+            <div className="container-fluid">
                 <div className="container-2">
-                    <div className="row" style={{ borderRadius: '10px', overflow: 'hidden' }}>
+                    <div className="row full-height-layout" style={{ borderRadius: '10px', margin: 0 }}>
                         {/* Sidebar */}
                         <div className="col-lg-2 sidebar-left">
                             <div className="user-info">

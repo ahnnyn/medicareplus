@@ -16,7 +16,6 @@ import UpdateBenhNhan from '../ThongTin/UpdateBenhNhan';
 import { RiAccountCircleFill } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { MdOutlineAccountCircle } from "react-icons/md";
-import ScrollToTop from '../ScrollToTop/ScrollToTop';
 import './header.scss';
 
 
@@ -103,7 +102,8 @@ const HeaderViewDoctor = () => {
                             <img
                                 style={{
                                     cursor: "pointer",
-                                    height: "100px", // không cần width cố định, auto theo height
+                                    maxHeight: "80px",
+                                    width: "auto",
                                     objectFit: "contain"
                                 }}
                                 onClick={() => navigate("/")}
@@ -125,7 +125,7 @@ const HeaderViewDoctor = () => {
                         </Col>
     
                         {/* Avatar or login icon */}
-                        <Col xs={8} sm={6} md={4} className="col-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <Col xs={8} sm={6} md={4} className="col-top avatar-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                             <div style={{ cursor: "pointer", color: "rgb(69, 195, 210)" }}>
                                 {isAuthenticated ? (
                                     <Dropdown menu={{ items }}>
@@ -151,7 +151,7 @@ const HeaderViewDoctor = () => {
                     <ModalDoiMK openModalDoiMK={openModalDoiMK} setOpenModalDoiMK={setOpenModalDoiMK} />
                 </div>
     
-                <ScrollToTop />
+                
             </div>
             <div style={{ marginBottom: "13vh" }}></div>
 

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { FaChevronRight, FaRegCalendarAlt } from 'react-icons/fa';
 import { IoIosShareAlt } from 'react-icons/io';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { fetchBacSiByMaBS, getTimeSlotsByBacSiAndDate } from '../../../services/apiChuyenKhoaBacSi';
+import { fetchBacSiByMaBS, getTimeSlotsByDoctorAndDate } from '../../../services/apiChuyenKhoaBacSi';
 import moment from 'moment';
 
 const PageViewDoctor = () => {
@@ -16,10 +16,14 @@ const PageViewDoctor = () => {
     const [placement, setPlacement] = useState('right');
     const [hienThiTime, setHienThiTime] = useState('Bấm vào đây để xem lịch khám!');
     const [selectedTimeId, setSelectedTimeId] = useState(null);
-    const [timeGioList, setTimeGioList] = useState([]);
+    const [dataLichKham, setDataLichKham] = useState([]);
     const [dataBacSi, setDataBacSi] = useState(null);  
     const [error, setError] = useState(null); // Lưu thông báo lỗi
-
+    const [hoveredIndex, setHoveredIndex] = useState(null);
+    const [showDetails, setShowDetails] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [timeGioList, setTimeGioList] = useState([]);
+    const [giaKham, setGiaKham] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -36,36 +40,56 @@ const PageViewDoctor = () => {
     }, [maBacSi]);
 
     useEffect(() => {
-        if (!selectedTimeId || !maBacSi) return;
-        fetchBacSiTimes(maBacSi, selectedTimeId);
-    }, [selectedTimeId]);
+        if (dataBacSi) {
+            setGiaKham(dataBacSi.giaKham);
+        }
+    }, [dataBacSi]);
+
+    console.log("giaKham: ", giaKham);
+    
+
 
     const fetchBacSiByID = async (maBacSi) => {
         const res = await fetchBacSiByMaBS(maBacSi)
-        console.log("res: ", res);
+        console.log("res: ", res.data);
         if(res && res.data) {
             setDataBacSi(res.data)
         }
     };
+    console.log("dataBacSi: ", dataBacSi);
+
+    useEffect(() => {
+        const fetchBacSiTimes = async () => {
+            if (!selectedDate) {
+                console.warn("selectedDate is null or undefined");
+                return;
+            }
+            if (!maBacSi) {
+                console.warn("maBacSi is null or undefined");
+                return;
+            }
+    
+            console.log("selectedDate: ", selectedDate);
+            const doctorId = maBacSi;
+            const appointmentDate = selectedDate; // Ngày đã chọn từ Drawer
+            console.log("appointmentDate: ", appointmentDate);    
+            const res = await getTimeSlotsByDoctorAndDate(doctorId, appointmentDate);
+            console.log("res fetch: ", res);
+    
+            if (res && Array.isArray(res)) {
+                setDataLichKham(res);
+            } else {
+                console.error('Error fetching time slots:', await res.json());
+            }
+        };
+    
+        fetchBacSiTimes();
+    }, [selectedDate, maBacSi]);
+    
+    
+    console.log("dataLichKham: ", dataLichKham);
     
 
-    const fetchBacSiTimes = async (maBacSi, appointmentDate) => {
-        try {
-            let query = `maBacSi=${maBacSi}&date=${appointmentDate}`;
-            const res = await getTimeSlotsByBacSiAndDate(query);
-            console.log("Kết quả API lịch khám: ", res);
-            
-            if (res && res.timeGioList) {
-                setTimeGioList(res.timeGioList);
-            } else {
-                setTimeGioList([]);
-                console.warn("Không có lịch khám.");
-            }
-        } catch (err) {
-            console.error("Lỗi khi lấy lịch khám:", err);
-            setTimeGioList([]);
-        }
-    };
 
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '';
@@ -92,10 +116,13 @@ const PageViewDoctor = () => {
         "Saturday": "Thứ 7"
     };   
 
-    // hiển thị trong drawer
-    //const listTime = dataBacSi?.thoiGianKham.map(item => item.date) || [];        
+// hiển thị trong drawer
+const listTime = (dataBacSi?.danhSachNgayLamViec || '')
+    .split(',')
+    .map(date => date.trim())
+    .filter(date => moment(date, 'YYYY-MM-DD', true).isValid());
 
-    //console.log("listTime: ",listTime);
+
 
     const styleTime = (index) => ({
         cursor: "pointer",
@@ -104,9 +131,10 @@ const PageViewDoctor = () => {
     });
     
     
-    const handleRedirectBacSi = (item, thoiGianKhamBenh, listTime) => {
-        navigate(`/page-dat-lich-kham?id=${item._id}&idGioKhamBenh=${thoiGianKhamBenh}&ngayKham=${listTime}`)
-    }    
+    const handleRedirectBacSi = (item, idKhungGio, thoiGianKhamBenh, selectedDate, giaKham) => {
+        const formattedDate = moment(selectedDate, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        navigate(`/page-dat-lich-kham?id=${item.maBacSi}&idGioKhamBenh=${idKhungGio}&khungGioKham=${thoiGianKhamBenh}&ngayKham=${formattedDate}&giaKham=${giaKham}`);
+    };   
     return (
         <>
             <div className='layout-app'>
@@ -165,16 +193,48 @@ const PageViewDoctor = () => {
                                     </p>
 
                                     <Drawer
-                                        title={`Thông tin lịch khám bệnh của 
+                                        title={`Thông tin lịch khám bệnh của bác sĩ
+                                            
                                             ${dataBacSi?.hoTen}`}                                        
                                         placement={placement}
                                         closable={false}
                                         onClose={onClose}
                                         open={open}
                                         key={placement}
+                                        // height={450}
+                                        // width={300}
+                                        // style={{ backgroundColor: 'blue', color: 'white' }} // Thay đổi màu nền
                                     >
+                                        {listTime.length > 0 ? (
+                                            listTime
+                                                .sort((a, b) => moment(a).unix() - moment(b).unix()) // Sắp xếp từ nhỏ đến lớn
+                                                .map((time, index) => {
+                                                    const formattedTime = moment(time).format("dddd - DD/MM"); // Định dạng lại thời gian
+                                                    const vietnameseDay = englishToVietnameseDays[moment(time).format("dddd")]; // Chuyển đổi tên ngày sang tiếng Việt
+                                                    const displayTime = `${vietnameseDay} - ${moment(time).format("DD/MM")}`; // Tạo chuỗi hiển thị
+                                                    return (
+                                                        <p 
+                                                            onClick={() => {                                                    
+                                                                console.log("time: ", time);
+                                                                setHienThiTime(displayTime);
+                                                                setSelectedTimeId(time);
+                                                                setSelectedDate(time); // Cập nhật ngày đã chọn
+                                                                onClose(); // Đóng drawer
+                                                            }}
+                                                            onMouseEnter={() => setHoveredIndex(index)} // Khi hover vào thẻ
+                                                            onMouseLeave={() => setHoveredIndex(null)} // Khi rời khỏi thẻ
+                                                            className='times' 
+                                                            style={styleTime(index)} 
+                                                            key={index}
+                                                        >
+                                                            {displayTime} {/* Hiển thị thời gian đã định dạng */}
+                                                        </p>
+                                                    );
+                                                })
+                                        ) : (
+                                            <p>Không có thời gian khám nào.</p>
+                                        )}
 
-    
                                         <Button color="default" variant="outlined" onClick={() => setOpen(false)}>Bỏ Qua</Button>
                                     </Drawer>
                                 </Col>    
@@ -186,21 +246,33 @@ const PageViewDoctor = () => {
                                         <FaRegCalendarAlt />
                                         <span style={{marginLeft: "10px"}}>LỊCH KHÁM</span>    
                                     </p>
-                                    <Row justify="start" style={{marginTop: "-10px"}}>
+                                    <Row justify="start" style={{ marginTop: "-10px" }}>
                                         {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
-                                            timeGioList.map((item, index) => (
-                                                <Col span={4} className='cach-deu' onClick={() => handleRedirectBacSi(dataBacSi, item.maBacSi, selectedDate)}>
-                                                    <div className='lich-kham' key={index}>
-                                                    {item.tenGio}
+                                            dataLichKham.map((item, index) => (
+                                                <Col
+                                                    span={4}
+                                                    className='cach-deu'
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setTimeGioList(item.khungGio);
+                                                        setSelectedTimeId(item.maKhungGio);
+                                                        handleRedirectBacSi(dataBacSi, item.maKhungGio, item.khungGio, selectedDate, giaKham);
+                                    
+                                                    }}
+                                                >
+                                                    <div className='lich-kham'>
+                                                        {item.khungGio}
                                                     </div>
                                                 </Col>
                                             ))
                                         ) : (
-                                            <span style={{color: "red", margin: "0 0 10px"}}>Không có thời gian khám nào. 
-                                            <br/> Chọn lịch
+                                            <span style={{ color: "red", margin: "0 0 10px" }}>
+                                                Không có thời gian khám nào.
+                                                <br /> Chọn lịch
                                             </span>
-                                        )}                                                                                                                          
+                                        )}
                                     </Row>
+
                                 </Col>                            
 
                                 <Col span={24}  style={{backgroundColor: "white", top: "-30px", position: "relative"}}>

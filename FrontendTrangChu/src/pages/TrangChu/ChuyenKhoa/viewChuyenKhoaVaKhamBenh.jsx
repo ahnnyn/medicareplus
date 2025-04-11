@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { FaLocationDot } from "react-icons/fa6"
 import { FaRegCalendarAlt, FaRegHandPointRight, FaRegHandPointUp } from "react-icons/fa"
-import { fetchChuyenKhoaByID, fetchBacSiByChuyenKhoa, getTimeSlotsByBacSiAndDate } from "../../../services/apiChuyenKhoaBacSi"
+import { fetchChuyenKhoaByID, fetchBacSiByChuyenKhoa, getTimeSlotsByDoctorAndDate } from "../../../services/apiChuyenKhoaBacSi"
 import moment from "moment"
 import styled, { keyframes } from 'styled-components';
 
@@ -139,7 +139,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
     const fetchBacSiTimes = async (doctorId, date) => {
         if (!date) return; // Ensure an appointment date is selected
         let query = `doctorId=${doctorId}&date=${date}`;
-        const res = await getTimeSlotsByBacSiAndDate(query);
+        const res = await getTimeSlotsByDoctorAndDate(query);
         if (res && res.timeGioList) {
             setTimeGioList(res.timeGioList); // Set the fetched time slots
         } else {

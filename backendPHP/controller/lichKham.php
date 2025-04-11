@@ -19,6 +19,18 @@
         $result = $p->capNhatTrangThaiLichKham($maBacSi, $maLichKham, $trangThai);
         return $result;
     }
+
+    public function createLichKham($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham,$lyDoKham, $hinhThucThanhToan) {
+        $p = new mLichKham();
+        $result = $p->taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham,$lyDoKham, $hinhThucThanhToan);
+        return $result;
+    }
+
+    public function updateTrangThaiThanhToan($maLichKham, $trangThaiThanhToan) {
+        $p = new mLichKham();
+        $result = $p->capNhatTrangThaiThanhToan($maLichKham, $trangThaiThanhToan);
+        return $result;
+    }
     
  }
 ?>

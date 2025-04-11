@@ -9,11 +9,22 @@
     // height: 50vh;
     display: flex;
     justify-content: center;
+    padding: 4vh 0;
+
+    @media (max-width: 768px) {
+        padding: 2vh 10px;
+    }
 
     .ben-trong {
         display: flex;
         justify-content: start;
         width: 80%;
+
+        @media (max-width: 768px) {
+            width: 95%;
+            flex-direction: column;
+            align-items: center;
+        }
     }
 
     .cot-ben-trong {
@@ -39,6 +50,10 @@
         background-size: cover; /* Phủ toàn bộ khu vực của phần tử */
         background-position: center; /* Căn giữa hình nền */
         background-repeat: no-repeat; /* Ngăn không cho hình nền lặp lại */        
+
+        @media (max-width: 768px) {
+            border-radius: 20px;
+        }
     }
 
     .boc-ngoai-Imghcn {
@@ -51,6 +66,12 @@
         justify-content: center;
         align-items: center;
         margin: 8% 20%;
+
+        @media (max-width: 768px) {
+            width: 8vh;
+            height: 8vh;
+            margin: 10px auto;
+        }
     }
     
 }
@@ -73,6 +94,22 @@
             border: none; // Bỏ border
             box-shadow: none; // Bỏ bóng
         }
+    }
+}
+
+
+.slicer-banner {
+    min-height: 60vh;
+
+    @media (max-width: 768px) {
+        min-height: 40vh;
+    }
+
+    img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        border-radius: 0 0 20px 20px;
     }
 }
 

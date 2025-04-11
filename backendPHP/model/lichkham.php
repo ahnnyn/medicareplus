@@ -88,5 +88,91 @@
                 return ["status" => false, "error" => "Không thể kết nối CSDL"];
             }
         }
+
+        public function taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham, $lyDoKham, $hinhThucThanhToan) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+        
+            if ($pdo) {
+                try {
+                    if (!is_numeric($maBenhNhan) || !is_numeric($maBacSi) || !is_numeric($maKhungGio) || !is_numeric($giaKham)) {
+                        return ["status" => false, "error" => "Thông tin không hợp lệ"];
+                    }
+        
+                   // Chuyển đổi sang chuỗi ngày đúng định dạng
+                    $ngayKhamFormatted = DateTime::createFromFormat('Y-m-d', $ngayKham);
+
+                    if (!$ngayKhamFormatted) {
+                        return ["status" => false, "error" => "Ngày khám không hợp lệ"];
+                    }
+
+                    $ngayKhamStr = $ngayKhamFormatted->format('Y-m-d');
+
+        
+                    $query = $pdo->prepare("INSERT INTO lichkham (maBenhNhan, maBacSi, maKhungGio, hoTenBenhNhan, giaKham, ngayKham, lyDoKham, phuongthucthanhtoan) 
+                        VALUES (:maBenhNhan, :maBacSi, :maKhungGio, :tenBenhNhan, :giaKham, :ngayKham, :lyDoKham, :phuongthucthanhtoan)");
+        
+                    $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
+                    $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
+                    $query->bindParam(":maKhungGio", $maKhungGio, PDO::PARAM_INT);
+                    $query->bindParam(":giaKham", $giaKham, PDO::PARAM_INT);
+                    $query->bindParam(":tenBenhNhan", $tenBenhNhan, PDO::PARAM_STR);
+                    $query->bindParam(":ngayKham", $ngayKhamStr, PDO::PARAM_STR);
+                    $query->bindParam(":lyDoKham", $lyDoKham, PDO::PARAM_STR);
+                    $query->bindParam(":phuongthucthanhtoan", $hinhThucThanhToan, PDO::PARAM_STR);
+        
+                    $success = $query->execute();
+                    $maLichKham = $pdo->lastInsertId();
+                    if ($success) {
+                        return [
+                            "status" => true,
+                            "message" => "Tạo lịch khám thành công",
+                            "maLichKham" => $maLichKham
+                        ];
+                    } else {
+                        return ["status" => false, "error" => "Không thể thực thi câu lệnh INSERT"];
+                    }
+        
+                } catch (PDOException $e) {
+                    return ["status" => false, "error" => "Lỗi PDO: " . $e->getMessage()];
+                }
+            } else {
+                return ["status" => false, "error" => "Không thể kết nối CSDL"];
+            }
+        }
+        
+
+        public function capNhatTrangThaiThanhToan($maLichKham, $trangThaiThanhToan) {
+            $validStatuses = ['Chưa thanh toán', 'Đã thanh toán']; // Valid enum values for database
+            if (!in_array($trangThaiThanhToan, $validStatuses)) {
+                return ["status" => false, "error" => "Trạng thái không hợp lệ"];
+            }
+        
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    if (!is_numeric($maLichKham)) {
+                        return ["status" => false, "error" => "Mã lịch khám không hợp lệ"];
+                    }
+        
+                    $query = $pdo->prepare("UPDATE lichkham SET trangThaiThanhToan = :trangThaiThanhToan WHERE maLich = :maLichKham");
+                    $query->bindParam(":trangThaiThanhToan", $trangThaiThanhToan, PDO::PARAM_STR);
+                    $query->bindParam(":maLichKham", $maLichKham, PDO::PARAM_INT);
+        
+                    $success = $query->execute();
+                    if ($success) {
+                        return ["status" => true];
+                    } else {
+                        return ["status" => false, "error" => "Không thể thực thi câu lệnh UPDATE"];
+                    }
+        
+                } catch (PDOException $e) {
+                    return ["status" => false, "error" => "Lỗi PDO: " . $e->getMessage()];
+                }
+            } else {
+                return ["status" => false, "error" => "Không thể kết nối CSDL"];
+            }
+        }
     }
 ?>

@@ -1,5 +1,6 @@
 import Footer from "../../components/TrangChu/Footer/Footer"
 import HeaderViewDoctor from "../../components/TrangChu/Header/HeaderViewDoctor"
+import ScrollToTop from '../../components/TrangChu/ScrollToTop/ScrollToTop';
 import '../TrangChu/home.scss'
 import BodyHomePage from "./BodyHomePage/BodyHomePage"
 const Home = () => {
@@ -7,11 +8,11 @@ const Home = () => {
     return (
         <>
             <div className='layout-app'>
-                {/* <Header /> */}
                 <HeaderViewDoctor />
                 <BodyHomePage />
                 <Footer />
-            </div>            
+            </div>      
+            <ScrollToTop />            
         </>
     )
 }

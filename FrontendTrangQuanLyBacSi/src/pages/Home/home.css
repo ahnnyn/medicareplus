@@ -1,14 +1,22 @@
 .container-2 {
   width: 100%;
-  padding-left: 15px;
-  padding-right: 15px;
   max-width: 100%;
+  height: calc(100vh - 100px);
+  overflow-y: scroll;            /* vẫn cho cuộn */
+  -ms-overflow-style: none;      /* IE, Edge */
+  scrollbar-width: none; 
 }
 
-.account-tab-area-start {
+.container-2::-webkit-scrollbar {
+  display: none;                 /* Chrome, Safari */
+}
+
+  .account-tab-area-start {
   padding: 30px 0;
   background-color: #f0f2f5;
 }
+
+
 
 /* Sidebar style */
 .sidebar-left {
@@ -16,7 +24,6 @@
   color: white;
   padding: 20px 10px;
   border-radius: 8px;
-  min-height: 100%;
 }
 
 .user-info {
@@ -78,3 +85,60 @@
   padding: 20px;
   border-left: 1px solid #d9d9d9;
 }
+
+/* Wrapper tổng chứa sidebar và nội dung */
+@media (min-width: 992px) {
+  .sidebar-left {
+    position: fixed; /* cố định ở bên trái */
+    top: 100px; /* bằng chiều cao header nếu header cao 100px */
+    left: 0;
+    width: 16.666667%; /* = col-lg-2 */
+    height: calc(100vh - 100px); /* 100vh trừ header và padding/margin */
+    background-color: #072D44;
+    color: white;
+    padding: 20px 10px;
+    border-radius: 8px;
+    overflow-y: auto;
+  }
+
+  .content-area {
+    margin-left: 16.666667%; /* để tránh bị đè lên bởi sidebar cố định */
+    padding: 20px;
+    top: 100px;
+    background-color: #fff;
+    border-left: 1px solid #d9d9d9;
+    height: calc(100vh - 100px);
+    padding: 20px 10px;
+  }
+
+  .container-2 {
+    max-width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .row {
+    margin: 0;
+  }
+}
+
+/* Mobile: không cần chiều cao 100%, để tự cuộn */
+@media (max-width: 991.98px) {
+  .sidebar-left {
+    width: 100%;
+    position: relative;
+    height: auto;
+  }
+
+  .content-area {
+    width: 100%;
+    height: auto;
+  }
+
+  .row.full-height-layout {
+    flex-direction: column;
+    height: auto;
+  }
+}
+
+/* Phần còn lại giữ nguyên */

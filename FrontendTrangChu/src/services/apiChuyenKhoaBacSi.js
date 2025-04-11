@@ -44,13 +44,15 @@ export const deleteBacSi = (maBacSi) => {
     }
     
     // lấy bác sĩ thông qua id
-export const fetchBacSiByMaBS = (maBacSi) => {
-    const URL_BACKEND = `/api/bacsi.php?action=getBacSiByID&maBacSi=${maBacSi}`
-    return axios.get(URL_BACKEND)
-}
+    export const fetchBacSiByMaBS = (maBacSi) => {
+        console.log("Đang gọi API với maBacSi: ", maBacSi); // 👈 debug ở đây
+        const URL_BACKEND = `/api/bacsi.php?action=getBacSiByID&maBacSi=${maBacSi}`;
+        return axios.get(URL_BACKEND);
+    };
+    
 
     // hiển thị info doctor kèm theo thgian khám cho page đặt lịch khám
-export const fetchBacSirByNgayGio1 = (id, idGioKhamBenh, ngayKham) => {
+export const fetchBacSiByNgayGio1 = (id, idGioKhamBenh, ngayKham) => {
     const URL_BACKEND = `/api/bacsi.php?id=${id}&idGioKhamBenh=${idGioKhamBenh}&ngayKham=${ngayKham}`
     return axios.get(URL_BACKEND)
 }
@@ -59,6 +61,23 @@ export const fetchBacSiByNgayGio = (query) => {
     return axios.get(URL_BACKEND)
 }
 
+export const getTimeSlotsByDoctorAndDate = async (maBacSi, ngayLamViec) => {
+    const URL_BACKEND = `/api/lichlamviec.php?action=getLichLamViecTheoNgay&maBacSi=${maBacSi}&ngayLamViec=${ngayLamViec}`;
+  
+    try {
+      const response = await axios.get(URL_BACKEND);
+  
+      console.log("Dữ liệu lịch làm việc từ API:", response);
+  
+      return response; // Trả về response.data thay vì response
+    } catch (error) {
+      console.error(
+        "Lỗi khi gọi lịch làm việc API:",
+        error.response ? error.response : error.message
+      );
+      return [];
+    }
+  };
 
 // fetch time
 export const fetchAllTime = () => {
@@ -68,10 +87,6 @@ export const fetchAllTime = () => {
 export const fetchAllTime2 = (doctorId, date) => {
     const URL_BACKEND = `/api/bacsi.php`;
     return axios.get(URL_BACKEND);
-}
-export const getTimeSlotsByBacSiAndDate = (query) => {
-    const URL_BACKEND = `/api/bacsi.php`
-    return axios.get(URL_BACKEND)
 }
 
 // them thoi gian kham benh
@@ -113,38 +128,55 @@ export const updateBenhNhan = (_id, email, password, firstName, lastName, phone,
 }
 
 // dat lich kham
+// Đặt lịch khám thông thường
 export const datLichKhamBenh = (
-    _idDoctor, _idTaiKhoan, patientName, email,
-    gender, phone, dateBenhNhan, address, lidokham,
-    hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
+    maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan
 ) => {
-    const data = {
-        _idDoctor, _idTaiKhoan, patientName, email,
-        gender, phone, dateBenhNhan, address, lidokham,
-        hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
-    }
-    return axios.post('/api/bacsi.php', data)
+    return axios.post('/api/lichkham.php?action=dat-lich-kham-moi', {
+        maBenhNhan,
+        maBacSi,
+        khungGioKham,
+        tenBenhNhan,
+        giaKham,
+        ngayKhamBenh,
+        lyDoKham,
+        hinhThucThanhToan
+    })
 }
-export const datLichKhamBenhVnPay = (
-    _idDoctor, _idTaiKhoan, patientName, email,
-    gender, phone, dateBenhNhan, address, lidokham,
-    hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
+
+export const datLichKhamBenhVnPay = (maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan
 ) => {
-    const data = {
-        _idDoctor, _idTaiKhoan, patientName, email,
-        gender, phone, dateBenhNhan, address, lidokham,
-        hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
-    }
-    return axios.post('/api/bacsi.php', data)
-}
-export const getThongBaoThanhToan = () => {
-    const URL_BACKEND = `/api/bacsi.php`    
+    return axios.post('/api/lichkham.php?action=dat-lich-kham-moi', {
+        maBenhNhan,
+        maBacSi,
+        khungGioKham,
+        tenBenhNhan,
+        giaKham,
+        ngayKhamBenh,
+        lyDoKham,
+        hinhThucThanhToan
+    })
+};
+
+export const taoVnPayUrl = (maLichKham, amount, tenBenhNhan) => {
+    const URL_BACKEND = `/api/thanhtoan.php?action=thanh-toan&maLichKham=${maLichKham}&amount=${amount}&tenBenhNhan=${tenBenhNhan}`    
     return axios.get(URL_BACKEND)
 }
 
+export const getThongBaoThanhToan = (data) => {
+  const URL_BACKEND = `/api/thanhtoan.php?action=thong-tin-thanh-toan`;
+  return axios.post(URL_BACKEND, data); // truyền data để lưu
+};
+
+export const capNhatTrangThaiThanhToanLichKham = (data) => {
+  const URL_BACKEND = `/api/lichkham.php?action=cap-nhat-thanh-toan`;
+  return axios.post(URL_BACKEND, data); // truyền mã lịch khám
+};
+
+
 // get lich kham
 export const fetchLichKham = (idKhachHang) => {
-    const URL_BACKEND = `/api/dbacsi.php?idKhachHang=${idKhachHang}`
+    const URL_BACKEND = `/api/bacsi.php?idKhachHang=${idKhachHang}`
     return axios.get(URL_BACKEND)
 }
 

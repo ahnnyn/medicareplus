@@ -9,6 +9,7 @@ import BacSiNoiBat from "./pages/TrangChu/BacSiNoiBat/bacSiNoiBat";
 import ChuyenKhoa from "./pages/TrangChu/ChuyenKhoa/chuyenKhoa";
 import LienHe from "./pages/TrangChu/LienHe/LienHe";
 import ViewChuyenKhoaVaKhamBenh from "./pages/TrangChu/ChuyenKhoa/viewChuyenKhoaVaKhamBenh";
+import ThongBaoThanhToan from "./pages/TrangChu/ThongBaoThanhToan/ThongBaoThanhToan";
 import { LineHeightOutlined } from "@ant-design/icons";
 
 const App = () => {
@@ -23,7 +24,8 @@ const App = () => {
     { path: "/user/bac-si-noi-bat", element: <BacSiNoiBat /> },   // bac si noi bat
     { path: "/user/chuyen-khoa-kham", element: <ChuyenKhoa /> },   
     { path: "/user/view-chuyen-khoa-kham", element: <ViewChuyenKhoaVaKhamBenh /> },
-    { path: "/user/lien-he", element: <LienHe /> }
+    { path: "/user/lien-he", element: <LienHe /> },
+    {path: "/user/thong-bao-thanh-toan", element: <ThongBaoThanhToan />}, // thông báo thanh toán
   ];
   return (
     <>

@@ -7,12 +7,15 @@ import { BsFillCalendar2DateFill } from "react-icons/bs"
 import { FaRegHospital } from "react-icons/fa"
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { datLichKhamBenh, datLichKhamBenhVnPay, fetchBacSiByNgayGio } from "../../../services/apiChuyenKhoaBacSi"
+import { fetchBacSiByMaBS, datLichKhamBenh, datLichKhamBenhVnPay, taoVnPayUrl } from "../../../services/apiChuyenKhoaBacSi"
+import { fetchOneAccKH } from "../../../services/api"
 import moment from "moment"
 import { HiOutlineMailOpen } from "react-icons/hi"
 import { IoAddCircleSharp, IoLocationSharp } from "react-icons/io5"
+import { DollarOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux"
 import LoginPage from "../Login/Login"
+
 const { TextArea } = Input;
 const PageDatLichKham = () => {
 
@@ -20,17 +23,19 @@ const PageDatLichKham = () => {
     const queryParams = new URLSearchParams(location.search);
     const doctorId = queryParams.get('id');
     const idGioKhamBenh = queryParams.get('idGioKhamBenh');
+    const khungGioKham = queryParams.get('khungGioKham');
     const ngayKham = queryParams.get('ngayKham');
-    const [paymentMethod, setPaymentMethod] = useState('offline'); // Trạng thái mặc định là thanh toán online
-
-    const [infoDoctorr, setInfoDoctorr] = useState(null)
-    const [tenGio, setTenGio] = useState(null)
+    const giaKham = queryParams.get('giaKham');
+    const [paymentMethod, setPaymentMethod] = useState('VnPay'); // Trạng thái mặc định là thanh toán online
+    const [dataBacSi, setDataBacSi] = useState(null);  
     const [ngayKhamBenh, setNgayKhamBenh] = useState(null)
-
-    const [value, setValue] = useState(infoDoctorr?.giaKhamVN);
+    const [dataBenhNhan, setDataBenhNhan] = useState(null)
+    const [genderBenhNhan, setGenderBenhNhan] = useState(null)
+    const [phuongThucThanhToan, setPhuongThucThanhToan] = useState("VnPay")
+    const [value, setValue] = useState(0);
     const [tongtien, setTongTien] = useState(0)
     const [loadingSubmit, setLoadingSubmit] = useState(false)
-    const [form] = Form.useForm()
+    const [form] = Form.useForm();
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -39,36 +44,77 @@ const PageDatLichKham = () => {
 
     console.log("doctorId: ", doctorId);
     console.log("idGioKhamBenh: ", idGioKhamBenh);
+    console.log("khungGioKham: ", khungGioKham);
+    console.log("giaKham: ", giaKham);
     console.log("ngayKham: ", ngayKham);
     console.log("tongtien: ", tongtien);
 
+    const maBenhNhan = acc.user.maBenhNhan;
+    console.log("maBenhNhan: ", maBenhNhan);
+
+    useEffect(() => {
+        fetchBacSiByID(doctorId);
+    }, [doctorId]);
+
+
+    useEffect(() => {
+        if (ngayKham) {
+            setNgayKhamBenh(ngayKham);
+        }
+    }, [ngayKham]);
+    
+
+    useEffect(() => {
+        fetchBenhNhanByID(maBenhNhan);
+    }, [maBenhNhan]);
+
+
+    const fetchBenhNhanByID = async (maBenhNhan) => {
+        console.log("Đang fetch bác sĩ với ID: ", maBenhNhan);
+        try {
+            const res = await fetchOneAccKH(maBenhNhan);
+            console.log("Kết quả API bệnh nhân: ", res);
+            if (res && res.data) {
+                    setDataBenhNhan(res.data);
+            } else {
+                console.warn("Không có dữ liệu bác sĩ");
+            }
+        } catch (error) {
+            console.error("Lỗi khi gọi API bác sĩ: ", error);
+        }
+    };
+    console.log("dataBenhNhan: ", dataBenhNhan);
+
+
+
+    const fetchBacSiByID = async (doctorId) => {
+        console.log("Đang fetch bác sĩ với ID: ", doctorId);
+        try {
+            const res = await fetchBacSiByMaBS(doctorId);
+            console.log("Kết quả API bác sĩ: ", res);
+            if (res && res.data) {
+                if (res && res.data) {
+                    const data = res.data;
+                    data.giaKham = Number(data.giaKham); // ép kiểu
+                    setDataBacSi(data);
+                }
+            } else {
+                console.warn("Không có dữ liệu bác sĩ");
+            }
+        } catch (error) {
+            console.error("Lỗi khi gọi API bác sĩ: ", error);
+        }
+    };
+
+
+    console.log("dataBacSi: ", dataBacSi);
+
     const handlePaymentChange = (event) => {
         console.log("e: ", event);
-
         setPaymentMethod(event.target.value);
 
     };
 
-    useEffect(() => {
-        const fetchInfoDoctor = async () => {
-            if (doctorId && idGioKhamBenh && ngayKham) {
-                // const res = await fetchDoctorByNgayGio(doctorId, idGioKhamBenh, ngayKham);
-                const res = await fetchDoctorByNgayGio(location.search);
-                console.log("res:", res);
-                if (res && res.infoDoctor) {
-                    setInfoDoctorr(res.infoDoctor);
-                    setTenGio(res.tenGio);
-                    setNgayKhamBenh(res.ngayKham);
-                }
-            }
-        }
-        fetchInfoDoctor();
-    }, [doctorId, idGioKhamBenh, ngayKham])
-
-
-    console.log("infoDoctorr: ", infoDoctorr);
-    console.log("tenGio: ", tenGio);
-    console.log("ngayKhamBenh: ", ngayKhamBenh);
 
     const englishToVietnameseDays = {
         'Sunday': 'Chủ nhật',
@@ -100,86 +146,130 @@ const PageDatLichKham = () => {
     };
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '';
-        return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} VNĐ`;
+        
+        const number = parseInt(value, 10); // loại bỏ phần thập phân nếu có
+        return `${number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} VNĐ`;
     };
 
     const handleDatLich = async (values) => {
-        console.log('Received values:', values);
-        const { _idDoctor, _idTaiKhoan, patientName, email,
-            gender, phone, dateBenhNhan, address, lidokham,
-            hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
-        } = values
+        console.log("📋 Toàn bộ values:", values);
+        console.log("👤 Tên bệnh nhân:", values.patientName);
+        console.log("Updating benh nhan with data:", {
+            fullName: values.patientName, 
+            gender: values.gender, 
+            phoneNumber: values.phone,
+            email: values.email, 
+            address: values.address, 
+            giaKham: values.giaKham, 
+            lyDoKham: values.lyDoKham,
+            dateBenhNhan: values.dateBenhNhan,
+            hinhThucTT: values.hinhThucTT
+        });
 
-        if (!patientName) {
+        console.log("tenBN ", values.patientName);
+
+
+        setLoadingSubmit(true);
+    
+        try {
+    
+            const apiCall = values.hinhThucTT === 'VnPay'
+                ? datLichKhamBenhVnPay
+                : datLichKhamBenh;
+    
+            const res = await apiCall(
+                values.maBenhNhan,
+                values.maBacSi,
+                values.khungGioKham,
+                values.patientName,
+                values.giaKham,
+                values.ngayKhamBenh,
+                values.lyDoKham,
+                values.hinhThucTT
+            );
+    
+            
+            console.log("res dat lich:", res);
+    
+            if (res?.status) {
+                if (values.hinhThucTT === 'VnPay') {
+                    try {
+                      const vnpayRes = await taoVnPayUrl(res.maLichKham, values.giaKham, values.patientName);
+                      console.log("vnpayRes:", vnpayRes);
+                  
+                      const vnpayData = vnpayRes;
+                      if (vnpayData?.status) {
+                        window.location.href = vnpayData.payment_url;
+                      } else {
+                        notification.error({
+                          message: 'Lỗi VNPAY',
+                          description: vnpayData?.message || 'Không tạo được link thanh toán.'
+                        });
+                      }
+                    } catch (error) {
+                      console.error("Lỗi khi gọi API tạo URL VNPAY:", error);
+                      notification.error({
+                        message: 'Lỗi kết nối VNPAY',
+                        description: 'Không thể gửi yêu cầu đến máy chủ. Vui lòng thử lại.'
+                      });
+                    }
+                  } else {
+                    message.success(res.message || 'Đặt lịch thành công 🎉');
+                    form.resetFields();
+                  }
+                  
+            } else {
+                notification.error({
+                    message: 'Đã có lỗi xảy ra',
+                    description: res?.error || 'Không thể đặt lịch khám.'
+                });
+            }
+        } catch (error) {
+            console.error("Đặt lịch lỗi:", error);
             notification.error({
-                message: 'Đã có lỗi xảy ra',
-                description: "Vui lòng điền đầy đủ thông tin"
-            })
-            return
-        }
-        if (paymentMethod === 'online') {
-            setLoadingSubmit(true)
-            const res = await datLichKhamBenhVnPay(
-                _idDoctor, _idTaiKhoan, patientName, email,
-                gender, phone, dateBenhNhan, address, lidokham,
-                hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
-            )
-            console.log("res dat lich: ", res);
-
-
-            if (res && res.data && res.paymentUrl) {
-                message.success(res.message);
-                form.resetFields()
-                window.open(res.paymentUrl, '_blank');
-                navigate('/')
-            } else {
-                notification.error({
-                    message: 'Đã có lỗi xảy ra',
-                    description: res.message
-                })
-            }
-            setLoadingSubmit(false)
-
-        } else {
-            setLoadingSubmit(true)
-            const res = await datLichKhamBenh(
-                _idDoctor, _idTaiKhoan, patientName, email,
-                gender, phone, dateBenhNhan, address, lidokham,
-                hinhThucTT, tenGioKham, ngayKhamBenh, giaKham
-            )
-            console.log("res dat lich: ", res);
-
-
-            if (res && res.data) {
-                message.success(res.message);
-                form.resetFields()
-                navigate('/')
-            } else {
-                notification.error({
-                    message: 'Đã có lỗi xảy ra',
-                    description: res.message
-                })
-            }
-            setLoadingSubmit(false)
-        }
-    }
-    const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
-    const idKH = acc?._id
-    useEffect(() => {
-        if (infoDoctorr) {
-            form.setFieldsValue({
-                // thongTinDoctor: `${infoDoctorr.chucVuId.map(item => item?.name).join(', ')} - ${infoDoctorr.lastName} ${infoDoctorr.firstName}`,
-                // noiKham: `${infoDoctorr?.phongKhamId.name}`,
-                // diaChiKham: `${infoDoctorr?.phongKhamId.address}`,
-                // avtDoctor: `${infoDoctorr?.image}`,
-                tenGioKham: `${tenGio?.tenGio}`,
-                ngayKhamBenh: `${formatDateDatLich(ngayKhamBenh)}`,
-                _idTaiKhoan: `${idKH}`,
-                _idDoctor: `${infoDoctorr?._id}`
+                message: 'Lỗi kết nối',
+                description: 'Không thể gửi yêu cầu đến máy chủ.'
             });
+        } finally {
+            setLoadingSubmit(false);
         }
-    }, [infoDoctorr, idKH]);
+    };
+    
+    
+    const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
+    const idKH = acc?.user.maBenhNhan;
 
+
+    useEffect(() => {
+        if (
+            form &&
+            dataBacSi?.maBacSi &&
+            idKH &&
+            ngayKhamBenh &&
+            khungGioKham &&
+            dataBenhNhan
+        ) {
+            form.setFieldsValue({
+                khungGioKham: idGioKhamBenh,
+                ngayKhamBenh: ngayKham,
+                maBenhNhan: idKH,
+                maBacSi: dataBacSi.maBacSi,
+                patientName: dataBenhNhan.hoTen,
+                gender: dataBenhNhan.gioiTinh,
+                phone: dataBenhNhan.soDienThoai,
+                email: dataBenhNhan.email,
+                address: dataBenhNhan.diaChi,
+                dateBenhNhan: dataBenhNhan.ngaySinh
+                    ? moment(dataBenhNhan.ngaySinh, "YYYY-MM-DD")
+                    : null,
+            });
+    
+            setGenderBenhNhan(dataBenhNhan.gioiTinh);
+        }
+    }, [form, dataBacSi, idKH, ngayKhamBenh, khungGioKham, dataBenhNhan]);
+    
+    
+    
     const [openModalLogin, setOpenModalLogin] = useState(false);
 
     const notificationContent = () => (
@@ -224,25 +314,24 @@ const PageDatLichKham = () => {
                             <Col span={10} style={{ margin: "auto", }}>
                                 <Row>
                                     <Col md={4} span={4} style={{ textAlign: "center", top: "20px" }}>
-                                        <Avatar src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${infoDoctorr?.image}`} size={90} icon={<UserOutlined />} />
+                                        <Avatar src={`${import.meta.env.VITE_BACKEND_URL}/public/bacsi/${dataBacSi?.hinhAnh}`} size={90} icon={<UserOutlined />} />
                                     </Col>
                                     <Col span={20} md={20}>
                                         <p className="txtTile">ĐẶT LỊCH KHÁM</p>
                                         <p className="txtTile" style={{ color: "#337ab7", lineHeight: "25px", fontSize: "18px" }}>
-                                            {infoDoctorr ? infoDoctorr.chucVuId.map(item => item?.name).join(', ') : ''} - &nbsp;
-                                            {infoDoctorr?.lastName} {infoDoctorr?.firstName}
+                                            Bác sĩ {dataBacSi?.hoTen} - Chuyên khoa {dataBacSi?.tenKhoa} <br />
                                         </p>
                                         <p className="txtTile">
                                             <BsFillCalendar2DateFill style={{ color: "gray", marginRight: "10px" }} />
                                             <span className="txt2" style={{ color: "#FEC206" }}>
-                                                {tenGio?.tenGio} - {formatDate(ngayKhamBenh)}
+                                                {khungGioKham} - {formatDate(ngayKhamBenh)}
                                             </span>
                                         </p>
-                                        <p className="txtTile">
+                                        {/* <p className="txtTile">
                                             <FaRegHospital style={{ color: "gray", marginRight: "10px" }} />
-                                            <span>Phòng khám {infoDoctorr?.phongKhamId.name}</span>
-                                            <p style={{ marginLeft: "25px", fontWeight: "350" }}>{infoDoctorr?.phongKhamId.address}</p>
-                                        </p>
+                                            <span>Phòng khám {dataBacSi?.phongKhamId.name}</span>
+                                            <p style={{ marginLeft: "25px", fontWeight: "350" }}>{DataBacSi?.phongKhamId.address}</p>
+                                        </p> */}
                                     </Col>
                                 </Row>
                             </Col>
@@ -250,14 +339,10 @@ const PageDatLichKham = () => {
 
                         {/* the input an luu cac gia tri de truyen len server */}
                         <Row>
-                            <Form.Item name="_idTaiKhoan" hidden> <Input /> </Form.Item>
-                            {/* <Form.Item name="thongTinDoctor" hidden> <Input /> </Form.Item>
-                                <Form.Item name="noiKham" hidden> <Input /> </Form.Item>
-                                <Form.Item name="diaChiKham" hidden> <Input /> </Form.Item>
-                                <Form.Item name="avtDoctor" hidden> <Input /> </Form.Item> */}
-                            <Form.Item name="tenGioKham" hidden> <Input /> </Form.Item>
+                            <Form.Item name="maBenhNhan" hidden> <Input /> </Form.Item>
+                            <Form.Item name="khungGioKham" hidden> <Input /> </Form.Item>
                             <Form.Item name="ngayKhamBenh" hidden> <Input /> </Form.Item>
-                            <Form.Item name="_idDoctor" hidden> <Input /> </Form.Item>
+                            <Form.Item name="maBacSi" hidden> <Input /> </Form.Item>
                         </Row>
                     </Col>
 
@@ -266,28 +351,49 @@ const PageDatLichKham = () => {
                             <Col span={10} style={{ margin: "auto", }}>
                                 <Row gutter={[20, 20]}>
                                     <Col span={22} md={22} xs={24} sm={24} style={{ margin: "auto" }}>
-                                        <Form.Item
-                                            name="giaKham"
-                                            rules={[{ required: true, message: 'Vui lòng chọn giá khám!' }]}
-                                            initialValue={infoDoctorr?.giaKhamVN}
+                                    {/* <Form.Item
+                                        name="giaKham"
+                                        initialValue={giaKham || null}
+                                        rules={[{ required: true, message: 'Vui lòng chọn giá khám!' }]}
                                         >
-                                            <Radio.Group onChange={onChange} value={value}>
-                                                <Row gutter={[20, 0]}>
-                                                    <Col span={11} md={11} xs={24} sm={24} style={{ marginRight: '1px' }} className={`giaKhamdiv ${value === infoDoctorr?.giaKhamVN ? 'active1' : ''}`}>
-                                                        <Radio value={infoDoctorr?.giaKhamVN} onClick={() => setTongTien(infoDoctorr?.giaKhamVN)}>
-                                                            Giá Khám Người Việt Nam <br />
-                                                            <span style={{ color: "red" }}>{formatCurrency(infoDoctorr?.giaKhamVN)}</span>
-                                                        </Radio>
-                                                    </Col>
-                                                    <Col span={11} md={11} xs={24} sm={24} className={`giaKhamdiv ${value === infoDoctorr?.giaKhamNuocNgoai ? 'active1' : ''}`}>
-                                                        <Radio value={infoDoctorr?.giaKhamNuocNgoai} onClick={() => setTongTien(infoDoctorr?.giaKhamNuocNgoai)}>
-                                                            Giá Khám Người Nước Ngoài <br />
-                                                            <span style={{ color: "red" }}>{formatCurrency(infoDoctorr?.giaKhamNuocNgoai)}</span>
-                                                        </Radio>
-                                                    </Col>
-                                                </Row>
+                                        {dataBacSi?.giaKham ? (
+                                            <Radio.Group
+                                            onChange={onChange}
+                                            value={value || giaKham} // chọn mặc định nếu chưa chọn
+                                            >
+                                            <Row gutter={[20, 0]}>
+                                                <Col
+                                                span={30}
+                                                md={30}
+                                                xs={24}
+                                                sm={24}
+                                                className={`giaKhamdiv ${value === giaKham ? 'active1' : ''}`}
+                                                >
+                                                <Radio value={giaKham} onClick={() => setTongTien(giaKham)}>
+                                                    Giá khám <br />
+                                                    <span style={{ color: "red" }}>{formatCurrency(giaKham)}</span>
+                                                </Radio>
+                                                </Col>
+                                            </Row>
                                             </Radio.Group>
+                                        ) : (
+                                            <div style={{ color: '#888' }}>Đang tải giá khám...</div>
+                                        )}
+                                        </Form.Item> */}
+
+                                        <Form.Item name="giaKham" initialValue={giaKham} hidden>
+                                            <Input />
+                                            </Form.Item>
+
+                                            <Form.Item label="Giá khám">
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                                <DollarOutlined style={{ color: "#fa541c", fontSize: 18 }} />
+                                                <span style={{ color: "red", fontWeight: "bold" }}>
+                                                {formatCurrency(giaKham)}
+                                                </span>
+                                            </div>
                                         </Form.Item>
+
                                     </Col>
 
                                 </Row>
@@ -318,15 +424,13 @@ const PageDatLichKham = () => {
 
                                 <Row>
                                     <Col span={23} md={23} className="cac-the-input" >
-                                        <Form.Item
-                                            name="gender"
-                                            rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
-                                        >
-                                            <Radio.Group onChange={onChange} value={true}>
-                                                <Radio value={true}>Nam</Radio>
-                                                <Radio value={false}>Nữ</Radio>
-                                            </Radio.Group>
-                                        </Form.Item>
+                                    <Form.Item label="Giới tính" name="gender">
+                                        <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
+                                            <Radio value={"0"}>Nam</Radio>
+                                            <Radio value={"1"}>Nữ</Radio>
+                                            <Radio value={"2"}>Khác</Radio>
+                                        </Radio.Group>
+                                    </Form.Item>
                                     </Col>
                                 </Row>
 
@@ -402,6 +506,7 @@ const PageDatLichKham = () => {
                                                 placeholder="Ngày/Tháng/Năm Sinh (bắt buộc)"
                                                 style={{ width: "100%" }}
                                                 format="DD/MM/YYYY" // Định dạng ngày/tháng/năm
+                                                disabledDate={(current) => current && current > moment().endOf('day')}
                                     />
 
                                         </Form.Item>
@@ -433,7 +538,7 @@ const PageDatLichKham = () => {
                                 <Row>
                                     <Col span={23} md={23} className="cac-the-input" >
                                         <Form.Item
-                                            name="lidokham"
+                                            name="lyDoKham"
                                             rules={[
                                                 {
                                                     required: true,
@@ -462,11 +567,12 @@ const PageDatLichKham = () => {
                                         }}>Hình thức thanh toán</p>
                                         <Form.Item
                                             name="hinhThucTT"
+                                            initialValue="VnPay"
                                             rules={[{ required: true, message: 'Vui lòng chọn hình thức thanh toán!' }]}
                                         >
-                                            <Radio.Group onChange={handlePaymentChange} value="offline">
-                                                <Radio style={{ fontSize: "16px" }} value="offline">Thanh toán sau tại cơ sở y tế</Radio>
-                                                <Radio style={{ fontSize: "16px" }} value="online">Thanh toán Online </Radio>
+                                            <Radio.Group onChange={handlePaymentChange} value={phuongThucThanhToan}>
+                                                {/* <Radio style={{ fontSize: "16px" }} value="offline">Thanh toán sau tại cơ sở y tế</Radio> */}
+                                                <Radio style={{ fontSize: "16px" }} value="VnPay">Thanh toán Online </Radio>
                                             </Radio.Group>
                                         </Form.Item>
                                     </Col>
@@ -476,7 +582,7 @@ const PageDatLichKham = () => {
                                     <Col span={23} md={23} sm={24} className="cac-the-input divTT">
                                         <div style={{ justifyContent: "space-between", display: "flex" }}>
                                             <p className="txtTT">Giá khám</p>
-                                            <p className="txtTT">{formatCurrency(tongtien)}</p>
+                                            <p className="txtTT">{formatCurrency(giaKham)}</p>
                                         </div>
                                         <div style={{ justifyContent: "space-between", display: "flex", }}>
                                             <p className="txtTT">Phí đặt lịch</p>
@@ -485,7 +591,7 @@ const PageDatLichKham = () => {
                                         <hr style={{ marginTop: "5px", width: "95%", border: "1px solid #f4eeee" }} />
                                         <div style={{ justifyContent: "space-between", display: "flex" }}>
                                             <p className="txtTT">Tổng cộng</p>
-                                            <p className="txtTT" style={{ color: "red" }}>{formatCurrency(tongtien)}</p>
+                                            <p className="txtTT" style={{ color: "red" }}>{formatCurrency(giaKham)}</p>
                                         </div>
                                     </Col>
                                 </Row>
@@ -512,33 +618,35 @@ const PageDatLichKham = () => {
                                 <br />
                                 <Row>
                                     <Col span={23} className="cac-the-input">
-                                        <Form.Item>
-                                            <Button
-                                                style={{
-                                                    backgroundColor: 'orange',
-                                                    fontSize: "18px",
-                                                    borderColor: 'orange',
-                                                    color: 'white', fontWeight: "500"
-                                                }}
-                                                // htmlType="submit"
-                                                size="large"
-                                                onClick={() => {
-                                                    if (!isAuthenticated) {
-                                                        notification.warning({
-                                                            message: 'Cảnh báo',
-                                                            // description: 'Vui lòng đăng nhập trước khi đặt lịch.',
-                                                            description: notificationContent(),
-                                                            placement: 'topRight',
-                                                        });
-                                                        return;
-                                                    } else {
-                                                        form.submit(); // Proceed to submit the form
-                                                    }
-                                                }}
-                                                block
-                                                loading={loadingSubmit}
-                                            >Xác nhận đặt khám</Button>
+                                    <Form.Item>
+                                        <Button
+                                            type="primary"
+                                            style={{
+                                            backgroundColor: 'orange',
+                                            fontSize: "18px",
+                                            borderColor: 'orange',
+                                            color: 'white',
+                                            fontWeight: "500"
+                                            }}
+                                            size="large"
+                                            onClick={() => {
+                                            if (!isAuthenticated) {
+                                                notification.warning({
+                                                message: 'Cảnh báo',
+                                                description: notificationContent(),
+                                                placement: 'topRight',
+                                                });
+                                            } else {
+                                                form.submit(); // sẽ gọi hàm handleDatLich
+                                            }
+                                            }}
+                                            block
+                                            loading={loadingSubmit}
+                                        >
+                                            Xác nhận đặt khám
+                                        </Button>
                                         </Form.Item>
+
                                     </Col>
                                 </Row>
 
