@@ -61,15 +61,15 @@
                 echo json_encode(["success" => false, "message" => "Không gửi được email: {$mail->ErrorInfo}"]);
             }
         }
-        // public function updateThongTinBenhNhan(){
-        //     $p = new mBenhNhan();
-        //     $result = $p->capNhatThongTinBenhNhan();
+        public function updateThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $hinhAnh){
+            $p = new mBenhNhan();
+            $result = $p->capNhatThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $hinhAnh);
             
-        //     if (!$result) {
-        //         echo json_encode(["error" => "Lỗi truy vấn cơ sở dữ liệu"]);
-        //         return;
-        //     }
-        //     echo json_encode(["data" => "Cập nhật thông tin bệnh nhân thành công"]);
-        // }
+            if (isset($result['success'])) {
+                echo json_encode(["status" => true, "message" => $result['success']]);
+            } else {
+                echo json_encode(["status" => false, "error" => $result['error']]);
+            }
+        }
     }
 ?>

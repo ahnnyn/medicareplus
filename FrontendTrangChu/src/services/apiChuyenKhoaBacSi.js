@@ -175,8 +175,8 @@ export const capNhatTrangThaiThanhToanLichKham = (data) => {
 
 
 // get lich kham
-export const fetchLichKham = (idKhachHang) => {
-    const URL_BACKEND = `/api/bacsi.php?idKhachHang=${idKhachHang}`
+export const fetchLichKham = (maBenhNhan) => {
+    const URL_BACKEND = `/api/lichhen.php?action=lich-hen&maBenhNhan=${maBenhNhan}`
     return axios.get(URL_BACKEND)
 }
 
@@ -216,3 +216,15 @@ export const handleThongKe = (trangThaiKham, _idDoctor) => {
     }
     return axios.post(URL_BACKEND, data)
 }
+export const fetchHoSoBenhNhan = (maBenhNhan) => {
+    const URL_BACKEND = `/api/hosobenhnhan.php?action=getHoSoBenhNhan&maBenhNhan=${maBenhNhan}`;
+    return axios.get(URL_BACKEND);
+};
+
+export const taoHoSoBenhNhan = (maBenhNhan, hoTenBenhNhan, ngaySinh, gioiTinh, ngheNghiep, CCCD, diaChi) => {
+    const URL_BACKEND = `/api/hosobenhnhan.php?action=taoHoSo`
+    const data = {
+        maBenhNhan, hoTenBenhNhan, ngaySinh, gioiTinh, ngheNghiep, CCCD, diaChi
+    }
+    return axios.post(URL_BACKEND, data);
+};

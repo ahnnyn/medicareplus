@@ -1,18 +1,8 @@
 import { LoadingOutlined } from "@ant-design/icons";
-import {
-    Button,
-    Col,
-    Divider,
-    Form,
-    Input,
-    message,
-    Modal,
-    notification,
-    Row,
-} from "antd";
+import {Button, Col, Divider, Form, Input, message, Modal, notification, Row,} from "antd";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOneAccKH, doiThongTinKH } from "../../../services/api";
+import { fetchOneAccKH, doiMatKhau } from "../../../services/api";
 import { useNavigate } from "react-router-dom";
 import { doLogoutAction } from "../../../redux/account/accountSlice";
 import bcrypt from "bcryptjs-react";
@@ -26,21 +16,11 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
     const acc = useSelector((state) => state.account.user);
     const [loading, setLoading] = useState(false);
 
-    console.log("dataAccKH: ", dataAccKH);
-    console.log("Thông tin tài khoản:", acc);
-
     const cancel = () => {
         formDoiMK.resetFields();
         setOpenModalDoiMK(false);
     };
-    console.log("Account ID:", acc?.user?.maBenhNhan);
-    // if (!acc?.user?.maBenhNhan) {
-    //     return notification.error({
-    //         message: "Lỗi dữ liệu",
-    //         description: "Không tìm thấy thông tin tài khoản!",
-    //     });
-    // }
-    // Gọi API lấy thông tin tài khoản
+
     const fetchOneAcc = async () => {
         if (!acc?.user?.maBenhNhan) {
             return notification.error({
@@ -48,54 +28,34 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
                 description: "Không tìm thấy thông tin tài khoản!",
             });
         }
-    
-        const query = { maBenhNhan: acc.user.maBenhNhan };
-        console.log("Fetching account data with query:", query); // Log query to check the request data
-    
+
         try {
-            const res = await fetchOneAccKH(query.maBenhNhan);
-            console.log("API Response:", res); // Log the API response to check its structure
-            console.log(res.data);
-            // Kiểm tra sự tồn tại của res và res.data
-            if (res) {
-                setDataAccKH(res.data); // Lưu trữ đúng dữ liệu vào state
+            const res = await fetchOneAccKH(acc.user.maBenhNhan);
+            if (res?.data) {
+                setDataAccKH(res.data);
             } else {
                 notification.error({
-                    message: "Lỗi lấy dữ liệu tài khoản",
-                    description: "Không thể tải thông tin tài khoản từ hệ thống.",
+                    message: "Không thể tải dữ liệu",
+                    description: "Dữ liệu tài khoản không khả dụng.",
                 });
             }
         } catch (error) {
-            console.error("Lỗi khi gọi API lấy thông tin tài khoản:", error);
             notification.error({
                 message: "Lỗi hệ thống",
-                description: "Có lỗi xảy ra khi lấy thông tin tài khoản.",
+                description: "Không thể lấy thông tin tài khoản.",
             });
         }
     };
-    
-    
-    
-    
-
-    // Khi modal mở thì gọi lại thông tin tài khoản
-    useEffect(() => {
-        if (openModalDoiMK) {
-            console.log("Modal opened. Fetching account data...");
-            fetchOneAcc(); // Gọi API khi mở modal
-        }
-    }, [openModalDoiMK]); 
-
 
     useEffect(() => {
-        console.log("Data Account has been updated:", dataAccKH); 
-    }, [dataAccKH]); // This will log data when dataAccKH updates
-    // Cập nhật thông tin lên form
+        if (openModalDoiMK) fetchOneAcc();
+    }, [openModalDoiMK]);
 
     useEffect(() => {
         if (dataAccKH) {
             formDoiMK.setFieldsValue({
-                _idAcc: dataAccKH.maBenhNhan,
+                _idAcc: dataAccKH.maTaiKhoan,
+                idBN: dataAccKH.maBenhNhan,
                 hoTen: dataAccKH.hoTen,
                 soDienThoai: dataAccKH.soDienThoai,
                 email: dataAccKH.email,
@@ -103,17 +63,8 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
         }
     }, [dataAccKH]);
 
-    // Xử lý submit
     const onFinishDoiMK = async (values) => {
-        const {
-            _idAcc,
-            hoTen,
-            soDienThoai,
-            email,
-            password,
-            passwordMoi,
-            passwordMoiConfirm,
-        } = values;
+        const { _idAcc, idBN, matKhau, matKhauMoi, matKhauMoiConfirm } = values;
 
         if (!dataAccKH) {
             return notification.error({
@@ -122,40 +73,39 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
             });
         }
 
-        if (passwordMoi !== passwordMoiConfirm) {
+        if (matKhauMoi !== matKhauMoiConfirm) {
             return notification.error({
                 message: "Mật khẩu mới không khớp",
                 description: "Vui lòng kiểm tra lại mật khẩu mới và xác nhận.",
             });
         }
 
-        const isMatch = await bcrypt.compare(password, dataAccKH.matKhau);
+        const isMatch = await bcrypt.compare(matKhau, dataAccKH.matKhau);
         if (!isMatch) {
             return notification.error({
-                message: "Mật khẩu cũ không chính xác",
-                description: "Vui lòng nhập lại mật khẩu cũ.",
+                message: "Mật khẩu cũ không đúng",
+                description: "Vui lòng nhập đúng mật khẩu hiện tại.",
             });
         }
 
         try {
             setLoading(true);
-            const res = await doiThongTinKH(_idAcc, hoTen, email, soDienThoai, passwordMoi);
-            if (res && res.data) {
-                message.success("Đổi thông tin thành công. Vui lòng đăng nhập lại.");
+            const res = await doiMatKhau(_idAcc, idBN, acc.user.username, matKhau, matKhauMoi);
+            if (res?.success) {
+                message.success("Đổi mật khẩu thành công!");
                 dispatch(doLogoutAction());
                 navigate("/");
                 setOpenModalDoiMK(false);
             } else {
                 notification.error({
-                    message: "Đổi thông tin thất bại!",
-                    description: res.message || "Đã xảy ra lỗi.",
+                    message: "Đổi mật khẩu thất bại",
+                    description: res.message || "Vui lòng thử lại.",
                 });
             }
         } catch (error) {
-            console.error("Lỗi cập nhật tài khoản:", error);
             notification.error({
                 message: "Lỗi hệ thống",
-                description: "Có lỗi xảy ra trong quá trình cập nhật.",
+                description: "Không thể đổi mật khẩu.",
             });
         } finally {
             setLoading(false);
@@ -164,109 +114,97 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
 
     return (
         <Modal
-            title="Thông tin của bạn"
+        title={
+            <div style={{ fontSize: 20, fontWeight: 600, textAlign: 'center' }}>
+              Đổi mật khẩu
+            </div>
+          }
             open={openModalDoiMK}
             onCancel={cancel}
             footer={null}
             width={700}
             maskClosable={false}
+            className="doi-mk-modal"
         >
             <Divider />
             <Form form={formDoiMK} layout="vertical" onFinish={onFinishDoiMK}>
                 <Row gutter={[20, 10]}>
-                    <Form.Item name="_idAcc" hidden noStyle>
-                        <Input type="hidden" />
-                    </Form.Item>
-
-                    <Col span={12}>
-                        <Form.Item
-                            label="Họ tên"
-                            name="hoTen"
-                            rules={[
-                                { required: true, message: "Vui lòng nhập họ tên!" },
-                                {
-                                    pattern: /^[A-Za-zÀ-ỹ\s]+$/,
-                                    message: "Không được nhập số!",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Nhập họ tên của bạn" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col span={12}>
-                        <Form.Item
-                            label="Số điện thoại"
-                            name="soDienThoai"
-                            rules={[
-                                { required: true, message: "Vui lòng nhập số điện thoại!" },
-                                {
-                                    pattern: /^0\d{9}$/,
-                                    message: "SĐT phải có 10 chữ số, bắt đầu bằng 0",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Ví dụ: 0972138493" />
-                        </Form.Item>
-                    </Col>
-
-                    <Col span={24}>
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[
-                                { required: true, message: "Vui lòng nhập email!" },
-                                { type: "email", message: "Email không hợp lệ!" },
-                            ]}
-                        >
-                            <Input readOnly placeholder="Nhập email của bạn" />
-                        </Form.Item>
-                    </Col>
-
+                    <Form.Item name="_idAcc" hidden><Input hidden /></Form.Item>
+                    <Form.Item name="idBN" hidden><Input hidden /></Form.Item>
                     <Col span={12}>
                         <Form.Item
                             label="Mật khẩu cũ"
-                            name="password"
-                            rules={[{ required: true, message: "Vui lòng nhập mật khẩu cũ!" }]}
+                            name="matKhau"
+                            rules={[
+                                { required: true, message: "Vui lòng nhập mật khẩu cũ!" },
+                                {
+                                    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                                    message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!',
+                                },
+                            
+                            ]}
+                            hasFeedback
                         >
-                            <Input.Password placeholder="Nhập mật khẩu cũ" />
+                            <Input.Password placeholder="Mật khẩu hiện tại" />
                         </Form.Item>
                     </Col>
 
                     <Col span={12}>
                         <Form.Item
                             label="Mật khẩu mới"
-                            name="passwordMoi"
-                            rules={[{ required: true, message: "Vui lòng nhập mật khẩu mới!" }]}
+                            name="matKhauMoi"
+                            rules={[
+                                { required: true, message: "Vui lòng nhập mật khẩu mới!" },
+                                {
+                                    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                                    message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!',
+                                },
+                            
+                            ]}
+                            hasFeedback
                         >
-                            <Input.Password placeholder="Nhập mật khẩu mới" />
+                            <Input.Password placeholder="Mật khẩu mới" />
                         </Form.Item>
                     </Col>
 
-                    <Col span={12}>
+                    <Col span={24}>
                         <Form.Item
                             label="Xác nhận mật khẩu mới"
-                            name="passwordMoiConfirm"
+                            name="matKhauMoiConfirm"
+                            dependencies={['matKhauMoi']}
                             rules={[
-                                { required: true, message: "Vui lòng xác nhận mật khẩu mới!" },
+                                {
+                                    required: true,
+                                    message: 'Nhập lại mật khẩu mới!',
+                                },
+                                {
+                                    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                                    message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!',
+                                },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('matKhauMoi') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error("Mật khẩu không khớp!"));
+                                    },
+                                }),
                             ]}
+                            hasFeedback
                         >
-                            <Input.Password placeholder="Xác nhận mật khẩu mới" />
+                            <Input.Password placeholder="Nhập lại mật khẩu mới" />
                         </Form.Item>
                     </Col>
 
-                    <Col
-                        span={24}
-                        style={{ display: "flex", justifyContent: "center" }}
-                    >
+                    <Col span={24} style={{ textAlign: "center" }}>
                         <Button
                             type="primary"
                             size="large"
-                            onClick={() => !loading && formDoiMK.submit()}
-                            icon={loading ? <LoadingOutlined /> : <FaSave size={25} />}
+                            htmlType="submit"
+                            icon={loading ? <LoadingOutlined /> : <FaSave size={20} />}
                             loading={loading}
                         >
-                            Đổi thông tin
+                            Đổi mật khẩu
                         </Button>
                     </Col>
                 </Row>

@@ -75,22 +75,75 @@ if (isset($_GET['action'])) {
             }
             break;
 
-            case 'getThongTinBenhNhan':
-                if (isset($_GET['maBenhNhan'])) {
-                    $pd->layThongTinCaNhanBenhNhan($_GET['maBenhNhan']);
-                }else {
-                    echo json_encode(["error" => "Thiếu hoặc sai mã bệnh nhân"]);
-                }
-                break;
-            case 'quenMatKhau':
-                $email = $_GET["email_doimk"] ?? '';
-
-                if (empty($email)) {
-                    echo json_encode(["success" => false, "message" => "Vui lòng nhập email"]);
-                    exit;
-                }
+        case 'getThongTinBenhNhan':
+            if (isset($_GET['maBenhNhan'])) {
+                $pd->layThongTinCaNhanBenhNhan($_GET['maBenhNhan']);
+            }else {
+                echo json_encode(["error" => "Thiếu hoặc sai mã bệnh nhân"]);
+            }
+            break;
+        case 'quenMatKhau':
+            $email = $_GET["email_doimk"] ?? '';
+            if (empty($email)) {
+                echo json_encode(["success" => false, "message" => "Vui lòng nhập email"]);
+                exit;
+            }
                 $pd->quenMatKhau($email);
-                break;
+            break;
+        case 'doiMatKhau':
+            header("Content-Type: application/json"); // Đảm bảo API trả về JSON
+    
+            $data = json_decode(file_get_contents("php://input"), true);
+        
+            error_log("🔍 Dữ liệu nhận được từ React: " . json_encode($data));
+        
+            $idAcc = $data["_idAcc"] ?? null;
+            $idBN = $data["idBN"] ?? null;
+            $username = $data["username"] ?? null;
+            $matKhau = $data["matKhau"] ?? null;
+            $matKhauMoi = $data["matKhauMoi"] ?? null;
+        
+            if (!$idAcc || !$idBN || !$username || !$matKhau || !$matKhauMoi) {
+                echo json_encode(["success" => false, "message" => "Thiếu thông tin đầu vào"]);
+                exit;
+            }
+        
+            $result = $p->updateMatKhauBenhNhan($idAcc, $idBN, $username, $matKhau, $matKhauMoi);
+        
+            if (is_array($result) && isset($result["success"])) {
+                echo json_encode($result);
+            } else {
+                echo json_encode(["success" => false, "message" => "Lỗi xử lý dữ liệu"]);
+            }
+            exit;
+            break;
+        case 'updateThongTinBenhNhan':
+            $data = json_decode(file_get_contents("php://input"), true);
+            // Kiểm tra xem tất cả tham số quan trọng có đủ không
+            if (
+                isset($data['maBenhNhan']) && isset($data['hoTen']) && 
+                isset($data['gioiTinh']) && isset($data['soDienThoai']) && 
+                isset($data['email']) && isset($data['diaChi']) && 
+                isset($data['hinhAnh'])
+            ) {
+                        
+                // Gọi controller để cập nhật thông tin bệnh nhân
+                $result = $pd->updateThongTinBenhNhan(
+                    $data['maBenhNhan'], $data['hoTen'], $data['gioiTinh'], 
+                    $data['soDienThoai'], $data['email'], 
+                    $data['diaChi'], $data['hinhAnh']
+                );
+        
+                // Kiểm tra kết quả từ việc cập nhật thông tin bệnh nhân
+                if (isset($result['success'])) {
+                    echo json_encode(["status" => true, "message" => "Cập nhật thông tin bệnh nhân thành công!"]);
+                } else {
+                    echo json_encode(["status" => false, "error" => "Cập nhật thông tin bệnh nhân thất bại!"]);
+                }
+            } else {
+                echo json_encode(["status" => false, "error" => "Thiếu thông tin bệnh nhân"]);
+            }
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Action không hợp lệ!']);
     }

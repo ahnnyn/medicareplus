@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../../redux/account/accountSlice";
 import { handleLoginSuccess } from "../../../utils/axios-customize";
 import { handleQuenPassword } from "../../../services/apiChuyenKhoaBacSi";
-import './style.scss';
+import './login.scss';
 
 const LoginPage = (props) => {
 
@@ -109,11 +109,27 @@ const LoginPage = (props) => {
                     navigate("/");
                   }, 2000);
             } else {
-                notification.error({
-                    message: "Đăng nhập không thành công!",
-                    description: res.message || "Thông tin đăng nhập không đúng.",
-                    duration: 5,
-                });
+                if (res.errorField === "username") {
+                    formLogin.setFields([
+                        {
+                            name: "username",
+                            errors: [res.message || "Username không đúng!"]
+                        }
+                    ]);
+                } else if (res.errorField === "matKhau") {
+                    formLogin.setFields([
+                        {
+                            name: "matKhau",
+                            errors: [res.message || "Mật khẩu không đúng!"]
+                        }
+                    ]);
+                } else {
+                    notification.error({
+                        message: "Đăng nhập thất bại!",
+                        description: res.message || "Thông tin đăng nhập không đúng.",
+                        duration: 5,
+                    });
+                }
             }
         }catch(error){
             notification.error({ message: "Lỗi hệ thống", description: error.message });
@@ -128,19 +144,15 @@ const LoginPage = (props) => {
     return (
         <Modal
             className="login-modal"
-            title="Đăng Nhập Cho Bệnh Nhân"
+            title="Đăng Nhập"
             style={{
                 top: 100,
             }}
             open={openModalLogin}
-            // onOk={() => formLogin.submit()} 
             onCancel={() => handleCancel()}
             width={600}
             maskClosable={false}
-            footer={null}  // Ẩn footer
-        // confirmLoading={isSubmit}
-        // okText={"Xác nhận tạo mới"}
-        // cancelText="Huỷ"
+            footer={null} 
         >
             <Form
                 form={formLogin}
@@ -148,16 +160,16 @@ const LoginPage = (props) => {
                 onFinish={onFinish}
             >
                 <Form.Item
-                    label="Username"
+                    label="Tên đăng nhập"
                     name="username"
                     rules={[
                         {
                             required: true,
-                            message: 'Vui lòng nhập đầy đủ thông tin!',
+                            message: 'Vui lòng nhập tên đăng nhập!',
                         },
                         {
-                            type: "text",
-                            message: 'Vui lòng nhập đúng định dạng username',
+                            pattern: /^[a-zA-Z0-9@_]+$/,
+                            message: 'Username chỉ được chứa chữ cái, số, @ hoặc _',
                         },
 
                     ]}
@@ -167,17 +179,16 @@ const LoginPage = (props) => {
                 </Form.Item>
 
                 <Form.Item
-                    label="Password"
+                    label="Mật khẩu"
                     name="matKhau"
                     rules={[
                         {
                             required: true,
-                            message: 'Password không được để trống!',
+                            message: 'Vui lòng nhập mật khẩu!',
                         },
                         {
-                            required: false,
-                            pattern: new RegExp(/^(?!.*\s).{6,}$/),
-                            message: 'Không được nhập có dấu cách, tối thiểu có 6 kí tự!',
+                            pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                            message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!',
                         },
 
                     ]}
@@ -243,6 +254,7 @@ const LoginPage = (props) => {
                     formLayMK.resetFields()
                 }}>
                 <Divider />
+                
                 <Form
                     form={formLayMK}
                     className="registration-form"
