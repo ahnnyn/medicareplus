@@ -88,46 +88,77 @@ const BodyHomePage = () => {
 
     return (
         <>
-            <div style={{ marginTop: "12vh" }}></div> {/* chèn khoảng cách đẩy nội dung xuống dưới header */}
+            <div style={{ marginTop: "clamp(20px, 0.8vw, 50px)" }}></div>    {/* chèn khoảng cách đẩy nội dung xuống dưới header */}
 
-            <div className="slicer-banner" style={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden" }}>
+            <div
+                className="slicer-banner"
+                style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "auto",
+                    overflow: "hidden",
+                }}
+                >
                 <img
-                    src="../../../public/Blue_White_Minimalist_Hospital_Service_Health_Banner.png" // thay đường dẫn nếu ảnh của bạn ở nơi khác
+                    src="/Blue_White_Minimalist_Hospital_Service_Health_Banner.png"
                     alt="Slicer Banner"
-                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "0 0 20px 20px" }}
-                />
-                {/* <div
                     style={{
-                        position: "absolute",
-                        top: "50%",
-                        right: "50px",
-                        background: "rgba(0, 123, 255, 0.75)",
-                        color: "white",
-                        padding: "12px 24px",
-                        borderRadius: "8px",
-                        transform: "translateY(-50%)",
-                        fontSize: "2.5vh",
-                        fontWeight: 600,
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+                    width: "100%",
+                    height: "auto", // để giữ đúng tỷ lệ ảnh
+                    objectFit: "cover",
+                    borderRadius: "0 0 20px 20px",
+                    display: "block",
+                    }}
+                />
+
+                {/* Nếu bạn muốn giữ welcome message thì bật lại đoạn dưới */}
+                {/* 
+                <div
+                    style={{
+                    position: "absolute",
+                    top: "50%",
+                    right: "50px",
+                    background: "rgba(0, 123, 255, 0.75)",
+                    color: "white",
+                    padding: "12px 24px",
+                    borderRadius: "8px",
+                    transform: "translateY(-50%)",
+                    fontSize: "2.5vh",
+                    fontWeight: 600,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                     }}
                 >
                     Chào mừng bạn đến với hệ thống y tế thông minh!
-                </div> */}
-            </div>
+                </div>
+                */}
+                </div>
+
             <div className="danh-cho-ban">
                 <Row className="ben-trong">
-                    <span style={{ fontWeight: 500, fontSize: "4vh", width: "100%", padding: "4vh 0", zIndex: "50" }}>
+                    <span style={{ fontWeight: 500, fontSize: "clamp(25px, 5vw, 32px)", width: "100%", padding: "4vh 0", zIndex: "50" }}>
                         Dịch vụ
                     </span>
+                    <Row gutter={[16, 24]} justify="space-around">
                     {items_toandien.map((item, index) => (
-                        <Col key={index} md={12} sm={24} xs={24} style={{ marginBottom: "5vh" }}>
+                        <Col
+                            key={index}
+                            xl={12} // 4 item trên desktop
+                            lg={6}
+                            md={12} // 2 item trên tablet
+                            sm={24} // 1 item trên mobile
+                            xs={24}
+                            flex="0 0 400px"
+                            // style={{ marginBottom: "2vh" }}
+                        >
                             <HinhChuNhat icon={item.icon} txtP={item.txtP} />
                         </Col>
                     ))}
+                    </Row>
+
                 </Row>
             </div>
 
-            <div
+            {/* <div
                 style={{
                     display: "flex",
                     justifyContent: "center",
@@ -138,23 +169,27 @@ const BodyHomePage = () => {
                     borderRadius: "16px",
                     boxShadow: "0 8px 20px rgba(0, 0, 0, 0.05)",
                 }}
-                >                <div className="danh-cho-ban">
+                >                 */}
+                <div className="danh-cho-ban">
                     <Row className="ben-trong">
                         <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
-                            <span style={{ fontWeight: 500, fontSize: "4vh", padding: "4vh 0" }}>Chuyên khoa</span>
+                            <span style={{ fontWeight: 500, fontSize: "clamp(25px, 5vw, 32px)", padding: "4vh 0" }}>Chuyên khoa</span>
                             <span
                                 style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     fontWeight: 500,
-                                    fontSize: "3vh",
+                                    fontSize: "clamp(18px, 2.5vw, 20px)",
                                     height: "50px",
-                                    lineHeight: "45px",
+                                    lineHeight: "clamp(36px, 5vh, 48px)",
                                     borderRadius: "15px",
                                     textAlign: "center",
                                     backgroundColor: "#d0edf7",
                                     color: "rgb(45 145 179)",
                                     marginTop: "10px",
                                     cursor: "pointer",
-                                    padding: "3px 10px"
+                                    padding: "clamp(4px, 0.8vw, 8px) clamp(12px, 2vw, 20px)",
                                 }}
                                 onClick={() => navigate("/user/chuyen-khoa-kham")}
                             >
@@ -163,14 +198,19 @@ const BodyHomePage = () => {
                         </div>
                         <HinhVuongSlider
                             items={items_ChuyenKhoa}
-                            style={{ width: '100%', height: '300px' }}
+                            style={{
+                                width: '100%',
+                                height: '300px',
+                                background: "linear-gradient(135deg, #E3F2FD, #F5F8FF)",
+                                padding: "20px"
+                            }}
                             loadingCard={loadingCard}
                             urlDoctor={handleRedirectChuyenKhoa}
                             type="specialty"
                         />
                     </Row>
                 </div>
-            </div>
+            {/* </div> */}
 
             {/* <div
                 style={{
@@ -188,20 +228,23 @@ const BodyHomePage = () => {
                 <div className="danh-cho-ban">
                     <Row className="ben-trong">
                         <div style={{ display: "flex", width: "100%", justifyContent: "space-between"}}>
-                            <span style={{ fontWeight: 500, fontSize: "4vh", padding: "4vh 0" }}>Bác sĩ nổi bật</span>
+                            <span style={{ fontWeight: 500, fontSize: "clamp(25px, 5vw, 32px)", padding: "4vh 0" }}>Bác sĩ nổi bật</span>
                             <span
                                 style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     fontWeight: 500,
-                                    fontSize: "3vh",
+                                    fontSize: "clamp(18px, 2.5vw, 20px)",
                                     height: "50px",
-                                    lineHeight: "45px",
+                                    lineHeight: "clamp(36px, 5vh, 48px)",
                                     borderRadius: "15px",
                                     textAlign: "center",
                                     backgroundColor: "#d0edf7",
                                     color: "rgb(45 145 179)",
                                     marginTop: "10px",
                                     cursor: "pointer",
-                                    padding: "3px 10px"
+                                    padding: "clamp(4px, 0.8vw, 8px) clamp(12px, 2vw, 20px)",
                                 }}
                                 onClick={() => navigate("/user/bac-si-noi-bat")}
                             >
@@ -223,7 +266,7 @@ const BodyHomePage = () => {
 
                     </Row>
                 </div>
-                <div style={{ marginTop: "10vh" }}></div>      
+                <div style={{ marginBottom: "clamp(20px, 5vw, 100px)" }}></div>      
             {/* </div> */}
         </>
     );

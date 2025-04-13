@@ -99,16 +99,16 @@
                         return ["status" => false, "error" => "Thông tin không hợp lệ"];
                     }
         
-                   // Chuyển đổi sang chuỗi ngày đúng định dạng
+                    // Chuyển đổi sang chuỗi ngày đúng định dạng
                     $ngayKhamFormatted = DateTime::createFromFormat('Y-m-d', $ngayKham);
-
+        
                     if (!$ngayKhamFormatted) {
                         return ["status" => false, "error" => "Ngày khám không hợp lệ"];
                     }
-
-                    $ngayKhamStr = $ngayKhamFormatted->format('Y-m-d');
-
         
+                    $ngayKhamStr = $ngayKhamFormatted->format('Y-m-d');
+        
+                    // Thực thi câu lệnh INSERT vào bảng lichkham
                     $query = $pdo->prepare("INSERT INTO lichkham (maBenhNhan, maBacSi, maKhungGio, hoTenBenhNhan, giaKham, ngayKham, lyDoKham, phuongthucthanhtoan) 
                         VALUES (:maBenhNhan, :maBacSi, :maKhungGio, :tenBenhNhan, :giaKham, :ngayKham, :lyDoKham, :phuongthucthanhtoan)");
         
@@ -122,13 +122,33 @@
                     $query->bindParam(":phuongthucthanhtoan", $hinhThucThanhToan, PDO::PARAM_STR);
         
                     $success = $query->execute();
-                    $maLichKham = $pdo->lastInsertId();
+                    $maLichKham = $pdo->lastInsertId(); // Lấy ID của lịch khám mới tạo
+        
                     if ($success) {
-                        return [
-                            "status" => true,
-                            "message" => "Tạo lịch khám thành công",
-                            "maLichKham" => $maLichKham
-                        ];
+                        // Cập nhật trạng thái 'booked' vào bảng chitiet_lichlamviec
+                        $updateQuery = $pdo->prepare(
+                        "UPDATE chitiet_lichlamviec ct
+                            JOIN lichlamviec llv ON ct.lichLamViec_ID = llv.maLichLamViec
+                            JOIN lichkham lk ON llv.maBacSi = lk.maBacSi 
+                                             AND llv.ngayLamViec = lk.ngayKham
+                                             AND ct.khungGio_ID = lk.maKhungGio
+                            SET ct.trangThaiDatLich = 'booked'
+                            WHERE ct.trangThaiDatLich != 'booked' 
+                            AND lk.maLich = :maLichKham" // Điều kiện thêm để chỉ cập nhật các bản ghi cho lịch khám vừa tạo
+                        );
+        
+                        $updateQuery->bindParam(":maLichKham", $maLichKham, PDO::PARAM_INT);
+                        $updateSuccess = $updateQuery->execute();
+        
+                        if ($updateSuccess) {
+                            return [
+                                "status" => true,
+                                "message" => "Tạo lịch khám và cập nhật trạng thái thành công",
+                                "maLichKham" => $maLichKham
+                            ];
+                        } else {
+                            return ["status" => false, "error" => "Không thể cập nhật trạng thái đặt lịch"];
+                        }
                     } else {
                         return ["status" => false, "error" => "Không thể thực thi câu lệnh INSERT"];
                     }
@@ -140,6 +160,7 @@
                 return ["status" => false, "error" => "Không thể kết nối CSDL"];
             }
         }
+        
         
 
         public function capNhatTrangThaiThanhToan($maLichKham, $trangThaiThanhToan) {

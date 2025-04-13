@@ -1,10 +1,18 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Card, Carousel, Button, Avatar } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import './hinhvuongslicer.scss';
 
 const HinhVuongSlider = ({ items, urlDoctor, type }) => {
   const carouselRef = useRef(null);
+  const [chunkedItems, setChunkedItems] = useState([]);
+
+  const getChunkSize = () => {
+    const width = window.innerWidth;
+    if (width < 768) return 1;        // Mobile
+    if (width < 1200) return 2;       // Tablet
+    return 4;                         // Laptop/Desktop
+  };
 
   const chunkArray = (array, size) => {
     const result = [];
@@ -14,44 +22,45 @@ const HinhVuongSlider = ({ items, urlDoctor, type }) => {
     return result;
   };
 
-  const chunkedItems = chunkArray(items, 4); // Chia mỗi lần hiển thị 3 item
+  const updateChunks = () => {
+    const size = getChunkSize();
+    setChunkedItems(chunkArray(items, size));
+  };
+
+  useEffect(() => {
+    updateChunks();
+    window.addEventListener('resize', updateChunks);
+    return () => window.removeEventListener('resize', updateChunks);
+  }, [items]);
 
   return (
     <div className="slider-container">
-      {/* Nút bấm ngoài slider */}
-      <Button 
-        onClick={() => carouselRef.current.prev()} 
-        className="slider-button left"
-      >
+      <Button onClick={() => carouselRef.current.prev()} className="slider-button left">
         <LeftOutlined />
       </Button>
 
-      <Carousel ref={carouselRef} draggable>
-        {chunkedItems.map((chunk, chunkIndex) => (
-          <div key={chunkIndex}>
+      <Carousel ref={carouselRef} dots={false} draggable>
+        {chunkedItems.map((chunk, index) => (
+          <div key={index}>
             <div className="slider-wrapper">
-              {chunk.map((item, index) => (
-                <Card key={index} className="square-card" onClick={() => urlDoctor(item.id)}>
-                  {/* Avatar cho bác sĩ hoặc hình ảnh cho chuyên khoa */}
+              {chunk.map((item, idx) => (
+                <Card
+                  key={idx}
+                  className="square-card"
+                  onClick={() => urlDoctor(item.id)}
+                  hoverable
+                  bodyStyle={{ padding: 16 }}
+                >
                   {type === 'doctor' ? (
-                    <Avatar 
-                      shape="square" 
-                      size={200} 
-                      src={item.src} 
-                    />
+                    <Avatar shape="square" size={200} src={item.src} />
                   ) : (
-                    <img 
-                      className="specialty-image" 
-                      src={item.src} 
-                      alt={item.txtP} 
-                      style={{ width: 200, height: 200, objectFit: 'cover', borderRadius: '8px' }} 
+                    <img
+                      src={item.src}
+                      alt={item.txtP}
+                      className="square-image"
                     />
                   )}
-
-                  {/* Tên bác sĩ hoặc chuyên khoa */}
                   <p className="doctor-name">{item.txtP}</p>
-
-                  {/* Mô tả chuyên khoa hoặc chuyên môn bác sĩ */}
                   <p className="doctor-department">{item.txtB}</p>
                 </Card>
               ))}
@@ -60,11 +69,7 @@ const HinhVuongSlider = ({ items, urlDoctor, type }) => {
         ))}
       </Carousel>
 
-      {/* Nút bấm ngoài slider */}
-      <Button 
-        onClick={() => carouselRef.current.next()} 
-        className="slider-button right"
-      >
+      <Button onClick={() => carouselRef.current.next()} className="slider-button right">
         <RightOutlined />
       </Button>
     </div>

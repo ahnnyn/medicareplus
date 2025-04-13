@@ -6,6 +6,7 @@ import { CaretRightOutlined, DownOutlined, HomeOutlined, LikeFilled, PhoneOutlin
 import { FaLocationDot, FaRegHandPointUp } from 'react-icons/fa6';
 import { useEffect, useState } from 'react';
 import { FaChevronRight, FaRegCalendarAlt } from 'react-icons/fa';
+import { FaEnvelope } from "react-icons/fa";
 import { IoIosShareAlt } from 'react-icons/io';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchBacSiByMaBS, getTimeSlotsByDoctorAndDate } from '../../../services/apiChuyenKhoaBacSi';
@@ -16,7 +17,7 @@ const PageViewDoctor = () => {
     const [placement, setPlacement] = useState('right');
     const [hienThiTime, setHienThiTime] = useState('Bấm vào đây để xem lịch khám!');
     const [selectedTimeId, setSelectedTimeId] = useState(null);
-    const [dataLichKham, setDataLichKham] = useState([]);
+    const [dataLichLamViec, setDataLichLamViec] = useState([]);
     const [dataBacSi, setDataBacSi] = useState(null);  
     const [error, setError] = useState(null); // Lưu thông báo lỗi
     const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -77,7 +78,7 @@ const PageViewDoctor = () => {
             console.log("res fetch: ", res);
     
             if (res && Array.isArray(res)) {
-                setDataLichKham(res);
+                setDataLichLamViec(res);
             } else {
                 console.error('Error fetching time slots:', await res.json());
             }
@@ -87,13 +88,15 @@ const PageViewDoctor = () => {
     }, [selectedDate, maBacSi]);
     
     
-    console.log("dataLichKham: ", dataLichKham);
+    console.log("dataLichKham: ", dataLichLamViec);
     
 
 
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '';
-        return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} VNĐ`;
+        
+        const number = parseInt(value, 10); // loại bỏ phần thập phân nếu có
+        return `${number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} VNĐ`;
     };
 
     const showDrawer = () => {
@@ -117,10 +120,16 @@ const PageViewDoctor = () => {
     };   
 
 // hiển thị trong drawer
+// Lấy ngày hiện tại (không tính thời gian)
+const today = moment().startOf('day');
+
+// hiển thị trong drawer (chỉ hiển thị từ hôm nay trở đi)
 const listTime = (dataBacSi?.danhSachNgayLamViec || '')
     .split(',')
     .map(date => date.trim())
-    .filter(date => moment(date, 'YYYY-MM-DD', true).isValid());
+    .filter(date => moment(date, 'YYYY-MM-DD', true).isValid())
+    .filter(date => moment(date).isSameOrAfter(today));
+
 
 
 
@@ -140,6 +149,8 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
             <div className='layout-app'>
                 <HeaderViewDoctor />
                 
+                <Row style={{margin: "50px"}}></Row>
+            
                 <Row>
                     <Col span={18} className='body-view-doctocc'>
                         <Row>
@@ -161,12 +172,11 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                                     Nhiều năm kinh nghiệm trong khám và điều trị bệnh lý <br/>
                                     Bác sĩ nhận khám cho bệnh nhân từ 16 tuổi trở lên
                                 </p>
-                                <p style={{fontSize: "15px", marginTop: "-5px",}}><FaLocationDot />
-                                    <span style={{marginLeft: "5px"}}>{dataBacSi?.diaChi}</span> &nbsp; &nbsp; - &nbsp;&nbsp;
+                                <p style={{fontSize: "15px", marginTop: "-5px",}}><FaEnvelope />
+                                    <span style={{marginLeft: "5px"}}>{dataBacSi?.email}</span> &nbsp;&nbsp; - &nbsp;&nbsp;
                                     <span style={{marginLeft: "5px"}}><PhoneOutlined /> {dataBacSi?.soDienThoai}</span>
                                 </p>                                
-                                <Button type="primary" style={{marginRight: "10px", fontSize: "14px"}} icon={<LikeFilled />}>Thích 0</Button>                                
-                                <Button type="primary" style={{fontSize: "14px"}} icon={<IoIosShareAlt />}>Chia sẻ</Button>
+                                
                             </Col>
 
                             <Col md={3} sm={24} xs={24} span={3} pull={21} style={{backgroundColor: "white", textAlign: "center"}}>
@@ -247,31 +257,32 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                                         <span style={{marginLeft: "10px"}}>LỊCH KHÁM</span>    
                                     </p>
                                     <Row justify="start" style={{ marginTop: "-10px" }}>
-                                        {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
-                                            dataLichKham.map((item, index) => (
-                                                <Col
-                                                    span={4}
-                                                    className='cach-deu'
-                                                    key={index}
-                                                    onClick={() => {
-                                                        setTimeGioList(item.khungGio);
-                                                        setSelectedTimeId(item.maKhungGio);
-                                                        handleRedirectBacSi(dataBacSi, item.maKhungGio, item.khungGio, selectedDate, giaKham);
-                                    
-                                                    }}
-                                                >
-                                                    <div className='lich-kham'>
-                                                        {item.khungGio}
-                                                    </div>
-                                                </Col>
-                                            ))
-                                        ) : (
-                                            <span style={{ color: "red", margin: "0 0 10px" }}>
-                                                Không có thời gian khám nào.
-                                                <br /> Chọn lịch
-                                            </span>
-                                        )}
-                                    </Row>
+    {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
+        dataLichLamViec
+            .filter(item => item.trangThaiDatLich !== 'booked')
+            .map((item, index) => (
+                <Col
+                    span={4}
+                    className='cach-deu'
+                    key={index}
+                    onClick={() => {
+                        setTimeGioList(item.khungGio);
+                        setSelectedTimeId(item.maKhungGio);
+                        handleRedirectBacSi(dataBacSi, item.maKhungGio, item.khungGio, selectedDate, giaKham);
+                    }}
+                >
+                    <div className='lich-kham'>
+                        {item.khungGio}
+                    </div>
+                </Col>
+            ))
+    ) : (
+        <span style={{ color: "red", margin: "0 0 10px" }}>
+            Không có thời gian khám nào.
+            <br /> Chọn lịch
+        </span>
+    )}
+</Row>
 
                                 </Col>                            
 
@@ -282,7 +293,7 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                                 </Col>
                             </Col>
 
-                            {/*
+                            
                             <Col span={12} style={{backgroundColor: "white", padding: "45px 20px"}}>
                         
                                 {showDetails ? (
@@ -293,38 +304,27 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                                             display: "flex", justifyContent: "space-between"
                                         }}>
                                             <span className='span-gia-kham'>
-                                                <p style={{ fontWeight: "500" }}>Giá khám cho người Việt</p>
-                                                <p>Giá khám chưa bao gồm chi phí chụp chiếu, xét nghiệm</p>
+                                                <p style={{ fontWeight: "500" }}>Giá khám</p>
+                                                {/* <p>Giá khám chưa bao gồm chi phí chụp chiếu, xét nghiệm</p> */}
                                             </span>
                                             <span style={{ lineHeight: "70px", marginRight: "5px", color: "red", fontWeight: "500" }} className='span-gia-kham'>
-                                            {formatCurrency(dataDoctor?.giaKhamVN)}
+                                            {formatCurrency(dataBacSi?.giaKham)}
                                             </span>
                                         </div>
 
-                                        <div style={{
-                                            backgroundColor: "#f7f7f7", border: "1px solid #d9d2d2",
-                                            display: "flex", justifyContent: "space-between"
-                                        }}>
-                                            <span className='span-gia-kham'>
-                                                <p style={{ fontWeight: "500" }}>Giá khám cho người nước ngoài</p>
-                                                <p>Giá khám chưa bao gồm chi phí chụp chiếu, xét nghiệm</p>
-                                            </span>
-                                            <span style={{ lineHeight: "70px", marginRight: "5px", color: "red", fontWeight: "500" }} className='span-gia-kham'>
-                                            {formatCurrency(dataDoctor?.giaKhamNuocNgoai)}
-                                            </span>
-                                        </div>
+                                        
                                         <a onClick={toggleDetails} style={{ float: "right", marginTop: "5px" }}>Ẩn bảng giá</a>
                                     </div>
                                 ) : (
                                     <p>
                                         <span style={{ fontWeight: "500", color: "gray" }}>GIÁ KHÁM:</span> &nbsp;
-                                        <span style={{color: "red", fontWeight: "500"}}>{formatCurrency(dataDoctor?.giaKhamVN)}</span> đến <span style={{color: "red", fontWeight: "500"}}>{formatCurrency(dataDoctor?.giaKhamNuocNgoai)}</span>
-                                        <a onClick={toggleDetails} style={{ marginLeft: "10px" }}>Xem chi tiết</a>
+                                        <span style={{color: "red", fontWeight: "500"}}>{formatCurrency(dataBacSi?.giaKham)}</span>
+                                        {/* <a onClick={toggleDetails} style={{ marginLeft: "10px" }}>Xem chi tiết</a> */}
                                     </p>
                                 )}                                
                             </Col>
 
-                            */}
+                           
                         </Row>
 
                     </Col>
@@ -338,15 +338,7 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                         </Row>
                     </Col>
                 </Row>
-                <Row> 
-                    <Col span={24} style={{backgroundColor: "#f7f7f7", borderTop: "1px solid rgba(228, 228, 221, 0.637)", marginTop: "20px"}}>
-                        <Row>
-                            <Col span={18} style={{margin: "auto",}}>
-                            phản hồi ở đây
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
+                
                 <Footer />
             </div>        
         </>

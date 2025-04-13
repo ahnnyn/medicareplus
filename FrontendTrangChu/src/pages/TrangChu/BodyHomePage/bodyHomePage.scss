@@ -12,20 +12,21 @@
     padding: 4vh 0;
 
     @media (max-width: 768px) {
-        padding: 2vh 10px;
-    }
+        padding: 2vh 5px; // Giảm cho nhỏ hơn
+      }
 
     .ben-trong {
-        display: flex;
-        justify-content: start;
-        width: 80%;
-
+        width: 100%;
+        max-width: 1200px;
+        padding: 0 10px;
+        margin: 0 auto;
+    
         @media (max-width: 768px) {
+            padding: 0 5px;
             width: 95%;
-            flex-direction: column;
-            align-items: center;
         }
     }
+    
 
     .cot-ben-trong {
         display: flex;
@@ -42,15 +43,16 @@
     }
 
     .hcn-toan-dien {
-        width: 80vh;
-        // width: 550px;
-        height: 13vh;
+        width: 100%; // <-- Cái này sẽ giúp box tự co theo cột của AntD
+        height: auto; // Nếu muốn cao theo nội dung
+    
+        // Giữ mấy cái cũ nếu cần
         border-radius: 5vh;
         border: 1px solid rgb(231, 223, 223);
-        background-size: cover; /* Phủ toàn bộ khu vực của phần tử */
-        background-position: center; /* Căn giữa hình nền */
-        background-repeat: no-repeat; /* Ngăn không cho hình nền lặp lại */        
-
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    
         @media (max-width: 768px) {
             border-radius: 20px;
         }

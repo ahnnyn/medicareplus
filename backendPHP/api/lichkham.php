@@ -29,7 +29,7 @@ if (isset($_GET["action"])) {
             break;
             case "dat-lich-kham-moi":
                 $data = json_decode(file_get_contents("php://input"), true);
-                file_put_contents("debug.json", json_encode($data));
+                //file_put_contents("debug.json", json_encode($data));
 
                 
                 if (

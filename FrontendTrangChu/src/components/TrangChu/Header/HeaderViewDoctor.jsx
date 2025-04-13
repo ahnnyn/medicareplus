@@ -116,6 +116,7 @@ const HeaderViewDoctor = () => {
                         <Col xs={8} sm={12} md={12} className="col-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Navbar className="navbar-custom" expand="lg">
                                 <Nav className="me-auto nav-links">
+                                    <Nav.Link onClick={() => navigate("/")}>TRANG CHỦ</Nav.Link>
                                     <Nav.Link onClick={() => navigate("/user/chuyen-khoa-kham")}>CHUYÊN KHOA</Nav.Link>
                                     <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>BÁC SĨ</Nav.Link>
                                     <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>ĐẶT LỊCH KHÁM</Nav.Link>
