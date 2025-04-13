@@ -100,7 +100,7 @@ const BodyHomePage = () => {
                 }}
                 >
                 <img
-                    src="/Blue_White_Minimalist_Hospital_Service_Health_Banner.png"
+                    src="../../public/Blue_White_Minimalist_Hospital_Service_Health_Banner.png"
                     alt="Slicer Banner"
                     style={{
                     width: "100%",

@@ -17,6 +17,7 @@ import { RiAccountCircleFill } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { MdOutlineAccountCircle } from "react-icons/md";
 import { FaLock } from "react-icons/fa";
+import { FaBars } from 'react-icons/fa'; // hamburger icon
 import ScrollToTop from '../ScrollToTop/ScrollToTop';
 import './header.scss';
 
@@ -26,6 +27,8 @@ const HeaderViewDoctor = () => {
     const [openUpdateBenhNhan, setOpenModalThongTinCaNhan] = useState(false);
     const [openModalDoiMK, setOpenModalDoiMK] = useState(false);
     const [openModalLogin, setOpenModalLogin] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const dispatch = useDispatch();
     const [dataAcc, setDataAcc] = useState(null);
     const isAuthenticated = useSelector(state => state.account.isAuthenticated);
@@ -43,6 +46,18 @@ const HeaderViewDoctor = () => {
         };
         fetchBenhNhan();
     }, [acc?.maBenhNhan]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 1024);
+            if (window.innerWidth >= 1024) {
+                setMenuOpen(false); // reset hamburger nếu chuyển lên desktop
+            }
+        };
+    
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const items = [
         {
@@ -64,7 +79,27 @@ const HeaderViewDoctor = () => {
         {
             key: '5',
             danger: true,
-            label: <label onClick={() => handleLogout()}><FiLogOut size={20}/> Đăng xuất</label>,
+            label: (
+                <div
+                    onClick={() => handleLogout()}
+                    style={{
+                        backgroundColor: '#ff4d4f',
+                        color: 'white',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px', // khoảng cách giữa icon và chữ
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                    }}
+                >
+                    <FiLogOut size={20} />
+                    <span>Đăng xuất</span>
+                </div>
+            )
         }
     ];
 
@@ -106,85 +141,67 @@ const HeaderViewDoctor = () => {
     
     return (
         <>
-            <div
-                className="header"
-                
-            >
-                <div className="header-top">
-                    <Row
-                        align="middle"
-                        style={{
-                            height: "100px",
-                            width: "100%",
-                            padding: "0 3vw",
-                            display: "flex",
-                            justifyContent: "space-between"
-                        }}
-                    >
-                        {/* Logo */}
-                        <Col xs={8} sm={6} md={4} className="col-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                            <img
-                                style={{
-                                    cursor: "pointer",
-                                    height: "100px", // không cần width cố định, auto theo height
-                                    objectFit: "contain"
-                                }}
-                                onClick={() => navigate("/")}
-                                src="../../../../public/medicare-Photoroom-removebg-preview.png"
-                                alt="Logo"
-                            />
-                        </Col>
-    
-                        {/* Menu */}
-                        <Col xs={8} sm={12} md={12} className="col-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <Navbar className="navbar-custom" expand="lg">
-                                <Nav className="me-auto nav-links">
-                                    <Nav.Link onClick={() => navigate("/")}>TRANG CHỦ</Nav.Link>
-                                    <Nav.Link onClick={() => navigate("/user/chuyen-khoa-kham")}>CHUYÊN KHOA</Nav.Link>
-                                    <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>BÁC SĨ</Nav.Link>
-                                    <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>ĐẶT LỊCH KHÁM</Nav.Link>
-                                    <Nav.Link onClick={() => navigate("/user/lien-he")}>LIÊN HỆ</Nav.Link>
-                                </Nav>
-                            </Navbar>
-                        </Col>
-    
-                        {/* Avatar or login icon */}
-                        <Col xs={8} sm={6} md={4} className="col-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                            <div style={{ cursor: "pointer", color: "rgb(69, 195, 210)" }}>
-                                {isAuthenticated ? (
-                                    <Dropdown menu={{ items }}>
-                                        <Avatar
-                                             src={
-                                                dataAcc?.hinhAnh
-                                                ? `${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${acc.user.hinhAnh}`
-                                                : null
-                                            }
-                                            style={{ cursor: "pointer" }}
-                                            size={50}
-                                            icon={<UserOutlined />}
-                                        />
-                                    </Dropdown>
-                                ) : (
-                                    <Dropdown menu={{ items: itemss }}>
-                                        <MdOutlineAccountCircle size={"5vh"} color="#278DCA" />
-                                    </Dropdown>
-                                )}
-                            </div>
-                        </Col>
-                    </Row>
-    
-                    {/* Modals */}
-                    <LoginPage openModalLogin={openModalLogin} setOpenModalLogin={setOpenModalLogin} />
-                    <UpdateBenhNhan openUpdateBenhNhan={openUpdateBenhNhan} setOpenModalThongTinCaNhan={setOpenModalThongTinCaNhan} />
-                    <ModalDoiMK openModalDoiMK={openModalDoiMK} setOpenModalDoiMK={setOpenModalDoiMK} />
+          <div className="header">
+            {/* Top: Logo + Avatar */}
+            
+            <div className="header-top">
+              <div className="logo-avatar-container">
+                <div className="logo" onClick={() => navigate("/")}>
+                  <img src="../../../../public/medicare-Photoroom-removebg-preview.png" alt="Logo" />
                 </div>
-    
-                <ScrollToTop />
+      
+                <div className="avatar-section">
+                  {isAuthenticated ? (
+                    <Dropdown menu={{ items }} trigger={['click']}>
+                      <Avatar
+                        src={dataAcc?.hinhAnh
+                          ? `${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${acc.user.hinhAnh}`
+                          : null}
+                        style={{ cursor: "pointer" }}
+                        size={50}
+                        icon={<UserOutlined />}
+                      />
+                    </Dropdown>
+                  ) : (
+                    <Dropdown menu={{ items: itemss }} trigger={['click']}>
+                      <MdOutlineAccountCircle size={"5vh"} color="#278DCA" />
+                    </Dropdown>
+                  )}
+                </div>
+              </div>
             </div>
-            <div style={{ marginBottom: "13vh" }}></div>
+      
+            {/* Menu Section */}
+            <div className="menu-wrapper" >
+              {isMobile && (
+                <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+                  <FaBars />
+                </div>
+              )}
+              <div className={`menu ${menuOpen || !isMobile ? "open" : ""}`}>
+                <Navbar className="navbar-custom">
+                  <Nav className="me-auto nav-links">
+                    <Nav.Link onClick={() => navigate("/")}>TRANG CHỦ</Nav.Link>
+                    <Nav.Link onClick={() => navigate("/user/chuyen-khoa-kham")}>CHUYÊN KHOA</Nav.Link>
+                    <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>BÁC SĨ</Nav.Link>
+                    <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>ĐẶT LỊCH KHÁM</Nav.Link>
+                    <Nav.Link onClick={() => navigate("/user/lien-he")}>LIÊN HỆ</Nav.Link>
+                  </Nav>
+                </Navbar>
+              </div>
+            </div>
 
+               {/* Modals */}
+               <LoginPage openModalLogin={openModalLogin} setOpenModalLogin={setOpenModalLogin} />
+                <UpdateBenhNhan openUpdateBenhNhan={openUpdateBenhNhan} setOpenModalThongTinCaNhan={setOpenModalThongTinCaNhan} />
+                <ModalDoiMK openModalDoiMK={openModalDoiMK} setOpenModalDoiMK={setOpenModalDoiMK} />
+          </div>
+
+          
+          <ScrollToTop />
+          <div style={{ marginBottom: "22vh" }}></div>
         </>
-    );
-};
+      );
+    }
 
 export default HeaderViewDoctor;

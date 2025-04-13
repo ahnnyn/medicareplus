@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { FaChevronRight, FaRegCalendarAlt } from 'react-icons/fa';
 import { FaEnvelope } from "react-icons/fa";
 import { IoIosShareAlt } from 'react-icons/io';
+import { IoHomeSharp } from "react-icons/io5";
+
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchBacSiByMaBS, getTimeSlotsByDoctorAndDate } from '../../../services/apiChuyenKhoaBacSi';
 import moment from 'moment';
@@ -149,15 +151,16 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
             <div className='layout-app'>
                 <HeaderViewDoctor />
                 
-                <Row style={{margin: "50px"}}></Row>
+                <Row style={{margin: "10px"}}></Row>
             
                 <Row>
                     <Col span={18} className='body-view-doctocc'>
-                        <Row>
+                        <Row style={{marginBottom: "30px"}}>
                             <Col span={24} style={{backgroundColor: "white", height: "7vh"}}>
-                                <p style={{ color: "rgb(69, 195, 210)", fontSize: "15px", marginLeft: "5px", top: "-5px", position: "relative"}}>
-                                    <HomeOutlined /> /Các chuyên khoa/ 
-                                    {dataBacSi?.tenKhoa || 'Chưa có thông tin'}
+                                <p style={{ color: "rgb(69, 195, 210)", fontSize: "18px", marginLeft: "5px", fontWeight:"bold", position: "relative"}}>
+                                    <IoHomeSharp /> / Các chuyên khoa / 
+                                    <span style={{marginLeft: "5px"}}> {dataBacSi?.tenKhoa || 'Chưa có thông tin'} </span>
+                                    <span style={{marginLeft: "5px"}}> / Bác sĩ {dataBacSi?.hoTen || 'Chưa có thông tin'}</span>
                                 </p>
                             </Col>
                         </Row>
@@ -257,31 +260,31 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                                         <span style={{marginLeft: "10px"}}>LỊCH KHÁM</span>    
                                     </p>
                                     <Row justify="start" style={{ marginTop: "-10px" }}>
-    {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
-        dataLichLamViec
-            .filter(item => item.trangThaiDatLich !== 'booked')
-            .map((item, index) => (
-                <Col
-                    span={4}
-                    className='cach-deu'
-                    key={index}
-                    onClick={() => {
-                        setTimeGioList(item.khungGio);
-                        setSelectedTimeId(item.maKhungGio);
-                        handleRedirectBacSi(dataBacSi, item.maKhungGio, item.khungGio, selectedDate, giaKham);
-                    }}
-                >
-                    <div className='lich-kham'>
-                        {item.khungGio}
-                    </div>
-                </Col>
-            ))
-    ) : (
-        <span style={{ color: "red", margin: "0 0 10px" }}>
-            Không có thời gian khám nào.
-            <br /> Chọn lịch
-        </span>
-    )}
+                                        {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
+                                            dataLichLamViec
+                                                .filter(item => item.trangThaiDatLich !== 'booked')
+                                                .map((item, index) => (
+                                                    <Col
+                                                        span={4}
+                                                        className='cach-deu'
+                                                        key={index}
+                                                        onClick={() => {
+                                                            setTimeGioList(item.khungGio);
+                                                            setSelectedTimeId(item.maKhungGio);
+                                                            handleRedirectBacSi(dataBacSi, item.maKhungGio, item.khungGio, selectedDate, giaKham);
+                                                        }}
+                                                    >
+                                                        <div className='lich-kham'>
+                                                            {item.khungGio}
+                                                        </div>
+                                                    </Col>
+                                                ))
+                                        ) : (
+                                            <span style={{ color: "red", margin: "0 0 10px" }}>
+                                                Không có thời gian khám nào.
+                                                <br /> Chọn lịch
+                                            </span>
+                                        )}
 </Row>
 
                                 </Col>                            
@@ -338,7 +341,7 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                         </Row>
                     </Col>
                 </Row>
-                
+                <Row style={{margin: "20px"}}></Row>
                 <Footer />
             </div>        
         </>

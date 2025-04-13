@@ -58,6 +58,7 @@ const ChuyenKhoa = () => {
     return (
         <>
         <HeaderViewDoctor />
+        <Row style={{margin: "10px"}}></Row>
         <Row>
             <Col span={18} className="col-body">
                 <Row>

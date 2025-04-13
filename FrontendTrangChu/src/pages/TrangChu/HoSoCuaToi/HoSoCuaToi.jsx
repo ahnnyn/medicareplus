@@ -27,33 +27,33 @@ const HoSoCuaToi = () => {
                 <div className="tab-wrapper">
                     {/* Sidebar */}
                     <div className="sidebar-left">
-    <div className="sidebar-menu">
-        <button
-            className={`sidebar-item`}
-            onClick={()  => navigate("/user/tao-ho-so")}
-        >
-            <i className="fa-solid fa-plus"></i> Thêm hồ sơ
-        </button>
-        <button
-            className={`sidebar-item ${activeTab === "hoSoCuaToi" ? "active" : ""}`}
-            onClick={() => setActiveTab("hoSoCuaToi")}
-        >
-            <i className="fa-solid fa-file-medical"></i> Hồ sơ bệnh nhân
-        </button>
-        <button
-            className={`sidebar-item ${activeTab === "phieuKham" ? "active" : ""}`}
-            onClick={() => setActiveTab("phieuKham")}
-        >
-            <i className="fa-solid fa-file-medical-alt"></i> Phiếu khám bệnh
-        </button>
-        <button
-            className={`sidebar-item ${activeTab === "thongBao" ? "active" : ""}`}
-            onClick={() => setActiveTab("thongBao")}
-        >
-            <i className="fa-solid fa-bell"></i> Thông báo <span className="badge">99+</span>
-        </button>
-    </div>
-</div>
+                        <div className="sidebar-menu">
+                            <button
+                                className={`sidebar-item`}
+                                onClick={()  => navigate("/user/tao-ho-so")}
+                            >
+                                <i className="fa-solid fa-plus"></i> Thêm hồ sơ
+                            </button>
+                            <button
+                                className={`sidebar-item ${activeTab === "hoSoCuaToi" ? "active" : ""}`}
+                                onClick={() => setActiveTab("hoSoCuaToi")}
+                            >
+                                <i className="fa-solid fa-file-medical"></i> Hồ sơ bệnh nhân
+                            </button>
+                            <button
+                                className={`sidebar-item ${activeTab === "phieuKham" ? "active" : ""}`}
+                                onClick={() => setActiveTab("phieuKham")}
+                            >
+                                <i className="fa-solid fa-file-medical-alt"></i> Phiếu khám bệnh
+                            </button>
+                            <button
+                                className={`sidebar-item ${activeTab === "thongBao" ? "active" : ""}`}
+                                onClick={() => setActiveTab("thongBao")}
+                            >
+                                <i className="fa-solid fa-bell"></i> Thông báo <span className="badge">99+</span>
+                            </button>
+                        </div>
+                    </div>
 
                     {/* Content */}
                     <div className="content-area">

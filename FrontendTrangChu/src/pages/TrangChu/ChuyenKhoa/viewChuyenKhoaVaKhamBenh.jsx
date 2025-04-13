@@ -170,6 +170,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
     return (
         <>
         <HeaderViewDoctor />
+        <Row style={{margin: "10px"}}></Row>
         <Row>
             <Col span={18} className="col-body" >
                 <Row 
@@ -181,7 +182,8 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                 }}
                 >
                     <Col span={24}>
-                        <p className="txt-title"><IoHomeSharp /> / Khám chuyên khoa</p>
+                        <p className="txt-title"><IoHomeSharp /> / Khám chuyên khoa<span style={{marginLeft: "5px"}}> / {dataChuyenKhoaByID?.tenKhoa}</span></p>
+                        
                         {/* <Divider/> */}
                         {/* <hr style={{border: "1px solid rgb(243, 243, 243)"}} /> */}
                     </Col>
