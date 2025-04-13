@@ -3,11 +3,11 @@ import { IoIosTimer } from 'react-icons/io';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import LoginPage from '../../../pages/TrangChu/Login/Login';
 import { LuLogIn } from 'react-icons/lu';
-import { callLogoutBenhNhan } from '../../../services/api';
+import { callLogoutBenhNhan, fetchOneAccKH } from '../../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { doLogoutAction } from '../../../redux/account/accountSlice';
 import { UserOutlined } from '@ant-design/icons';
@@ -16,6 +16,8 @@ import UpdateBenhNhan from '../ThongTin/UpdateBenhNhan';
 import { RiAccountCircleFill } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { MdOutlineAccountCircle } from "react-icons/md";
+import { FaLock } from "react-icons/fa";
+import ScrollToTop from '../ScrollToTop/ScrollToTop';
 import './header.scss';
 
 
@@ -25,8 +27,22 @@ const HeaderViewDoctor = () => {
     const [openModalDoiMK, setOpenModalDoiMK] = useState(false);
     const [openModalLogin, setOpenModalLogin] = useState(false);
     const dispatch = useDispatch();
+    const [dataAcc, setDataAcc] = useState(null);
     const isAuthenticated = useSelector(state => state.account.isAuthenticated);
     const acc = useSelector(state => state.account.user);
+
+    console.log("acc: ", acc);
+    useEffect(() => {
+        const fetchBenhNhan = async () => {
+            if (acc?.user?.maBenhNhan) {
+                const res = await fetchOneAccKH(acc.user.maBenhNhan);
+                if (res?.data) {
+                    setDataAcc(res.data);
+                }
+            }
+        };
+        fetchBenhNhan();
+    }, [acc?.maBenhNhan]);
 
     const items = [
         {
@@ -35,11 +51,15 @@ const HeaderViewDoctor = () => {
         },
         {
             key: '2',
-            label: <label onClick={() => handleRedirectLichHen(acc._id)}><IoIosTimer size={20}/> Lịch hẹn</label>,
+            label: <label onClick={() => handleRedirectLichHen(acc.maBenhNhan)}><IoIosTimer size={20}/> Lịch hẹn</label>,
         },
         {
             key: '3',
-            label: <label onClick={() => setOpenModalDoiMK(true)}><RiAccountCircleFill size={20}/> Đổi mật khẩu</label>,
+            label: <label onClick={() => handleRedirectHoSo(acc.maBenhNhan)}><IoIosTimer size={20}/> Hồ sơ của tôi</label>,
+        },
+        {
+            key: '4',
+            label: <label onClick={() => setOpenModalDoiMK(true)}><FaLock  size={20}/> Đổi mật khẩu</label>,
         },
         {
             key: '5',
@@ -76,10 +96,14 @@ const HeaderViewDoctor = () => {
         }
     };
 
-    const handleRedirectLichHen = (id) => {
-        navigate(`/user/lich-hen?idKhachHang=${id}`);
+    const handleRedirectLichHen = (maBenhNhan) => {
+        navigate(`/user/lich-hen`);
     };
 
+    const handleRedirectHoSo = (maBenhNhan) => {
+        navigate(`/user/ho-so-cua-toi`);
+    };
+    
     return (
         <>
             <div
@@ -102,8 +126,7 @@ const HeaderViewDoctor = () => {
                             <img
                                 style={{
                                     cursor: "pointer",
-                                    maxHeight: "80px",
-                                    width: "auto",
+                                    height: "100px", // không cần width cố định, auto theo height
                                     objectFit: "contain"
                                 }}
                                 onClick={() => navigate("/")}
@@ -126,12 +149,16 @@ const HeaderViewDoctor = () => {
                         </Col>
     
                         {/* Avatar or login icon */}
-                        <Col xs={8} sm={6} md={4} className="col-top avatar-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <Col xs={8} sm={6} md={4} className="col-top" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                             <div style={{ cursor: "pointer", color: "rgb(69, 195, 210)" }}>
                                 {isAuthenticated ? (
                                     <Dropdown menu={{ items }}>
                                         <Avatar
-                                            src={`${import.meta.env.VITE_BACKEND_URL}/public/user/${acc.image}`}
+                                             src={
+                                                dataAcc?.hinhAnh
+                                                ? `${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${acc.user.hinhAnh}`
+                                                : null
+                                            }
                                             style={{ cursor: "pointer" }}
                                             size={50}
                                             icon={<UserOutlined />}
@@ -152,7 +179,7 @@ const HeaderViewDoctor = () => {
                     <ModalDoiMK openModalDoiMK={openModalDoiMK} setOpenModalDoiMK={setOpenModalDoiMK} />
                 </div>
     
-                
+                <ScrollToTop />
             </div>
             <div style={{ marginBottom: "13vh" }}></div>
 

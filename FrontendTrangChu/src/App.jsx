@@ -5,11 +5,12 @@ import PageDatLichKham from "./pages/TrangChu/DatLich/datLichKhamDoctor";
 import LoginPage from "./pages/TrangChu/Login/Login";
 import RegisterPage from "./pages/TrangChu/Login/Register";
 import LichHen from "./pages/TrangChu/LichHen/lichHen";
+import HoSoCuaToi from "./pages/TrangChu/HoSoCuaToi/HoSoCuaToi";
+import TaoHoSo from "./pages/TrangChu/TaoHoSo/TaoHoSo";
 import BacSiNoiBat from "./pages/TrangChu/BacSiNoiBat/bacSiNoiBat";
 import ChuyenKhoa from "./pages/TrangChu/ChuyenKhoa/chuyenKhoa";
 import LienHe from "./pages/TrangChu/LienHe/LienHe";
 import ViewChuyenKhoaVaKhamBenh from "./pages/TrangChu/ChuyenKhoa/viewChuyenKhoaVaKhamBenh";
-import ThongBaoThanhToan from "./pages/TrangChu/ThongBaoThanhToan/ThongBaoThanhToan";
 import { LineHeightOutlined } from "@ant-design/icons";
 
 const App = () => {
@@ -21,11 +22,12 @@ const App = () => {
     { path: "/user/login-benh-nhan", element: <LoginPage /> },  // login benh-nhan
     { path: "/user/register-benh-nhan", element: <RegisterPage /> },  // Register benh-nhan
     { path: "/user/lich-hen", element: <LichHen /> },   // lich hen kham benh
+    { path: "/user/ho-so-cua-toi", element: <HoSoCuaToi /> },   // ho so cua toi
+    { path: "/user/tao-ho-so", element: <TaoHoSo /> },   // tao ho so
     { path: "/user/bac-si-noi-bat", element: <BacSiNoiBat /> },   // bac si noi bat
     { path: "/user/chuyen-khoa-kham", element: <ChuyenKhoa /> },   
     { path: "/user/view-chuyen-khoa-kham", element: <ViewChuyenKhoaVaKhamBenh /> },
-    { path: "/user/lien-he", element: <LienHe /> },
-    {path: "/user/thong-bao-thanh-toan", element: <ThongBaoThanhToan />}, // thông báo thanh toán
+    { path: "/user/lien-he", element: <LienHe /> }
   ];
   return (
     <>

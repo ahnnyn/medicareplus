@@ -39,23 +39,23 @@ export const accountSlide = createSlice({
             state.isAuthenticated = false;
             state.user = {
                 email: "",
-                phone: "",
-                firstName: "",
-                lastName: "",
-                address: "",
-                role: "",
-                image: "",
+                soDienThoai: "",
+                hoTen: "",
+                diaChi: "",
+                gioiTinh: "",
+                ngaySinh: "",
+                hinhAnh: "",
                 id: ""
             }
             // Lưu thông tin vào localStorage
             localStorage.setItem('user', JSON.stringify({
                 email: "",
-                phone: "",
-                firstName: "",
-                lastName: "",
-                address: "",
-                role: "",
-                image: "",
+                soDienThoai: "",
+                hoTen: "",
+                diaChi: "",
+                gioiTinh: "",
+                ngaySinh: "",
+                hinhAnh: "",
                 id: ""
             }));
         },

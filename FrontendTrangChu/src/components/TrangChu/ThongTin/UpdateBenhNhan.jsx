@@ -1,45 +1,34 @@
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons"
-import { Button, Col, Divider, Form, Input, message, Modal, notification, Radio, Row, Upload } from "antd"
-import { useEffect, useState } from "react"
-import { FaSave } from "react-icons/fa"
-import { useDispatch, useSelector } from "react-redux"
-import { doiThongTinKH, fetchOneAccKH } from "../../../services/api"
-import { useNavigate } from "react-router-dom"
-import { doLogoutAction } from "../../../redux/account/accountSlice"
-import { v4 as uuidv4 } from "uuid";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Checkbox, Col, Divider, Form, Input, InputNumber, message, Modal, notification, Radio, Row, Upload, DatePicker } from "antd";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOneAccKH, updateBenhNhan, callUploadBenhNhanImg } from "../../../services/api";
+import { useNavigate } from "react-router-dom";
+import { doLogoutAction } from "../../../redux/account/accountSlice";
+import bcrypt from "bcryptjs-react";
+import { FaSave } from "react-icons/fa";
+import "./style.css";
 
-const UpdateBenhNhan = (props) => {
-    const { openUpdateBenhNhan, setOpenModalThongTinCaNhan } = props;
-
-    const [form] = Form.useForm();
+const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [form] = Form.useForm();
+    const [dataAccKH, setDataAccKH] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [imageUrl, setImageUrl] = useState("");
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    // const [genderBenhNhan, setGenderBenhNhan] = useState(null);
+    const [isSubmit, setIsSubmit] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [genderDoctor, setGenderDoctor] = useState(true);
-    const [dataAccKH, setDataAccKH] = useState(null);
     const acc = useSelector((state) => state.account.user);
+    console.log("dataAccKH: ", dataAccKH);
+    console.log("Thông tin tài khoản:", acc);
 
-    // console.log("dataAccKH: ", dataAccKH);
-    // const fetchOneAcc = async () => {
-    //     try {
-    //         let id = `id=${acc._id}`;
-    //         console.log("Gửi request API với id:", id);
+    const cancel = () => {
+        form.resetFields();
+        setOpenModalThongTinCaNhan(false);
+    };
+    console.log("Account ID:", acc?.user?.maBenhNhan);
     
-    //         const res = await fetchOneAccKH(id);
-    //         console.log("Dữ liệu trả về từ API:", res);
-    
-    //         if (res?.data && res.data.length > 0) {
-    //             setDataAccKH(res.data[0]);
-    //         } else {
-    //             console.warn("Không có dữ liệu người dùng từ API");
-    //         }
-    //     } catch (error) {
-    //         console.error("Lỗi khi lấy dữ liệu tài khoản:", error);
-    //     }
-    // };
     const fetchOneAcc = async () => {
         if (!acc?.user?.maBenhNhan) {
             return notification.error({
@@ -53,8 +42,6 @@ const UpdateBenhNhan = (props) => {
     
         try {
             const res = await fetchOneAccKH(query.maBenhNhan);
-            console.log("API Response:", res); // Log the API response to check its structure
-            console.log(res.data);
             // Kiểm tra sự tồn tại của res và res.data
             if (res) {
                 setDataAccKH(res.data); // Lưu trữ đúng dữ liệu vào state
@@ -72,86 +59,159 @@ const UpdateBenhNhan = (props) => {
             });
         }
     };
-    const cancel = () => {
-        setOpenModalThongTinCaNhan(false);
-        form.resetFields();
-    };
-
-
     
-
+    // Khi modal mở thì gọi lại thông tin tài khoản
     useEffect(() => {
-        if (acc.maBenhNhan) {
-            fetchOneAcc();
+        if (openUpdateBenhNhan) {
+            fetchOneAcc(); // Gọi API khi mở modal
         }
-    }, [acc.maBenhNhan]);
+    }, [openUpdateBenhNhan]); 
 
+    // Cập nhật thông tin lên form
     useEffect(() => {
-        if (dataAccKH) {
-            if (dataAccKH.image) {
-                setFileList([
-                    {
-                        uid: uuidv4(),
-                        name: dataAccKH.image,
-                        status: "done",
-                        url: `${import.meta.env.VITE_BACKEND_URL}/uploads/${dataAccKH.image}`,
-                    },
-                ]);
+        if (dataAccKH){
+            if (dataAccKH.hinhAnh) {
+                setFileList([{
+                    uid: "-1",
+                    name: dataAccKH.hinhAnh,
+                    status: "done",
+                    url: `${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${dataAccKH.hinhAnh}`,
+                }]);
+                setImageUrl(dataAccKH.hinhAnh);
             }
+        }
+        if (dataAccKH) {
+            form.setFieldsValue({
+                maBenhNhan: dataAccKH.maBenhNhan,
+                hoTen: dataAccKH.hoTen,
+                gioiTinh: dataAccKH.gioiTinh,
+                soDienThoai: dataAccKH.soDienThoai,
+                email: dataAccKH.email,
+                diaChi: dataAccKH.diaChi,
+            });
 
-            const init = {
-                _idAcc: dataAccKH?.maBenhNhan,
-                hoTen: dataAccKH?.hoTen,
-                gioiTinh: dataAccKH?.gioiTinh,
-                soDienThoai: dataAccKH?.soDienThoai,
-                email: dataAccKH?.email,
-                diaChi: dataAccKH?.diaChi,
-                hinhAnh: dataAccKH?.hinhAnh,
-            };
-            form.setFieldsValue(init);
+            // setGenderBenhNhan(dataAccKH.gioiTinh);
         }
     }, [dataAccKH]);
 
-    const handleUpdateBenhNhan = async (values) => {
-        console.log("Giá trị form:", values);
+    const handleUploadFileImage = async ({ file }) => {
+        setLoading(true);
+        try {
+            const res = await callUploadBenhNhanImg(file);
+            console.log("Upload Response:", res); // Kiểm tra dữ liệu trả về từ API
+            console.log("File Name:", res.filename); // Log the file name to the console
+            console.log("File url:", res.url); // Log the file type to the console
+            console.log("File success:", res.success); // Log the file size to the console
+            console.log("File Status:", res.status); // Log the file status to the console
+    
+            if (res.success) {    
+                // const fileName = res.url.split("/").pop();
+                const imageUrl = `${import.meta.env.VITE_BACKEND_URL}${res.url}`;
+                // const fileName = res.url.split("/").pop();
+                setImageUrl(imageUrl);  // ✅ Đúng tên biến ở đây
+                // form.setFieldsValue({ hinhAnh: fileName }); 
+                setFileList([{ 
+                    uid: "-1", 
+                    name: file.name, 
+                    status: "done", 
+                    url: imageUrl
+                }]);
+                console.log("imgURL:", imageUrl);
+                message.success("Tải ảnh lên thành công!");
+            }
+            
+        } catch (error) {
+            message.error(error.message || "Lỗi khi tải ảnh lên!");
+        }
+        setLoading(false);
+    };
 
+    const beforeUpload = (file) => {
+        const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+        if (!isJpgOrPng) {
+            message.error("Bạn chỉ có thể tải lên hình ảnh JPG/PNG!");
+        }
+        return isJpgOrPng;
+    };
+
+    const handleRemoveFile = (file) => {
+        setFileList([]);
+        setImageUrl("");
+        message.success(`${file.name} đã được xóa`);
+    };
+
+    // Xử lý submit
+    const handleUpdateBenhNhan = async (values) => {
+        console.log("Form Values:", values);
+        console.log("BenhNhan ID:", values.maBenhNhan);
+        // console.log("Hình ảnh (file name):", hinhAnh);
         if (!imageUrl) {
-            notification.error({
-                message: "Lỗi validate",
-                description: "Vui lòng upload hình ảnh",
-            });
+            notification.error({ message: "Lỗi", description: "Vui lòng upload hình ảnh" });
             return;
         }
-
-        const hinhAnh = imageUrl.split("/").pop();
-        console.log("hinhanh: ", hinhAnh);
-
-        const res = await doiThongTinKH({
-            _id: values._idAcc,
-            hoTen: values.hoTen,
-            gioiTinh: values.gioiTinh,
-            soDienThoai: values.soDienThoai,
-            email: values.email,
-            diaChi: values.diaChi,
-            hinhAnh,
+        const hinhAnh = imageUrl.split("/").pop(); // Extract filename from the image URL
+        
+         // ⚠️ Kiểm tra kỹ mã bệnh nhân
+    if (!values.maBenhNhan) {
+        notification.error({
+            message: "Thiếu thông tin!",
+            description: "Không có mã bệnh nhân.",
         });
+        return;
+    }
+        
+        
+        setIsSubmit(true);
+        // const hinhAnh = imageUrl; // ✅
 
-        if (res?.success) {
-            message.success(res.message);
-            cancel();
-        } else {
+        
+
+        console.log("Updating Paint with data:", {
+            maBenhNhan: values.maBenhNhan, 
+            hoTen: values.hoTen, 
+            gioiTinh: values.gioiTinh, 
+            soDienThoai: values.soDienThoai,
+            email: values.email, 
+            diaChi: values.diaChi, 
+            hinhAnh: hinhAnh
+        });
+        console.log("VALUES GỬI LÊN:", values); // 👈 Thêm dòng này
+
+        try {
+            // setLoading(true);
+            const res = await updateBenhNhan(
+                values.maBenhNhan, values.hoTen, values.gioiTinh, values.soDienThoai, values.email, 
+                values.diaChi, hinhAnh);
+console.log(res);
+            if (res.status) {
+                message.success(res.message || "Cập nhật thành công");
+                // dispatch(doLogoutAction());
+                // navigate("/");
+                // setOpenModalThongTinCaNhan(false);
+                fetchOneAcc(acc.user.maBenhNhan);
+
+            } else {
+                notification.error({
+                    message: "Đổi thông tin thất bại!",
+                    description: res.message || "Đã xảy ra lỗi.",
+                });
+            }
+        } catch (error) {
+            console.error("Lỗi cập nhật tài khoản:", error);
             notification.error({
-                message: "Đã có lỗi xảy ra",
-                description: res?.message || "Không thể cập nhật thông tin",
+                message: "Lỗi hệ thống",
+                description: "Có lỗi xảy ra trong quá trình cập nhật.",
             });
         }
+        finally {
+            setIsSubmit(false);
+          }
     };
 
     return (
         <Modal
-            title="Thông tin của bạn"
+            title="Thông tin của tôi"
             open={openUpdateBenhNhan}
-            style={{ top: 30 }}
             onCancel={cancel}
             footer={null}
             width={700}
@@ -160,43 +220,110 @@ const UpdateBenhNhan = (props) => {
             <Divider />
             <Form form={form} layout="vertical" onFinish={handleUpdateBenhNhan}>
                 <Row gutter={[20, 10]}>
-                    <Col span={24}>
-                        <Form.Item name="_idAcc" hidden>
-                            <Input hidden />
-                        </Form.Item>
-                        <Form.Item label="Họ tên" name="hoTen" rules={[{ required: true, message: "Vui lòng nhập họ tên!" }]}>
+                
+                <Form.Item name="maBenhNhan" hidden><Input hidden /></Form.Item>
+
+                    <Col span={12}>
+                        <Form.Item
+                        
+                            label="Họ tên"
+                            name="hoTen"
+                            rules={[
+                                { required: true, message: "Vui lòng nhập họ tên!" },
+                                { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số!" },
+                            ]}
+                        >
                             <Input />
                         </Form.Item>
                     </Col>
+
                     <Col span={12}>
-                        <Form.Item label="Giới tính" name="gioiTinh" rules={[{ required: true }]}>
-                            <Radio.Group
-                                onChange={(e) => setGenderDoctor(e.target.value)}
-                                value={genderDoctor}
+                        <Form.Item
+                            label="Email"
+                            name="email"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Vui lòng nhập email!',
+                                },
+                                {
+                                    pattern: /^[a-zA-Z0-9._%+-]+@gmail\.com$/,
+                                    message: 'Email phải có đuôi @gmail.com',
+                                },
+                            ]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </Col>
+
+                    <Col span={12}>
+                        <Form.Item
+                            label="Số điện thoại"
+                            name="soDienThoai"
+                            rules={[
+                                { required: true, message: "Vui lòng nhập số điện thoại!" },
+                                {
+                                    pattern: /^0\d{9}$/,
+                                    message: "Số điện thoại phải có 10 chữ số, bắt đầu bằng 0",
+                                },
+                            ]}
+                        >
+                            <Input placeholder="Ví dụ: 0972138493" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item 
+                            label="Địa chỉ liên hệ" 
+                            name="diaChi" 
+                            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}>
+                            <Input />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item label="Giới tính" name="gioiTinh">
+                            {/* <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
+                                <Radio value={"0"}>Nam</Radio>
+                                <Radio value={"1"}>Nữ</Radio>
+                                <Radio value={"2"}>Khác</Radio>
+                            </Radio.Group> */}
+                            <Radio.Group>
+                                <Radio value={0}>Nam</Radio>
+                                <Radio value={1}>Nữ</Radio>
+                                <Radio value={2}>Khác</Radio>
+                                </Radio.Group>
+                        </Form.Item>
+                    </Col>
+
+                    
+                    
+                    <Col span={24}>
+                        <Form.Item label="Hình ảnh" name="hinhAnh">
+                            <Upload
+                                listType="picture-card"
+                                maxCount={1}
+                                customRequest={handleUploadFileImage}
+                                beforeUpload={beforeUpload}
+                                onRemove={handleRemoveFile}
+                                fileList={fileList}
                             >
-                                <Radio value={true}>Nam</Radio>
-                                <Radio value={false}>Nữ</Radio>
-                            </Radio.Group>
+                                <div>{loading ? <LoadingOutlined /> : <PlusOutlined />} Upload</div>
+                            </Upload>
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
-                        <Form.Item label="Số Điện Thoại" name="soDienThoai" rules={[{ required: true }]}>
-                            <Input />
-                        </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                        <Form.Item label="Email" name="email" rules={[{ required: true, type: "email" }]}>
-                            <Input />
-                        </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                        <Form.Item label="Địa chỉ" name="diaChi" rules={[{ required: true }]}>
-                            <Input />
-                        </Form.Item>
-                    </Col>
-                    <Col span={24}>
-                        <Button type="primary" htmlType="submit" icon={<FaSave />}>
-                            Cập nhật thông tin
+
+                    <Col
+                        span={24}
+                        style={{ display: "flex", justifyContent: "center" }}
+                    >
+                        <Button
+                        className="custom-btn-save"
+                            type="primary"
+                            size="large"
+                            onClick={() => !loading && form.submit()}
+                            icon={loading ? <LoadingOutlined /> : <FaSave size={25} />}
+                            loading={loading}
+                        >
+                            Đổi thông tin
                         </Button>
                     </Col>
                 </Row>
@@ -205,4 +332,4 @@ const UpdateBenhNhan = (props) => {
     );
 };
 
-export default UpdateBenhNhan;
+export default ModalUpdateThongTin;

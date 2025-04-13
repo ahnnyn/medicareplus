@@ -59,36 +59,41 @@
             return $query->execute();
         }
         
-        // public function capNhatThongTinBenhNhan(){
-        //     $p = new connectdatabase();
-        //     $pdo = $p->connect();
-        //     if ($pdo) {
-        //         try {
-        //             $query = $pdo->prepare("
-        //                 UPDATE benhnhan
-        //                 SET hoTen = :hoTen, 
-        //                     gioiTinh = :gioiTinh, 
-        //                     soDienThoai = :soDienThoai, 
-        //                     email = :email,
-        //                     diaChi = :diaChi, 
-        //                     hinhAnh = :hinhAnh, 
-        //                 WHERE maBenhNhan = :maBenhNhan
-        //             ");
-        //             $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
-        //             $query->bindParam(":hoTen", $hoTen, PDO::PARAM_STR);
-        //             $query->bindParam(":gioiTinh", $gioiTinh, PDO::PARAM_STR);
-        //             $query->bindParam(":soDienThoai", $soDienThoai, PDO::PARAM_STR);
-        //             $query->bindParam(":email", $email, PDO::PARAM_STR);
-        //             $query->bindParam(":diaChi", $diaChi, PDO::PARAM_STR);
-        //             $query->bindParam(":hinhAnh", $hinhAnh, PDO::PARAM_STR);
-        //             $query->execute();
-        //             return ["success" => "Cập nhật thông tin bệnh nhân thành công"];
-        //         } catch (PDOException $e) {
-        //             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
-        //         }
-        //     } else {
-        //         return ["error" => "Không thể kết nối database"];
-        //     }
-        // }      
+        public function capNhatThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $hinhAnh){
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    error_log("ID: " . $maBenhNhan);
+                    $queryStr = "
+                        UPDATE benhnhan
+                        SET hoTen = :hoTen, 
+                            gioiTinh = :gioiTinh,
+                            soDienThoai = :soDienThoai, 
+                            email = :email,
+                            diaChi = :diaChi, 
+                            hinhAnh = :hinhAnh
+                    ";
+
+                    $queryStr .= " WHERE maBenhNhan = :maBenhNhan";
+            
+                    $query = $pdo->prepare($queryStr);
+                
+                    $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
+                    $query->bindParam(":hoTen", $hoTen, PDO::PARAM_STR);
+                    $query->bindParam(":gioiTinh", $gioiTinh, PDO::PARAM_STR);
+                    $query->bindParam(":soDienThoai", $soDienThoai, PDO::PARAM_STR);
+                    $query->bindParam(":email", $email, PDO::PARAM_STR);
+                    $query->bindParam(":diaChi", $diaChi, PDO::PARAM_STR);
+                    $query->bindParam(":hinhAnh", $hinhAnh, PDO::PARAM_STR);
+                    $query->execute();
+                    return ["success" => "Cập nhật thông tin bệnh nhân thành công"];
+                } catch (PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }      
     }
 ?>

@@ -1,9 +1,20 @@
 // Căn giữa tiêu đề
 .login-modal .ant-modal-title {
     text-align: center;
-    font-size: 22px; // Tăng kích thước chữ tiêu đề
-    font-weight: bold;
+    font-size: 25px;
+    font-weight: 600;
 }
+/* Fix chung cho input thường và password */
+.ant-input,
+.ant-input-password .ant-input {
+  height: 30px !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  box-sizing: border-box;
+  line-height: 1.5715; /* line height mặc định của Ant Design */
+}
+
+
 
 // Định dạng phần chứa ghi nhớ tài khoản & quên mật khẩu
 .login-option {
