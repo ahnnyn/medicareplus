@@ -151,7 +151,8 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
             <div className='layout-app'>
                 <HeaderViewDoctor />
                 
-                <Row style={{margin: "10px"}}></Row>
+                <Row style={{marginBottom: "150px"}}></Row>
+
             
                 <Row>
                     <Col span={18} className='body-view-doctocc'>
@@ -285,7 +286,7 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                                                 <br /> Chọn lịch
                                             </span>
                                         )}
-</Row>
+                                    </Row>
 
                                 </Col>                            
 
@@ -341,7 +342,7 @@ const listTime = (dataBacSi?.danhSachNgayLamViec || '')
                         </Row>
                     </Col>
                 </Row>
-                <Row style={{margin: "20px"}}></Row>
+                <Row style={{marginBottom: "100px"}}></Row>
                 <Footer />
             </div>        
         </>

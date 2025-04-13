@@ -170,7 +170,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
     return (
         <>
         <HeaderViewDoctor />
-        <Row style={{margin: "10px"}}></Row>
+        <Row style={{marginBottom: "150px"}}></Row>
         <Row>
             <Col span={18} className="col-body" >
                 <Row 
@@ -332,7 +332,9 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                     </Col>
                 </Row> 
             </Col>    
-        </Row>    
+        </Row>   
+        <Row style={{marginBottom: "100px"}}></Row>
+ 
         <Footer/>
         </>
     )

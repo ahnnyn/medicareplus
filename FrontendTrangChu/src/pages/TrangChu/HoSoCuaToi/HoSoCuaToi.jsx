@@ -21,6 +21,8 @@ const HoSoCuaToi = () => {
     return (
         <>
             <HeaderViewDoctor />
+            <div style={{marginBottom: "150px"}}></div>
+
             <div className="container-2">
                 <p className="txt-title"><IoHomeSharp /> / Hồ sơ của tôi</p>
 
@@ -73,6 +75,8 @@ const HoSoCuaToi = () => {
                     </div>
                 </div>
             </div>
+            <div style={{marginBottom: "150px"}}></div>
+
             <Footer />
         </>
     );

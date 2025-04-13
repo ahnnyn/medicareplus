@@ -45,7 +45,7 @@ const HeaderViewDoctor = () => {
             }
         };
         fetchBenhNhan();
-    }, [acc?.maBenhNhan]);
+    }, [acc?.user?.maBenhNhan]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -149,16 +149,34 @@ const HeaderViewDoctor = () => {
                 <div className="logo" onClick={() => navigate("/")}>
                   <img src="../../../../public/medicare-Photoroom-removebg-preview.png" alt="Logo" />
                 </div>
-      
-                <div className="avatar-section">
+
+                <div className="avatar-section" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  {isAuthenticated && dataAcc?.hoTen && (
+                    <span
+                      style={{
+                        fontWeight: "500",
+                        fontSize: "clamp(14px, 2vw, 16px)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        maxWidth: "100px", // hoặc 150px tùy bạn
+                        color: "#333",
+                      }}
+                    >
+                      {dataAcc.hoTen}
+                    </span>
+                  )}
+
                   {isAuthenticated ? (
                     <Dropdown menu={{ items }} trigger={['click']}>
                       <Avatar
-                        src={dataAcc?.hinhAnh
-                          ? `${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${acc.user.hinhAnh}`
-                          : null}
+                        src={
+                          dataAcc?.hinhAnh
+                            ? `${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${acc.user.hinhAnh}`
+                            : null
+                        }
                         style={{ cursor: "pointer" }}
-                        size={50}
+                        size={55}
                         icon={<UserOutlined />}
                       />
                     </Dropdown>
@@ -170,6 +188,7 @@ const HeaderViewDoctor = () => {
                 </div>
               </div>
             </div>
+
       
             {/* Menu Section */}
             <div className="menu-wrapper" >
@@ -196,10 +215,7 @@ const HeaderViewDoctor = () => {
                 <UpdateBenhNhan openUpdateBenhNhan={openUpdateBenhNhan} setOpenModalThongTinCaNhan={setOpenModalThongTinCaNhan} />
                 <ModalDoiMK openModalDoiMK={openModalDoiMK} setOpenModalDoiMK={setOpenModalDoiMK} />
           </div>
-
-          
           <ScrollToTop />
-          <div style={{ marginBottom: "22vh" }}></div>
         </>
       );
     }

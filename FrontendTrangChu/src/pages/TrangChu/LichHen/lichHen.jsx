@@ -47,7 +47,9 @@ const LichHenCard = () => {
   return (
     <>
       <HeaderViewDoctor />
-      <div className="container" style={{ padding: "24px 16px" }}>
+      <Row style={{marginBottom: "150px"}}></Row>
+
+      <div className="container" >
         <p className="txt-title">
           <IoHomeSharp /> / Lịch hẹn
         </p>
@@ -103,6 +105,8 @@ const LichHenCard = () => {
                 </Row>
               </Card>
       </div>
+      <Row style={{marginBottom: "50px"}}></Row>
+
       <Footer />
     </>
   );

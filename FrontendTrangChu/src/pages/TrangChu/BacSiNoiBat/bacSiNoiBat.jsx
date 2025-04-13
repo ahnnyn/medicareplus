@@ -58,7 +58,7 @@ const BacSiNoiBat = () => {
   return (
     <>
       <HeaderViewDoctor />
-      <Row style={{margin: "10px"}}></Row>
+      <Row style={{marginTop: "150px"}}></Row>
       <Row>
         <Col span={18} className="col-body">
           <Row>
@@ -123,6 +123,8 @@ const BacSiNoiBat = () => {
           </Row>
         </Col>
       </Row>
+      <Row style={{marginBottom: "150px"}}></Row>
+
       <Footer />
     </>
   );

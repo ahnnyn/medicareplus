@@ -4,6 +4,8 @@ import emailjs from "@emailjs/browser";
 import Swal from "sweetalert2";
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
 import Footer from "../../../components/TrangChu/Footer/Footer";
+import { IoHomeSharp } from "react-icons/io5";
+import { Col, Row } from "antd";
 import "../../../index.css";
 
 function LienHe() {
@@ -44,7 +46,17 @@ function LienHe() {
   return (
     <>
       <HeaderViewDoctor />
+      <div style={{marginBottom: "120px"}}></div>
       <div className="contact-container">
+        <Col span={18} className="col-body">
+          <Row>
+            <Col span={24}>
+              <p className="txt-title">
+                <IoHomeSharp /> / Liên hệ
+                  </p>
+            </Col>
+          </Row>
+        </Col>
         <div className="contact-header">
           <h2>LIÊN HỆ VỚI CHÚNG TÔI</h2>
           <p>Mọi thắc mắc hoặc cần hỗ trợ, bạn có thể liên hệ qua biểu mẫu dưới đây.</p>
@@ -89,6 +101,8 @@ function LienHe() {
           </div>
         </div>
       </div>
+      <div style={{marginBottom: "150px"}}></div>
+
       <Footer />
     </>
   );

@@ -26,13 +26,13 @@ import {
 } from "@ant-design/icons";
 
 // AntD Typography destructure
-const { Title, Text, Paragraph } = Typography;
 
 // React Icons
 import { HiOutlineMailOpen } from "react-icons/hi";
 import { IoLocationSharp, IoAddCircleSharp } from "react-icons/io5";
 import { BsFillCalendar2DateFill } from "react-icons/bs";
 import { FaRegHospital } from "react-icons/fa";
+import { IoHomeSharp } from "react-icons/io5";
 
 // Local Components
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
@@ -50,9 +50,8 @@ import { fetchOneAccKH } from "../../../services/api";
 
 // Styles
 import "./styleDatLich.scss";
-
-
 const { TextArea } = Input;
+
 const PageDatLichKham = () => {
 
     const location = useLocation(); // Lấy location
@@ -332,11 +331,21 @@ const PageDatLichKham = () => {
         <>
             <HeaderViewDoctor />
             <div style={{ marginBottom: "150px" }}></div>
+            <Col span={18} className="col-body">
+                <Row>
+                    <Col span={24}>
+                        <p className="txt-title">
+                            <IoHomeSharp /> / Đặt lịch khám
+                        </p>
+                    </Col>
+                </Row>
+            </Col>
             <Card
                 style={{
                     padding: 24,
                     margin: "auto",
                     maxWidth: 1000,
+                    height: "auto",
                     borderRadius: 12,
                     boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
 
@@ -346,13 +355,16 @@ const PageDatLichKham = () => {
                     form={form}
                     name="basic"
                     layout="vertical"
+                    style={{
+                    maxWidth: "100%",
+                }}
                     initialValues={{ remember: true }}
                     onFinish={handleDatLich}
                     autoComplete="off"
                 >
                     <Row>
                         <Col span={24}>
-                            <Row justify="center">
+                            <Row justify="center" >
                                 <Col span={20}>
                                 <div
                                         style={{
@@ -371,7 +383,7 @@ const PageDatLichKham = () => {
                                             padding: 24,
                                             background: "#fafafa",
                                             borderRadius: 16,
-                                            boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                                            boxShadow: "1px 4px 12px rgba(13, 10, 10, 0.06)",
                                             marginBottom: 24,
                                             
                                         }}
@@ -412,7 +424,7 @@ const PageDatLichKham = () => {
                                 <Form.Item name="maBacSi" hidden><Input /></Form.Item>
                                 <Form.Item name="giaKham" initialValue={giaKham} hidden><Input /></Form.Item>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item label="Giá khám">
                                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                                             <DollarOutlined style={{ color: "#fa541c", fontSize: 20 }} />
@@ -421,7 +433,7 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item
                                         name="patientName"
                                         rules={[
@@ -437,7 +449,7 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item label="Giới tính" name="gender">
                                         <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
                                             <Radio value={"0"}>Nam</Radio>
@@ -447,7 +459,7 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item
                                         name="phone"
                                         rules={[
@@ -463,7 +475,7 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item
                                         name="email"
                                         rules={[
@@ -476,7 +488,7 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item
                                         name="dateBenhNhan"
                                         rules={[{ required: true, message: 'Vui lòng chọn ngày/tháng/năm sinh' }]}
@@ -491,7 +503,7 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item
                                         name="address"
                                         rules={[{ required: true, message: 'Vui lòng nhập địa chỉ chi tiết của bạn' }]}
@@ -501,13 +513,20 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
+                                        
+                                <Col span={24} className="cac-the-input">
                                     <Form.Item
                                         name="lyDoKham"
                                         rules={[{ required: true, message: 'Vui lòng nhập lí do khám' }]}
                                         hasFeedback
                                     >
-                                        <TextArea rows={4} placeholder="Lý do khám" />
+                                        <TextArea
+                                            size="large"
+                                            placeholder="Lý do khám"
+                                            prefix={<IoAddCircleSharp />}
+                                            rows={5} //  số dòng hiển thị
+                                            style={{ height: "auto", resize: 'none' }} // chiều cao tối thiểu
+                                        />
                                     </Form.Item>
                                 </Col>
 

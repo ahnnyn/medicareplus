@@ -70,6 +70,8 @@ import {
     return (
       <>
         <HeaderViewDoctor />
+        <Row style={{marginBottom: "150px"}}></Row>
+
         <div className="container">
           <p className="txt-title"><IoHomeSharp /> / Tạo hồ sơ bệnh nhân</p>
           <h2 className="form-title">TẠO MỚI HỒ SƠ</h2>
@@ -171,6 +173,8 @@ import {
             </Form>
           </div>
         </div>
+        <Row style={{marginBottom: "150px"}}></Row>
+
         <Footer />
       </>
     );

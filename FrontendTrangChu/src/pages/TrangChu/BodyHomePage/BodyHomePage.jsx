@@ -88,15 +88,15 @@ const BodyHomePage = () => {
 
     return (
         <>
-            <div style={{ marginTop: "clamp(20px, 0.8vw, 50px)" }}></div>    {/* chèn khoảng cách đẩy nội dung xuống dưới header */}
+           <div style={{ height: "clamp(2rem, 10vh, 5rem)" }}></div>   {/* chèn khoảng cách đẩy nội dung xuống dưới header */}
 
             <div
                 className="slicer-banner"
                 style={{
                     position: "relative",
                     width: "100%",
-                    height: "auto",
                     overflow: "hidden",
+                    paddingTop: "50px"
                 }}
                 >
                 <img
