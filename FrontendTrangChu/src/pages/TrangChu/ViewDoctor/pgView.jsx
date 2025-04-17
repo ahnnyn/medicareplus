@@ -9,9 +9,6 @@ import { FaChevronRight, FaRegCalendarAlt } from 'react-icons/fa';
 import { FaEnvelope } from "react-icons/fa";
 import { IoIosShareAlt } from 'react-icons/io';
 import { IoHomeSharp } from "react-icons/io5";
-import { Select } from 'antd';
-const { Option } = Select;
-
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchBacSiByMaBS, getTimeSlotsByDoctorAndDate, getTimeSlotsByDoctor } from '../../../services/apiChuyenKhoaBacSi';
@@ -35,7 +32,6 @@ const PageViewDoctor = () => {
     const params = new URLSearchParams(location.search);
     const maBacSi = params.get("maBacSi");
     const hinhThucKham = params.get("hinhThucKham");
-    const [selectedHinhThucKham, setSelectedHinhThucKham] = useState(hinhThucKham || 'tatca');
 
     console.log("check id bác sĩ: ", maBacSi);
 
@@ -67,16 +63,21 @@ const PageViewDoctor = () => {
 
     useEffect(() => {
         const fetchBacSiTimes = async () => {
-
+            if (!selectedDate) {
+                console.warn("selectedDate is null or undefined");
+                return;
+            }
             if (!maBacSi) {
                 console.warn("maBacSi is null or undefined");
                 return;
             }
     
+            console.log("selectedDate: ", selectedDate);
+            const doctorId = maBacSi;
             // const appointmentDate = selectedDate; // Ngày đã chọn từ Drawer
             // console.log("appointmentDate: ", appointmentDate);    
             // const res = await getTimeSlotsByDoctorAndDate(doctorId, appointmentDate);
-            const res = await getTimeSlotsByDoctor(maBacSi);
+            const res = await getTimeSlotsByDoctor(doctorId);
             console.log("res fetch: ", res);
     
             if (res && Array.isArray(res)) {
@@ -124,39 +125,14 @@ const PageViewDoctor = () => {
 const today = moment().startOf('day');
 
 // hiển thị trong drawer (chỉ hiển thị từ hôm nay trở đi)
-// const listTime = (dataBacSi?.danhSachNgayLamViec || '')
-//     .split(',')
-//     .map(date => date.trim())
-//     .filter(date => moment(date, 'YYYY-MM-DD', true).isValid())
-//     .filter(date => moment(date).isSameOrAfter(today));
+const listTime = (dataBacSi?.danhSachNgayLamViec || '')
+    .split(',')
+    .map(date => date.trim())
+    .filter(date => moment(date, 'YYYY-MM-DD', true).isValid())
+    .filter(date => moment(date).isSameOrAfter(today));
 
 
-// Lọc danh sách lịch làm việc theo hình thức khám và lấy danh sách ngày không trùng lặp từ hôm nay trở đi
-const danhSachNgayLamViec = Array.from(new Set(
-    dataLichLamViec
-      .filter(item => {
-        if (selectedHinhThucKham === 'tructuyen') {
-          return item.hinhThucKham === 'Trực tuyến';
-        }
-        if (selectedHinhThucKham === 'chuyenkhoa') {
-          return item.hinhThucKham === 'Chuyên khoa';
-        }
-        return true; // 'tatca'
-      })
-      .map(item => item.ngayLamViec)
-      .filter(ngay => moment(ngay, 'YYYY-MM-DD').isSameOrAfter(today))
-  ));
 
-
-console.log("selectedHinhThucKham: ", selectedHinhThucKham);
-
-useEffect(() => {
-    if (hinhThucKham) {
-      setSelectedHinhThucKham(hinhThucKham);
-    }
-  }, [hinhThucKham]);
-  
-console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
 
     const styleTime = (index) => ({
         cursor: "pointer",
@@ -165,9 +141,9 @@ console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
     });
     
     
-    const handleRedirectBacSi = (item, idKhungGio, thoiGianKhamBenh, selectedDate, giaKham, hinhThucKham) => {
+    const handleRedirectBacSi = (item, idKhungGio, thoiGianKhamBenh, selectedDate, giaKham) => {
         const formattedDate = moment(selectedDate, 'YYYY-MM-DD').format('YYYY-MM-DD');
-        navigate(`/page-dat-lich-kham?id=${item.maBacSi}&idGioKhamBenh=${idKhungGio}&khungGioKham=${thoiGianKhamBenh}&ngayKham=${formattedDate}&giaKham=${giaKham}&hinhThucKham=${hinhThucKham}`);
+        navigate(`/page-dat-lich-kham?id=${item.maBacSi}&idGioKhamBenh=${idKhungGio}&khungGioKham=${thoiGianKhamBenh}&ngayKham=${formattedDate}&giaKham=${giaKham}`);
     };   
     return (
         <>
@@ -210,137 +186,135 @@ console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
                             </Col>
                         </Row>
 
-                        <Row gutter={[16, 25]} style={{ marginTop: "20px" }}>
-                            <Col span={24}>
-                                <span style={{ marginRight: 10, fontWeight: "500" }}>Chọn hình thức khám:</span>
-                                <Select
-                                    value={selectedHinhThucKham}
-                                    style={{ width: 200 }}
-                                    onChange={(value) => setSelectedHinhThucKham(value)}
-                                >
-                                    <Select.Option value="tatca">Tất cả</Select.Option>
-                                    <Select.Option value="chuyenkhoa">Chuyên khoa</Select.Option>
-                                    <Select.Option value="tructuyen">Trực tuyến</Select.Option>
-                                </Select>
-                            </Col>
-
-                            {/* Cột trái - Chọn ngày và khung giờ */}
-                            <Col span={12} style={{ backgroundColor: "white", borderRight: "1px solid rgba(228, 228, 221, 0.637)" }}>
-                                <div style={{ backgroundColor: "white" }}>
-                                    <p
-                                        onClick={showDrawer}
+                        <Row>
+                            <Col span={12} style={{backgroundColor: "white", borderRight: "1px solid rgba(228, 228, 221, 0.637)"}}>
+                                <Col span={24} style={{backgroundColor: "white"}}>                                
+                                    <p  onClick={showDrawer} 
                                         style={{
-                                            color: "rgb(69, 195, 210)",
-                                            fontWeight: "500",
-                                            fontSize: "16px",
-                                            padding: "10px 0",
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        {hienThiTime}
-                                        <DownOutlined style={{ fontSize: "14px", marginLeft: "3px", fontWeight: "600" }} />
-                                        <hr style={{ width: hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? "130px" : "230px", margin: "5px" }} />
+                                            color: "rgb(69, 195, 210)", fontWeight: "500", fontSize: "16px", padding: "10px 0", cursor: "pointer", 
+                                        }}>                                         
+                                        {/* <CaretRightOutlined /> */}
+                                        {hienThiTime} {/* Hiển thị ngày đã chọn */}
+                                        <DownOutlined style={{fontSize: "14px", marginLeft: "3px", fontWeight: "600"}} /> 
+                                        {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
+                                            <hr style={{ width: "130px", margin: "5px"}}/>
+                                        ) : (
+                                            <hr style={{ width: "230px", margin: "5px"}}/>
+                                        )} 
+                                        
                                     </p>
 
                                     <Drawer
-                                        title={`Thông tin lịch khám bệnh của bác sĩ ${dataBacSi?.hoTen}`}
+                                        title={`Thông tin lịch khám bệnh của bác sĩ
+                                            
+                                            ${dataBacSi?.hoTen}`}                                        
                                         placement={placement}
                                         closable={false}
                                         onClose={onClose}
                                         open={open}
                                         key={placement}
+                                        // height={450}
+                                        // width={300}
+                                        // style={{ backgroundColor: 'blue', color: 'white' }} // Thay đổi màu nền
                                     >
-                                        {danhSachNgayLamViec.length > 0 ? (
-                                            danhSachNgayLamViec
-                                                .sort((a, b) => moment(a).unix() - moment(b).unix())
+                                        {listTime.length > 0 ? (
+                                            listTime
+                                                .sort((a, b) => moment(a).unix() - moment(b).unix()) // Sắp xếp từ nhỏ đến lớn
                                                 .map((time, index) => {
-                                                    const vietnameseDay = englishToVietnameseDays[moment(time).format("dddd")];
-                                                    const displayTime = `${vietnameseDay} - ${moment(time).format("DD/MM")}`;
+                                                    const formattedTime = moment(time).format("dddd - DD/MM"); // Định dạng lại thời gian
+                                                    const vietnameseDay = englishToVietnameseDays[moment(time).format("dddd")]; // Chuyển đổi tên ngày sang tiếng Việt
+                                                    const displayTime = `${vietnameseDay} - ${moment(time).format("DD/MM")}`; // Tạo chuỗi hiển thị
                                                     return (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
+                                                        <p 
+                                                            onClick={() => {                                                    
+                                                                console.log("time: ", time);
                                                                 setHienThiTime(displayTime);
                                                                 setSelectedTimeId(time);
-                                                                setSelectedDate(time);
-                                                                onClose();
+                                                                setSelectedDate(time); // Cập nhật ngày đã chọn
+                                                                onClose(); // Đóng drawer
                                                             }}
-                                                            onMouseEnter={() => setHoveredIndex(index)}
-                                                            onMouseLeave={() => setHoveredIndex(null)}
-                                                            className="times"
-                                                            style={styleTime(index)}
+                                                            onMouseEnter={() => setHoveredIndex(index)} // Khi hover vào thẻ
+                                                            onMouseLeave={() => setHoveredIndex(null)} // Khi rời khỏi thẻ
+                                                            className='times' 
+                                                            style={styleTime(index)} 
+                                                            key={index}
                                                         >
-                                                            {displayTime}
+                                                            {displayTime} {/* Hiển thị thời gian đã định dạng */}
                                                         </p>
                                                     );
                                                 })
                                         ) : (
                                             <p>Không có thời gian khám nào.</p>
                                         )}
+
                                         <Button color="default" variant="outlined" onClick={() => setOpen(false)}>Bỏ Qua</Button>
                                     </Drawer>
-                                </div>
+                                </Col>    
 
-                                <div style={{ backgroundColor: "white", top: "-18px", position: "relative" }}>
-                                    <p style={{ color: "gray", fontSize: "16px", fontWeight: "500", padding: "10px 0" }}>
+                                <Col span={24}  style={{backgroundColor: "white", top: "-18px", position: "relative"}}>
+                                    <p style={{
+                                        color: "gray", fontSize: "16px", fontWeight: "500", padding: "10px 0"
+                                    }}>
                                         <FaRegCalendarAlt />
-                                        <span style={{ marginLeft: "10px" }}>LỊCH KHÁM</span>
+                                        <span style={{marginLeft: "10px"}}>LỊCH KHÁM</span>    
                                     </p>
-
                                     <Row justify="start" style={{ marginTop: "-10px" }}>
-                                        {hienThiTime !== 'Bấm vào đây để xem lịch khám!' && selectedDate ? (
-                                            (() => {
-                                                const khungGioTheoNgay = dataLichLamViec.filter(
-                                                    item =>
-                                                        item.trangThaiDatLich !== 'booked' &&
-                                                        item.ngayLamViec === selectedDate
-                                                );
-                                                if (khungGioTheoNgay.length > 0) {
-                                                    return khungGioTheoNgay.map((item, index) => (
-                                                        <Col
-                                                            span={4}
-                                                            className="cach-deu"
-                                                            key={index}
-                                                            onClick={() => {
-                                                                setTimeGioList(item.khungGio);
-                                                                setSelectedTimeId(item.maKhungGio);
-                                                                handleRedirectBacSi(
-                                                                    dataBacSi,
-                                                                    item.maKhungGio,
-                                                                    item.khungGio,
-                                                                    selectedDate,
-                                                                    giaKham, selectedHinhThucKham
-                                                                );
-                                                            }}
-                                                        >
-                                                            <div className="lich-kham">{item.khungGio}</div>
-                                                        </Col>
-                                                    ));
-                                                } else {
-                                                    return (
-                                                        <span style={{ color: 'red', margin: '0 0 10px' }}>
-                                                            Không có thời gian khám nào.
-                                                        </span>
-                                                    );
-                                                }
-                                            })()
-                                        ) : (
-                                            <span style={{ color: 'red', margin: '0 0 10px' }}>
-                                                Không có thời gian khám nào.
-                                            </span>
-                                        )}
-                                    </Row>
-                                </div>
+    {hienThiTime !== 'Bấm vào đây để xem lịch khám!' ? (
+        dataLichLamViec
+            .filter(item =>
+                item.trangThaiDatLich !== 'booked' &&
+                item.hinhThucKham === hinhThucKham &&
+                item.ngayKham === selectedDate // lọc theo ngày đang chọn
+            )
+            .length > 0 ? (
+            dataLichLamViec
+                .filter(item =>
+                    item.trangThaiDatLich !== 'booked' &&
+                    item.hinhThucKham === hinhThucKham &&
+                    item.ngayKham === selectedDate
+                )
+                .map((item, index) => (
+                    <Col
+                        span={4}
+                        className='cach-deu'
+                        key={index}
+                        onClick={() => {
+                            setTimeGioList(item.khungGio);
+                            setSelectedTimeId(item.maKhungGio);
+                            handleRedirectBacSi(dataBacSi, item.maKhungGio, item.khungGio, selectedDate, giaKham);
+                        }}
+                    >
+                        <div className='lich-kham'>
+                            {item.khungGio}
+                        </div>
+                    </Col>
+                ))
+        ) : (
+            <span style={{ color: "red", margin: "0 0 10px" }}>
+                Không có thời gian khám nào.<br />Chọn lịch
+            </span>
+        )
+    ) : (
+        <span style={{ color: "red", margin: "0 0 10px" }}>
+            Không có thời gian khám nào.<br />Chọn lịch
+        </span>
+    )}
+</Row>
 
-                                <div style={{ backgroundColor: "white", top: "-30px", position: "relative" }}>
-                                    <p style={{ fontSize: "14px", color: "gray" }}>
+
+
+                                </Col>                            
+
+                                <Col span={24}  style={{backgroundColor: "white", top: "-30px", position: "relative"}}>
+                                    <p style={{fontSize: "14px", color: "gray"}}>
                                         Chọn <FaRegHandPointUp size={14} /> và đặt (Phí đặt lịch 0đ)
                                     </p>
-                                </div>
+                                </Col>
                             </Col>
 
-                            {/* Cột phải - Giá khám */}
-                            <Col span={12} style={{ backgroundColor: "white", padding: "45px 20px" }}>
+                            
+                            <Col span={12} style={{backgroundColor: "white", padding: "45px 20px"}}>
+                        
                                 {showDetails ? (
                                     <div>
                                         <p style={{ fontWeight: "500" }}>GIÁ KHÁM:</p>
@@ -350,22 +324,27 @@ console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
                                         }}>
                                             <span className='span-gia-kham'>
                                                 <p style={{ fontWeight: "500" }}>Giá khám</p>
+                                                {/* <p>Giá khám chưa bao gồm chi phí chụp chiếu, xét nghiệm</p> */}
                                             </span>
                                             <span style={{ lineHeight: "70px", marginRight: "5px", color: "red", fontWeight: "500" }} className='span-gia-kham'>
-                                                {formatCurrency(dataBacSi?.giaKham)}
+                                            {formatCurrency(dataBacSi?.giaKham)}
                                             </span>
                                         </div>
+
+                                        
                                         <a onClick={toggleDetails} style={{ float: "right", marginTop: "5px" }}>Ẩn bảng giá</a>
                                     </div>
                                 ) : (
                                     <p>
-                                        <span style={{ fontWeight: "500", color: "gray" }}>GIÁ KHÁM:</span>&nbsp;
-                                        <span style={{ color: "red", fontWeight: "500" }}>{formatCurrency(dataBacSi?.giaKham)}</span>
+                                        <span style={{ fontWeight: "500", color: "gray" }}>GIÁ KHÁM:</span> &nbsp;
+                                        <span style={{color: "red", fontWeight: "500"}}>{formatCurrency(dataBacSi?.giaKham)}</span>
+                                        {/* <a onClick={toggleDetails} style={{ marginLeft: "10px" }}>Xem chi tiết</a> */}
                                     </p>
-                                )}
+                                )}                                
                             </Col>
-                        </Row>
 
+                           
+                        </Row>
 
                     </Col>
                 </Row>

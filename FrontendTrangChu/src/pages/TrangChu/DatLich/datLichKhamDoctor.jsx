@@ -61,28 +61,34 @@ const PageDatLichKham = () => {
     const khungGioKham = queryParams.get('khungGioKham');
     const ngayKham = queryParams.get('ngayKham');
     const giaKham = queryParams.get('giaKham');
+    const hinhThucKham = queryParams.get('hinhThucKham');
     const [paymentMethod, setPaymentMethod] = useState('VnPay'); // Trạng thái mặc định là thanh toán online
     const [dataBacSi, setDataBacSi] = useState(null);  
     const [ngayKhamBenh, setNgayKhamBenh] = useState(null)
     const [dataBenhNhan, setDataBenhNhan] = useState(null)
     const [genderBenhNhan, setGenderBenhNhan] = useState(null)
-    const [phuongThucThanhToan, setPhuongThucThanhToan] = useState("VnPay")
     const [value, setValue] = useState(0);
     const [tongtien, setTongTien] = useState(0)
     const [loadingSubmit, setLoadingSubmit] = useState(false)
     const [form] = Form.useForm();
+    
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const isAuthenticated = useSelector(state => state.account.isAuthenticated)
     const acc = useSelector(s => s.account.user)
 
-    console.log("doctorId: ", doctorId);
-    console.log("idGioKhamBenh: ", idGioKhamBenh);
-    console.log("khungGioKham: ", khungGioKham);
-    console.log("giaKham: ", giaKham);
-    console.log("ngayKham: ", ngayKham);
-    console.log("tongtien: ", tongtien);
+    useEffect(() => {
+        console.log("doctorId: ", doctorId);
+        console.log("idGioKhamBenh: ", idGioKhamBenh);
+        console.log("khungGioKham: ", khungGioKham);
+        console.log("giaKham: ", giaKham);
+        console.log("ngayKham: ", ngayKham);
+        console.log("tongtien: ", tongtien);
+        console.log("hinhThucKham: ", hinhThucKham);
+    }, [doctorId, idGioKhamBenh, khungGioKham, giaKham, ngayKham, tongtien, hinhThucKham]);
+
+    console.log(location.search); // Kiểm tra giá trị trong URL
 
     const maBenhNhan = acc?.user?.maBenhNhan;
 
@@ -188,30 +194,15 @@ const PageDatLichKham = () => {
     };
 
     const handleDatLich = async (values) => {
+        const ngayKham = values.ngayKhamBenh?.format?.('YYYY-MM-DD') || values.ngayKhamBenh;
+        const dateBN = values.dateBenhNhan?.format?.('YYYY-MM-DD') || values.dateBenhNhan;
+    
         console.log("📋 Toàn bộ values:", values);
-        console.log("👤 Tên bệnh nhân:", values.patientName);
-        console.log("Updating benh nhan with data:", {
-            fullName: values.patientName, 
-            gender: values.gender, 
-            phoneNumber: values.phone,
-            email: values.email, 
-            address: values.address, 
-            giaKham: values.giaKham, 
-            lyDoKham: values.lyDoKham,
-            dateBenhNhan: values.dateBenhNhan,
-            hinhThucTT: values.hinhThucTT
-        });
-
-        console.log("tenBN ", values.patientName);
-
-
+    
         setLoadingSubmit(true);
     
         try {
-    
-            const apiCall = values.hinhThucTT === 'VnPay'
-                ? datLichKhamBenhVnPay
-                : datLichKhamBenh;
+            const apiCall = values.hinhThucTT === 'VnPay' ? datLichKhamBenhVnPay : datLichKhamBenh;
     
             const res = await apiCall(
                 values.maBenhNhan,
@@ -219,41 +210,39 @@ const PageDatLichKham = () => {
                 values.khungGioKham,
                 values.patientName,
                 values.giaKham,
-                values.ngayKhamBenh,
+                ngayKham,
                 values.lyDoKham,
-                values.hinhThucTT
+                values.hinhThucTT,
+                values.hinhThucKham
             );
     
-            
             console.log("res dat lich:", res);
     
-            if (res?.status) {
+            if (res?.status === true || res?.status === 1) {
                 if (values.hinhThucTT === 'VnPay') {
                     try {
-                      const vnpayRes = await taoVnPayUrl(res.maLichKham, values.giaKham, values.patientName);
-                      console.log("vnpayRes:", vnpayRes);
-                  
-                      const vnpayData = vnpayRes;
-                      if (vnpayData?.status) {
-                        window.location.href = vnpayData.payment_url;
-                      } else {
-                        notification.error({
-                          message: 'Lỗi VNPAY',
-                          description: vnpayData?.message || 'Không tạo được link thanh toán.'
-                        });
-                      }
+                        const vnpayRes = await taoVnPayUrl(res.maLichKham, values.giaKham, values.patientName);
+                        console.log("vnpayRes:", vnpayRes);
+    
+                        if (vnpayRes?.status) {
+                            window.location.href = vnpayRes.payment_url;
+                        } else {
+                            notification.error({
+                                message: 'Lỗi VNPAY',
+                                description: vnpayRes?.message || 'Không tạo được link thanh toán.'
+                            });
+                        }
                     } catch (error) {
-                      console.error("Lỗi khi gọi API tạo URL VNPAY:", error);
-                      notification.error({
-                        message: 'Lỗi kết nối VNPAY',
-                        description: 'Không thể gửi yêu cầu đến máy chủ. Vui lòng thử lại.'
-                      });
+                        console.error("Lỗi khi gọi API tạo URL VNPAY:", error);
+                        notification.error({
+                            message: 'Lỗi kết nối VNPAY',
+                            description: 'Không thể gửi yêu cầu đến máy chủ. Vui lòng thử lại.'
+                        });
                     }
-                  } else {
+                } else {
                     message.success(res.message || 'Đặt lịch thành công 🎉');
                     form.resetFields();
-                  }
-                  
+                }
             } else {
                 notification.error({
                     message: 'Đã có lỗi xảy ra',
@@ -272,6 +261,7 @@ const PageDatLichKham = () => {
     };
     
     
+    
     const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
     const idKH = acc?.user?.maBenhNhan;
 
@@ -281,15 +271,21 @@ const PageDatLichKham = () => {
             form &&
             dataBacSi?.maBacSi &&
             idKH &&
+            hinhThucKham &&
             ngayKhamBenh &&
             khungGioKham &&
             dataBenhNhan
         ) {
+            // Kiểm tra thêm trường hợp khungGioKham
+            const khungGio = idGioKhamBenh || khungGioKham;
+    
             form.setFieldsValue({
-                khungGioKham: idGioKhamBenh,
+                khungGioKham: khungGio,
                 ngayKhamBenh: ngayKham,
                 maBenhNhan: idKH,
+                hinhThucKham: hinhThucKham,
                 maBacSi: dataBacSi.maBacSi,
+                giaKham: giaKham,
                 patientName: dataBenhNhan.hoTen,
                 gender: dataBenhNhan.gioiTinh,
                 phone: dataBenhNhan.soDienThoai,
@@ -300,9 +296,13 @@ const PageDatLichKham = () => {
                     : null,
             });
     
-            setGenderBenhNhan(dataBenhNhan.gioiTinh);
+            // Kiểm tra nếu gender không null hoặc undefined
+            if (dataBenhNhan.gioiTinh) {
+                setGenderBenhNhan(dataBenhNhan.gioiTinh);
+            }
         }
-    }, [form, dataBacSi, idKH, ngayKhamBenh, khungGioKham, dataBenhNhan]);
+    }, [form, dataBacSi, idKH, ngayKhamBenh, hinhThucKham, khungGioKham, dataBenhNhan, giaKham]);
+    
     
     
     
@@ -422,7 +422,8 @@ const PageDatLichKham = () => {
                                 <Form.Item name="khungGioKham" hidden><Input /></Form.Item>
                                 <Form.Item name="ngayKhamBenh" hidden><Input /></Form.Item>
                                 <Form.Item name="maBacSi" hidden><Input /></Form.Item>
-                                <Form.Item name="giaKham" initialValue={giaKham} hidden><Input /></Form.Item>
+                                <Form.Item name="hinhThucKham" hidden><Input /></Form.Item>
+                                <Form.Item name="giaKham" hidden><Input /></Form.Item>
 
                                 <Col span={24} className="cac-the-input">
                                     <Form.Item label="Giá khám">
@@ -530,18 +531,25 @@ const PageDatLichKham = () => {
                                     </Form.Item>
                                 </Col>
 
-                                <Col span={24}>
-                                    <p style={{ color: "navy", fontWeight: 500, fontSize: 16 }}>Hình thức thanh toán</p>
-                                    <Form.Item
-                                        name="hinhThucTT"
-                                        initialValue="VnPay"
-                                        rules={[{ required: true, message: 'Vui lòng chọn hình thức thanh toán!' }]}
-                                    >
-                                        <Radio.Group onChange={handlePaymentChange} value={phuongThucThanhToan}>
-                                            <Radio style={{ fontSize: 16 }} value="VnPay">Thanh toán Online</Radio>
-                                        </Radio.Group>
-                                    </Form.Item>
-                                </Col>
+                                <Row>
+                                    <Col span={23} md={23} className="cac-the-input" style={{ marginTop: "-30px", }} >
+                                        <p style={{
+                                            color: "navy",
+                                            fontWeight: "500",
+                                            fontSize: "16px",
+                                            marginBottom: "5px"
+                                        }}>Hình thức thanh toán</p>
+                                        <Form.Item
+                                            name="hinhThucTT"
+                                            rules={[{ required: true, message: 'Vui lòng chọn hình thức thanh toán!' }]}
+                                        >
+                                            <Radio.Group onChange={handlePaymentChange} value="TienMat">
+                                                <Radio style={{ fontSize: "16px" }} value="TienMat">Thanh toán sau tại cơ sở y tế</Radio>
+                                                <Radio style={{ fontSize: "16px" }} value="VnPay">Thanh toán Online </Radio>
+                                            </Radio.Group>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
 
                                 <Col span={24} className="divTT">
                                     <div style={{ display: "flex", justifyContent: "space-between" }}>

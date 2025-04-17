@@ -2,11 +2,11 @@
 include("../model/lichlamviec.php");
 
 class cLichLamViec {
-    public function getLichLamViec($maBacSi, $ngayLamViec)
+    public function getLichLamViec($maBacSi)
     {
         header('Content-Type: application/json; charset=utf-8');
         $p = new mLichLamViec();
-        $result = $p->layLichLamViecTheoNgay($maBacSi, $ngayLamViec);
+        $result = $p->layLichLamViecTheoNgay($maBacSi);
 
         if (isset($result['error'])) {
             http_response_code(500); // Lỗi truy vấn

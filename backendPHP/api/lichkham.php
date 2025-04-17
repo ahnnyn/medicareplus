@@ -29,8 +29,27 @@ if (isset($_GET["action"])) {
             break;
             case "dat-lich-kham-moi":
                 $data = json_decode(file_get_contents("php://input"), true);
-                //file_put_contents("debug.json", json_encode($data));
+            
+                // Mapping hình thức khám (nếu có)
+                $hinhThucKhamMapping = [
+                    "chuyenkhoa" => "Chuyên khoa",
+                    "tructuyen" => "Trực tuyến"
+                ];
 
+                $hinhThucThanhToanMapping = [
+                    "TienMat" => "Tiền mặt",
+                    "VnPay" => "VnPay"
+                ];
+            
+                // Kiểm tra và gán giá trị hình thức khám nếu có
+                $hinhThucKham = isset($data["hinhThucKham"]) && isset($hinhThucKhamMapping[$data["hinhThucKham"]])
+                    ? $hinhThucKhamMapping[$data["hinhThucKham"]]
+                    : null;
+                
+                
+                $hinhThucThanhToan = isset($data["hinhThucThanhToan"]) && isset($hinhThucThanhToanMapping[$data["hinhThucThanhToan"]])
+                    ? $hinhThucThanhToanMapping[$data["hinhThucThanhToan"]]
+                    : null;
                 
                 if (
                     isset($data["maBenhNhan"]) && !empty($data["maBenhNhan"]) &&
@@ -39,18 +58,20 @@ if (isset($_GET["action"])) {
                     isset($data["tenBenhNhan"]) && !empty($data["tenBenhNhan"]) &&
                     isset($data["giaKham"]) && !empty($data["giaKham"]) &&
                     isset($data["ngayKhamBenh"]) && !empty($data["ngayKhamBenh"]) &&
-                    isset($data["lyDoKham"]) && !empty($data["lyDoKham"])
-                    && isset($data["hinhThucThanhToan"]) && !empty($data["hinhThucThanhToan"])
+                    isset($data["lyDoKham"]) && !empty($data["lyDoKham"]) &&
+                    !empty($hinhThucThanhToan) &&
+                    !empty($hinhThucKham)
                 ) {
                     $result = $p->createLichKham(
                         $data["maBenhNhan"],
                         $data["maBacSi"],
                         $data["khungGioKham"],
-                        $data["tenBenhNhan"], // dùng ?? tránh lỗi nếu thiếu
+                        $data["tenBenhNhan"],
                         $data["giaKham"],
                         $data["ngayKhamBenh"],
                         $data["lyDoKham"],
-                        $data["hinhThucThanhToan"]
+                        $hinhThucThanhToan,
+                        $hinhThucKham // truyền giá trị đã được chuyển đổi vào đây
                     );
             
                     header('Content-Type: application/json');
@@ -59,6 +80,7 @@ if (isset($_GET["action"])) {
                     echo json_encode(["status" => false, "error" => "Thiếu hoặc sai tham số"]);
                 }
                 break;
+            
             
         case "cap-nhat-thanh-toan":
             $data = json_decode(file_get_contents("php://input"), true);

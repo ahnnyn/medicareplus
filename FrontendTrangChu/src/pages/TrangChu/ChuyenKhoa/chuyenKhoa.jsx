@@ -58,7 +58,38 @@ const ChuyenKhoa = () => {
     return (
         <>
         <HeaderViewDoctor />
-        <Row style={{marginBottom: "150px"}}></Row>
+        <Row style={{marginBottom: "120px"}}></Row>
+        <div
+      className=""
+      style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
+    >
+      <Row justify="space-between" align="middle" gutter={16}>
+        <Col xs={24} md={12} className="">
+          <div className="" style={{ marginLeft: "70px", padding: "10px 20px", borderRadius: "40px", backgroundColor: "white", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", marginTop: "50px" }}>
+            <h2 className="" style={{ fontSize: "clamp(20px, 5vw, 30px)", fontWeight: "bold", color: "#00B0F0" }}>
+              ĐẶT KHÁM THEO BÁC SĨ
+            </h2>
+            <ul className="" style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}>
+              <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
+              <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
+              <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
+              <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
+            </ul>
+          </div>
+        </Col>
+
+        <Col xs={24} md={12} className="z-0 flex justify-end">
+          <img
+            src="../../public/banner_1-removebg-preview.png"
+            alt="Doctors illustration"
+            className=""
+            style={{ maxHeight: "350px", float: "right", marginTop: "100px", marginRight: "50px" }}
+          />
+        </Col>
+      </Row>
+    </div>
+    <Row style={{ marginTop: "20px" }}></Row>
+
         <Row>
             <Col span={18} className="col-body">
                 <Row>

@@ -50,7 +50,12 @@
                     $bacSiList[] = [
                         "maBacSi" => $row["maBacSi"],
                         "hoTen" => $row["hoTen"],
-                        "hinhAnh" => $row["hinhAnh"]
+                        "hinhAnh" => $row["hinhAnh"], 
+                        "moTa"=>$row["moTa"],
+                        "maKhoa" => $row["maKhoa"],
+                        "giaKham" => $row["giaKham"],
+                        "soDT"=>$row["soDienThoai"],
+                        "email"=>$row["email"]
                     ];
                 }
             }

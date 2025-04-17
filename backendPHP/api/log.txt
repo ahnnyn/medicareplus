@@ -1,0 +1,1 @@
+{"maBenhNhan":"19","maBacSi":"1","khungGioKham":"22","tenBenhNhan":"Nguy\u1ec5n \u00c1nh","giaKham":"200000.00","ngayKhamBenh":"2025-04-19","lyDoKham":"\u0110\u00f3i","hinhThucThanhToan":"offline","hinhThucKham":"chuyenkhoa"}

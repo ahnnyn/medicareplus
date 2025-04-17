@@ -28,10 +28,10 @@ const BodyHomePage = () => {
     }, []);
 
     const items_toandien = [
-        { icon: <FaClinicMedical size={40} color="blue" />, txtP: "Khám chuyên khoa" },
-        { icon: <FiVideo size={40} color="blue" />, txtP: "Khám từ xa" },
-        { icon: <FaBrain size={40} color="blue" />, txtP: "Tư vấn tâm lý" },
-        { icon: <GiFruitBowl size={40} color="blue" />, txtP: "Tư vấn dinh dưỡng" }
+        { icon: <FaClinicMedical size={40} color="blue" />, txtP: "Đặt khám tại bệnh viện", redirect: "/user/chuyen-khoa-kham" },
+        { icon: <FiVideo size={40} color="blue" />, txtP: "Tư vấn sức khỏe trực tuyến", redirect: "/user/chuyen-khoa-kham" },
+        { icon: <FaBrain size={40} color="blue" />, txtP: "Tư vấn tâm lý trực tuyến", redirect: "/user/tu-van-tam-ly" },
+        { icon: <GiFruitBowl size={40} color="blue" />, txtP: "Tư vấn dinh dưỡng trực tuyến", redirect: "/user/tu-van-dinh-duong" }
     ];
 
     const listChuyenKhoa = async () => {
@@ -138,19 +138,30 @@ const BodyHomePage = () => {
                     <span style={{ fontWeight: 500, fontSize: "clamp(25px, 5vw, 32px)", width: "100%", padding: "4vh 0", zIndex: "50" }}>
                         Dịch vụ
                     </span>
-                    <Row gutter={[16, 24]} justify="space-around">
+                    <Row gutter={[0, 24]} justify="space-around">
                     {items_toandien.map((item, index) => (
                         <Col
                             key={index}
-                            xl={12} // 4 item trên desktop
-                            lg={6}
-                            md={12} // 2 item trên tablet
-                            sm={24} // 1 item trên mobile
-                            xs={24}
+                            xl={12}   // 2 dịch vụ trên màn hình lớn (desktop)
+                            lg={12}   // 2 dịch vụ trên tablet
+                            md={24}   // 1 dịch vụ trên màn hình vừa (như tablet nhỏ)
+                            sm={24}   // 1 dịch vụ trên mobile
+                            xs={24}   // 1 dịch vụ trên màn hình nhỏ nhất
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                cursor: "pointer"
+                            }}
                             flex="0 0 400px"
                             // style={{ marginBottom: "2vh" }}
                         >
-                            <HinhChuNhat icon={item.icon} txtP={item.txtP} />
+                        <HinhChuNhat
+                            icon={item.icon}
+                            txtP={item.txtP}
+                            onClick={() => navigate(item.redirect)}
+                            loadingCard={loadingCard}
+
+                        />
                         </Col>
                     ))}
                     </Row>

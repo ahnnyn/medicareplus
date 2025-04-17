@@ -10,22 +10,22 @@ class mLichLamViec {
     }
 
     // Lấy lịch làm việc theo ngày của bác sĩ
-    public function layLichLamViecTheoNgay($maBacSi, $ngayLamViec)
+    public function layLichLamViecTheoNgay($maBacSi)
     {
         if (!$this->pdo) {
             return ["error" => "Không thể kết nối database"];
         }
 
-        // Kiểm tra mã bác sĩ hợp lệ
-        if (!is_numeric($maBacSi)) {
-            return ["error" => "Mã bác sĩ không hợp lệ"];
-        }
+        // // Kiểm tra mã bác sĩ hợp lệ
+        // if (!is_numeric($maBacSi)) {
+        //     return ["error" => "Mã bác sĩ không hợp lệ"];
+        // }
 
-        // Kiểm tra định dạng ngày làm việc
-        $date = DateTime::createFromFormat('Y-m-d', $ngayLamViec);
-        if (!$date || $date->format('Y-m-d') !== $ngayLamViec) {
-            return ["error" => "Ngày làm việc không hợp lệ"];
-        }
+        // // Kiểm tra định dạng ngày làm việc
+        // $date = DateTime::createFromFormat('Y-m-d', $ngayLamViec);
+        // if (!$date || $date->format('Y-m-d') !== $ngayLamViec) {
+        //     return ["error" => "Ngày làm việc không hợp lệ"];
+        // }
 
         try {
             $sql = "SELECT 
@@ -34,12 +34,12 @@ class mLichLamViec {
                     JOIN chitiet_lichlamviec ct ON llv.maLichLamViec = ct.lichLamViec_ID 
                     JOIN calamviec cl ON cl.maCa = ct.caLamViec_ID
                     JOIN khungGio kg ON ct.khungGio_ID = kg.maKhungGio 
-                    WHERE llv.maBacSi = :maBacSi 
-                    AND llv.ngayLamViec = :ngayLamViec";
+                    join bacsi bs on llv.maBacSi = bs.maBacSi
+                    WHERE llv.maBacSi = :maBacSi";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':maBacSi', $maBacSi, PDO::PARAM_INT);
-            $stmt->bindParam(':ngayLamViec', $ngayLamViec, PDO::PARAM_STR);
+            // $stmt->bindParam(':ngayLamViec', $ngayLamViec, PDO::PARAM_STR);
             $stmt->execute();
 
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // Trả về mảng liên kết đầy đủ

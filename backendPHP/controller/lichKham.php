@@ -20,9 +20,9 @@
         return $result;
     }
 
-    public function createLichKham($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham,$lyDoKham, $hinhThucThanhToan) {
+    public function createLichKham($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham,$lyDoKham, $hinhThucThanhToan, $hinhThucKham) {
         $p = new mLichKham();
-        $result = $p->taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham,$lyDoKham, $hinhThucThanhToan);
+        $result = $p->taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham,$lyDoKham, $hinhThucThanhToan, $hinhThucKham);
         return $result;
     }
 

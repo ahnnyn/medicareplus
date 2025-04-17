@@ -7,9 +7,30 @@
             $pdo = $p->connect();
             if ($pdo) {
                 try {
-                    $query = $pdo->query("SELECT bs.maBacSi, bs.hoTen, bs.gioiTinh, bs.ngaySinh, bs.soDienThoai, bs.email, bs.diaChi, bs.giaKham,
-                                                    bs.hinhAnh, bs.moTa, bs.maKhoa, bs.maTaiKhoan, k.tenKhoa
-                             FROM bacsi bs JOIN khoa k on bs.maKhoa = k.maKhoa");
+                    $query = $pdo->query("SELECT 
+                                        bs.maBacSi, 
+                                        bs.hoTen, 
+                                        bs.gioiTinh, 
+                                        bs.ngaySinh, 
+                                        bs.soDienThoai, 
+                                        bs.email, 
+                                        bs.diaChi, 
+                                        bs.giaKham,
+                                        bs.hinhAnh, 
+                                        bs.moTa, 
+                                        bs.maKhoa, 
+                                        bs.maTaiKhoan, 
+                                        k.tenKhoa, 
+                                        GROUP_CONCAT(DISTINCT llv.hinhThucKham) AS hinhThucKham
+                                    FROM 
+                                        bacsi bs 
+                                    JOIN 
+                                        khoa k ON bs.maKhoa = k.maKhoa
+                                    JOIN 
+                                        lichlamviec llv ON bs.maBacSi = llv.maBacSi
+                                    GROUP BY 
+                                        bs.maBacSi
+                                    ");
                     $data = $query->fetchAll(PDO::FETCH_ASSOC);
                     return $data;
                 } catch (PDOException $e) {

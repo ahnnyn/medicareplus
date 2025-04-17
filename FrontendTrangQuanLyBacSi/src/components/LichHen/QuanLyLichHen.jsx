@@ -22,7 +22,7 @@ const QuanLyLichHen = () => {
     const [dataOrder, setDataOrder] = useState([]); // Dữ liệu hiển thị
     const [loadingOrder, setLoadingOrder] = useState(false);
     const [current, setCurrent] = useState(1);
-    const [pageSize, setPageSize] = useState(5);
+    const [pageSize, setPageSize] = useState(3);
     const [total, setTotal] = useState(0);
     const [openViewDH, setOpenViewDH] = useState(false);
     const [dataViewDH, setDataViewDH] = useState(null);
@@ -36,21 +36,18 @@ const QuanLyLichHen = () => {
 
     const user = useSelector(state => state.accountDoctor.user);
 
-    // Lấy dữ liệu lịch khám
+
     const fetchOrders = async () => {
         if (!user?.maBacSi) return;
         setLoadingOrder(true);
-    
-        let query = `page=${current}&limit=${pageSize}&idDoctor=${encodeURIComponent(user.maBacSi)}`;
-        if (searchValue) query += `&search=${encodeURIComponent(searchValue)}`;
-        if (selectedStatus !== "tatca") query += `&trangThai=${encodeURIComponent(selectedStatus)}`;
-    
         try {
             const res = await findAllLichKhamByBacSi(user.maBacSi); // API call
             if (res && Array.isArray(res)) {
-                setDataOrder(res);
-                setOriginalData(res);
-                setTotal(res.length);
+                setOriginalData(res); // Gốc không đổi
+                // Lọc lần đầu dựa vào trạng thái và tìm kiếm
+                filterAndSetData(res, searchValue, selectedStatus);
+                console.log(originalData); // Kiểm tra dữ liệu ban đầu
+
             }
         } catch (error) {
             notification.error({
@@ -58,51 +55,105 @@ const QuanLyLichHen = () => {
                 description: 'Không thể tải lịch khám từ hệ thống.'
             });
         }
-        console.log("Lịch khám", dataOrder);
-        console.log("Dữ liệu gốc", originalData);
         setLoadingOrder(false);
     };
 
-    console.log("Lịch khám", dataOrder);
-    
+    useEffect(() => {
+        console.log("origin", originalData); // Kiểm tra dữ liệu sau khi cập nhật
+    }, [originalData]); // Khi originalData thay đổi
+
 
     useEffect(() => {
-        fetchOrders();
-    }, [user, current, pageSize, searchValue, selectedStatus]);
+        console.log(searchValue); // Kiểm tra giá trị searchValue
+    }, [searchValue]); // Khi searchValue thay đổi
 
-    // Xử lý tìm kiếm và lọc theo trạng thái
-    const handleSearch = (value) => {
-        const lowerCaseValue = value.toLowerCase();
+    useEffect(() => {
+        console.log(selectedStatus); // Kiểm tra giá trị selectedStatus
+    }, [selectedStatus]); // Khi selectedStatus thay đổi
 
-        // Lọc theo tên, email, số điện thoại và trạng thái
-        let filtered = originalData.filter(item => {
-            const matchesSearchValue = 
-                item.hoTen.toLowerCase().includes(lowerCaseValue) ||
-                item.email.toLowerCase().includes(lowerCaseValue) ||
-                item.soDienThoai.includes(lowerCaseValue);
+    const filterAndSetData = (data, keyword, status) => {
+        const lowerKeyword = keyword.toLowerCase();
 
-            const matchesStatus = selectedStatus === "tatca" || item.trangThai === selectedStatus;
+        const filtered = data.filter(item => {
+            const matchSearch =
+                item.hoTen.toLowerCase().includes(lowerKeyword) ||
+                item.email.toLowerCase().includes(lowerKeyword) ||
+                item.soDienThoai.includes(lowerKeyword);
 
-            return matchesSearchValue && matchesStatus;
+            const matchStatus = status === "tatca" || item.trangThai === status;
+
+            return matchSearch && matchStatus;
         });
 
-        // Kiểm tra nếu không có dữ liệu
-        if (filtered.length === 0) {
-            setDataOrder([]);  // Hiển thị không có dữ liệu
-            setTotal(0);  // Tổng số = 0
-        } else {
-            setDataOrder(filtered);  // Cập nhật dữ liệu đã lọc
-            setTotal(filtered.length);  // Cập nhật tổng số kết quả
-        }
-
-        setCurrent(1); // Reset về trang đầu khi tìm kiếm lại
+        setDataOrder(filtered);
+        setTotal(filtered.length);
+        setCurrent(1); // Reset về trang đầu
     };
 
-    // Lọc theo trạng thái
+
+    const handleSearch = (value) => {
+        setSearchValue(value);
+        setCurrent(1); // Reset về trang đầu tiên
+    };
+
     const handleStatusFilter = (value) => {
-        setSelectedStatus(value);
-        handleSearch(searchValue);  // Lọc lại với trạng thái mới và giá trị tìm kiếm hiện tại
+        console.log("Trạng thái đã chọn:", value);  // Kiểm tra giá trị của selectedStatus
+        setSelectedStatus(value); // Cập nhật trạng thái đã chọn
+        setCurrent(1); // Reset về trang đầu tiên
     };
+    
+
+
+    const paginateData = () => {
+        console.log(originalData); // Kiểm tra dữ liệu ban đầu
+    
+        let filtered = [...originalData];
+    
+        // Lọc theo từ khóa tìm kiếm
+        if (searchValue) {
+            const lowerCaseValue = searchValue.toLowerCase();
+            filtered = filtered.filter(item =>
+                item.hoTen.toLowerCase().includes(lowerCaseValue) ||
+                item.email.toLowerCase().includes(lowerCaseValue) ||
+                item.soDienThoai.includes(lowerCaseValue)
+            );
+        }
+    
+        // Chuẩn hóa giá trị trạng thái (đảm bảo "Chờ khám" và "chokham" đều giống nhau)
+        const statusMapping = {
+            "chokham": "Chờ khám",
+            "dakham": "Đã khám",
+            "dahuy": "Đã hủy",
+            "tatca": "Tất cả",
+        };
+    
+        const statusToCompare = statusMapping[selectedStatus] || selectedStatus;
+    
+        // Lọc theo trạng thái nếu không phải "tất cả"
+        if (selectedStatus !== "tatca") {
+            filtered = filtered.filter(item => item.trangThai === statusToCompare);
+        }
+    
+        setTotal(filtered.length); // Cập nhật tổng số lượng sau khi lọc
+    
+        // Phân trang dữ liệu
+        const start = (current - 1) * pageSize;
+        const end = start + pageSize;
+        setDataOrder(filtered.slice(start, end)); // Cập nhật dữ liệu đã phân trang
+    };
+    
+
+    console.log("Lịch khám", dataOrder);
+    
+    useEffect(() => {
+        fetchOrders();
+    }, [user]);
+    
+    useEffect(() => {
+        paginateData();
+    }, [originalData, current, pageSize, searchValue, selectedStatus]);
+    
+    
 
     // Cập nhật trạng thái lịch khám
     const handleStatusChange = async (value, record) => {
@@ -156,7 +207,12 @@ const QuanLyLichHen = () => {
     };
 
     const columns = [
-        { title: "STT", dataIndex: "stt", render: (_, __, index) => index + 1, width: 50 },
+        {
+            title: "STT",
+            dataIndex: "stt",
+            key: "stt",
+            render: (text, record, index) => (current - 1) * pageSize + index + 1,
+          },
         {
             title: "Bệnh nhân", dataIndex: "hoTen", render: (_, record) => (
                 <span><b>{record.hoTen}</b> <br /> SĐT: {record.soDienThoai}</span>
@@ -242,16 +298,33 @@ const QuanLyLichHen = () => {
                 </Col>
 
                 <Col xs={24}>
-                    <Table
-                        columns={columns}
-                        dataSource={dataOrder}
-                        rowKey="_id"
-                        pagination={{ current, pageSize, total, showSizeChanger: true }}
-                        loading={loadingOrder}
-                        locale={{
-                            emptyText: dataOrder.length === 0 ? 'Không có lịch khám' : 'Không có dữ liệu'
-                        }}
+                <Table
+                    columns={columns}
+                    dataSource={dataOrder}
+                    rowKey="_id"
+                    pagination={{
+                        current,
+                        pageSize,
+                        total,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['3', '5', '10'],
+                        // showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng ${total} lịch khám`,
+                        onChange: (page, size) => {
+                        setCurrent(page);
+                        setPageSize(size);
+                        },
+                        onShowSizeChange: (currentPage, newSize) => {
+                        setCurrent(1); // reset về trang đầu khi đổi pageSize
+                        setPageSize(newSize);
+                        },
+                    }}
+                    loading={loadingOrder}
+                    locale={{
+                        emptyText: dataOrder.length === 0 ? 'Không có lịch khám' : 'Không có dữ liệu'
+                    }}
                     />
+
+
                 </Col>
             </Row>
 

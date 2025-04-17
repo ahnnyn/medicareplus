@@ -79,6 +79,24 @@ export const getTimeSlotsByDoctorAndDate = async (maBacSi, ngayLamViec) => {
     }
   };
 
+  export const getTimeSlotsByDoctor = async (maBacSi) => {
+    const URL_BACKEND = `/api/lichlamviec.php?action=getLichLamViec&maBacSi=${maBacSi}`;
+  
+    try {
+      const response = await axios.get(URL_BACKEND);
+  
+      console.log("Dữ liệu lịch làm việc từ API:", response);
+  
+      return response; // Trả về response.data thay vì response
+    } catch (error) {
+      console.error(
+        "Lỗi khi gọi lịch làm việc API:",
+        error.response ? error.response : error.message
+      );
+      return [];
+    }
+  };
+
 // fetch time
 export const fetchAllTime = () => {
     const URL_BACKEND = `/api/bacsi.php`;
@@ -130,7 +148,7 @@ export const updateBenhNhan = (_id, email, password, firstName, lastName, phone,
 // dat lich kham
 // Đặt lịch khám thông thường
 export const datLichKhamBenh = (
-    maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan
+    maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan, hinhThucKham
 ) => {
     return axios.post('/api/lichkham.php?action=dat-lich-kham-moi', {
         maBenhNhan,
@@ -140,11 +158,12 @@ export const datLichKhamBenh = (
         giaKham,
         ngayKhamBenh,
         lyDoKham,
-        hinhThucThanhToan
+        hinhThucThanhToan,
+        hinhThucKham
     })
 }
 
-export const datLichKhamBenhVnPay = (maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan
+export const datLichKhamBenhVnPay = (maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan, hinhThucKham
 ) => {
     return axios.post('/api/lichkham.php?action=dat-lich-kham-moi', {
         maBenhNhan,
@@ -154,7 +173,8 @@ export const datLichKhamBenhVnPay = (maBenhNhan, maBacSi, khungGioKham, tenBenhN
         giaKham,
         ngayKhamBenh,
         lyDoKham,
-        hinhThucThanhToan
+        hinhThucThanhToan,
+        hinhThucKham
     })
 };
 

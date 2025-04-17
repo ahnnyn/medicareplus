@@ -16,7 +16,7 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
     const [dataAccKH, setDataAccKH] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [imageUrl, setImageUrl] = useState("");
-    // const [genderBenhNhan, setGenderBenhNhan] = useState(null);
+    const [genderBenhNhan, setGenderBenhNhan] = useState(null);
     const [isSubmit, setIsSubmit] = useState(false);
     const [loading, setLoading] = useState(false);
     const acc = useSelector((state) => state.account.user);
@@ -90,7 +90,7 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
                 diaChi: dataAccKH.diaChi,
             });
 
-            // setGenderBenhNhan(dataAccKH.gioiTinh);
+            setGenderBenhNhan(dataAccKH.gioiTinh);
         }
     }, [dataAccKH]);
 
@@ -182,7 +182,7 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
             const res = await updateBenhNhan(
                 values.maBenhNhan, values.hoTen, values.gioiTinh, values.soDienThoai, values.email, 
                 values.diaChi, hinhAnh);
-console.log(res);
+                console.log(res);
             if (res.status) {
                 message.success(res.message || "Cập nhật thành công");
                 // dispatch(doLogoutAction());
@@ -281,16 +281,16 @@ console.log(res);
                     </Col>
                     <Col span={24}>
                         <Form.Item label="Giới tính" name="gioiTinh">
-                            {/* <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
+                            <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
                                 <Radio value={"0"}>Nam</Radio>
                                 <Radio value={"1"}>Nữ</Radio>
                                 <Radio value={"2"}>Khác</Radio>
-                            </Radio.Group> */}
-                            <Radio.Group>
+                            </Radio.Group>
+                            {/* <Radio.Group>
                                 <Radio value={0}>Nam</Radio>
                                 <Radio value={1}>Nữ</Radio>
                                 <Radio value={2}>Khác</Radio>
-                                </Radio.Group>
+                                </Radio.Group> */}
                         </Form.Item>
                     </Col>
 

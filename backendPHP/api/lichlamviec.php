@@ -21,9 +21,9 @@ if (isset($_GET["action"])) {
     $p = new cLichLamViec(); // Thêm dòng này
 
     switch ($_GET["action"]) {
-        case "getLichLamViecTheoNgay":
-            if (isset($_GET["maBacSi"]) && !empty($_GET["maBacSi"]) && isset($_GET["ngayLamViec"]) && !empty($_GET["ngayLamViec"])) {
-                $p->getLichLamViec($_GET["maBacSi"], $_GET["ngayLamViec"]);
+        case "getLichLamViec":
+            if (isset($_GET["maBacSi"]) && !empty($_GET["maBacSi"])) {
+                $p->getLichLamViec($_GET["maBacSi"]);
             } else {
                 echo json_encode(["error" => "Thiếu hoặc sai mã bác sĩ hoặc ngày làm việc"]);
             }

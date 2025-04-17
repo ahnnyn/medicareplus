@@ -12,6 +12,7 @@ import ChuyenKhoa from "./pages/TrangChu/ChuyenKhoa/chuyenKhoa";
 import LienHe from "./pages/TrangChu/LienHe/LienHe";
 import ViewChuyenKhoaVaKhamBenh from "./pages/TrangChu/ChuyenKhoa/viewChuyenKhoaVaKhamBenh";
 import { LineHeightOutlined } from "@ant-design/icons";
+import DichVuKham from "./pages/TrangChu/DatLich/DichVuKham";
 
 const App = () => {
 
@@ -27,6 +28,7 @@ const App = () => {
     { path: "/user/bac-si-noi-bat", element: <BacSiNoiBat /> },   // bac si noi bat
     { path: "/user/chuyen-khoa-kham", element: <ChuyenKhoa /> },   
     { path: "/user/view-chuyen-khoa-kham", element: <ViewChuyenKhoaVaKhamBenh /> },
+    { path: "user/dich-vu-kham", element: <DichVuKham /> }, // dich vu kham
     { path: "/user/lien-he", element: <LienHe /> }
   ];
   return (

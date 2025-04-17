@@ -89,7 +89,7 @@
             }
         }
 
-        public function taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham, $lyDoKham, $hinhThucThanhToan) {
+        public function taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham, $lyDoKham, $hinhThucThanhToan, $hinhThucKham) {
             $p = new connectdatabase();
             $pdo = $p->connect();
         
@@ -109,8 +109,8 @@
                     $ngayKhamStr = $ngayKhamFormatted->format('Y-m-d');
         
                     // Thực thi câu lệnh INSERT vào bảng lichkham
-                    $query = $pdo->prepare("INSERT INTO lichkham (maBenhNhan, maBacSi, maKhungGio, hoTenBenhNhan, giaKham, ngayKham, lyDoKham, phuongthucthanhtoan) 
-                        VALUES (:maBenhNhan, :maBacSi, :maKhungGio, :tenBenhNhan, :giaKham, :ngayKham, :lyDoKham, :phuongthucthanhtoan)");
+                    $query = $pdo->prepare("INSERT INTO lichkham (maBenhNhan, maBacSi, maKhungGio, hoTenBenhNhan, giaKham, ngayKham, lyDoKham, phuongthucthanhtoan, hinhThucKham) 
+                        VALUES (:maBenhNhan, :maBacSi, :maKhungGio, :tenBenhNhan, :giaKham, :ngayKham, :lyDoKham, :phuongthucthanhtoan, :hinhThucKham)");
         
                     $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
                     $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
@@ -120,6 +120,7 @@
                     $query->bindParam(":ngayKham", $ngayKhamStr, PDO::PARAM_STR);
                     $query->bindParam(":lyDoKham", $lyDoKham, PDO::PARAM_STR);
                     $query->bindParam(":phuongthucthanhtoan", $hinhThucThanhToan, PDO::PARAM_STR);
+                    $query->bindParam(":hinhThucKham", $hinhThucKham, PDO::PARAM_STR);
         
                     $success = $query->execute();
                     $maLichKham = $pdo->lastInsertId(); // Lấy ID của lịch khám mới tạo
