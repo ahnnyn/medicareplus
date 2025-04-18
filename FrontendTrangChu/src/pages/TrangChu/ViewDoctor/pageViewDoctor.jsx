@@ -9,6 +9,7 @@ import { FaChevronRight, FaRegCalendarAlt } from 'react-icons/fa';
 import { FaEnvelope } from "react-icons/fa";
 import { IoIosShareAlt } from 'react-icons/io';
 import { IoHomeSharp } from "react-icons/io5";
+import { MailOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 const { Option } = Select;
 
@@ -194,13 +195,15 @@ console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
                                 <p style={{fontSize: "25px", marginTop: "10px", fontWeight: "500"}}>
                                     {dataBacSi?.hoTen}
                                 </p>
-                                <p style={{fontSize: "15px", marginTop: "-20px", color: "#999999", lineHeight: "22px"}}>
+                                <p style={{fontSize: "15px", marginTop: "-20px", lineHeight: "22px"}} dangerouslySetInnerHTML={{ __html: dataBacSi?.moTa }}>
                                     
-                                    {dataBacSi?.moTa}
+                               
                                 </p>
-                                <p style={{fontSize: "15px", marginTop: "-5px",}}><FaEnvelope />
-                                    <span style={{marginLeft: "5px"}}>{dataBacSi?.email}</span> &nbsp;&nbsp; - &nbsp;&nbsp;
-                                    <span style={{marginLeft: "5px"}}><PhoneOutlined /> {dataBacSi?.soDienThoai}</span>
+                                <p style={{fontSize: "15px",}}>
+                                    <PhoneOutlined style={{ fontSize: 16, color: '#DB4437' }} />
+                                        <span style={{marginLeft: "3px"}}>{dataBacSi?.soDienThoai}</span>&nbsp; - &nbsp;
+                                    <MailOutlined style={{ fontSize: 16, color: '#DB4437' }} />
+                                        <span style={{marginLeft: "3px"}}> {dataBacSi?.email}</span>
                                 </p>                                
                                 
                             </Col>

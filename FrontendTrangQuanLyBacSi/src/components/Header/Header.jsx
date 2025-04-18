@@ -1,42 +1,68 @@
-import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import { Row, Col, Drawer, Button } from 'antd'
-import {
-  MenuOutlined,
-  SearchOutlined,
-  UserOutlined,
-} from '@ant-design/icons'
-import './css.css'
+import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Row, Col, Drawer, Button, message } from 'antd';
+import { MenuOutlined, SearchOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { doLogoutAction } from "../../redux/account/accountSlice";
+import { handleLogouDoctort } from "../../services/loginAPI";
+import { Navigate, useNavigate } from "react-router-dom";
+import './css.css';
 
 const Header = () => {
-  const user = useSelector(state => state.accountDoctor.user)
-  const [openDrawer, setOpenDrawer] = useState(false)
+  const user = useSelector(state => state.accountDoctor.user);
+  const isAuthenticated = useSelector(state => state.accountDoctor.isAuthenticated);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const showDrawer = () => setOpenDrawer(true)
-  const onCloseDrawer = () => setOpenDrawer(false)
+  const [openDrawer, setOpenDrawer] = useState(false);
+
+  const showDrawer = () => setOpenDrawer(true);
+  const onCloseDrawer = () => setOpenDrawer(false);
+
+  const logoutClick = async () => {
+    const res = await handleLogouDoctort();
+    if (res) {
+      dispatch(doLogoutAction());
+      message.success(res.message);
+      navigate('../../login-doctor');
+    }
+  };
 
   return (
     <div className="header-container">
       <Row justify="space-between" align="middle" className="w-100">
         {/* Logo */}
         <Col xs={6} md={4}>
-            <a href="/doctor" className="logo-area">
-            <img src="../../../assets/images/banner/medicare-Photoroom-removebg-preview.png" alt="Logo" className="logo-img" style={{width:"100px", height:"100px"}}/>
-            </a>
+          <a href="/doctor" className="logo-area">
+            <img
+              src="../../../assets/images/banner/medicare-Photoroom-removebg-preview.png"
+              alt="Logo"
+              className="logo-img"
+              style={{ width: '100px', height: '100px' }}
+            />
+          </a>
         </Col>
 
         {/* Spacer */}
-        <Col xs={0} md={12} />
+        <Col xs={0} md={16} />
 
-        {/* Welcome */}
-        <Col xs={0} md={8} style={{ textAlign: 'right' }}>
-            <div className="welcome-text">
-            Xin chào bác sĩ <span>{user?.hoTen}</span>
+        {/* Welcome + Logout (Only show if authenticated) */}
+        {isAuthenticated && (
+          <Col xs={0} md={4} style={{ textAlign: 'right' }}>
+            <div className="welcome-text" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button
+                className="nav-link"
+                onClick={logoutClick}
+                type="button"
+                style={{ background: 'none', border: 'none', color: '#ffff', fontSize: '16px', cursor: 'pointer' }}
+              >
+                <i className="fa-solid fa-right-from-bracket" style={{ marginRight: '5px' }}></i> Đăng xuất
+              </button>
             </div>
-        </Col>
-        </Row>
+          </Col>
+        )}
+      </Row>
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

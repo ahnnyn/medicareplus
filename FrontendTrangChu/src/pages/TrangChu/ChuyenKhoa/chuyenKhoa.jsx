@@ -59,35 +59,35 @@ const ChuyenKhoa = () => {
         <>
         <HeaderViewDoctor />
         <Row style={{marginBottom: "120px"}}></Row>
-        <div
-      className=""
-      style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
-    >
-      <Row justify="space-between" align="middle" gutter={16}>
-        <Col xs={24} md={12} className="">
-          <div className="" style={{ marginLeft: "70px", padding: "10px 20px", borderRadius: "40px", backgroundColor: "white", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", marginTop: "50px" }}>
-            <h2 className="" style={{ fontSize: "clamp(20px, 5vw, 30px)", fontWeight: "bold", color: "#00B0F0" }}>
-              ĐẶT KHÁM THEO BÁC SĨ
-            </h2>
-            <ul className="" style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}>
-              <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
-              <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
-              <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
-              <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
-            </ul>
-          </div>
-        </Col>
+            <div
+                className=""
+                style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
+                >
+                <Row justify="space-between" align="middle" gutter={16}>
+                    <Col xs={24} md={12} className="">
+                    <div className="" style={{ marginLeft: "70px", padding: "10px 20px", borderRadius: "40px", backgroundColor: "white", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", marginTop: "50px" }}>
+                        <h2 className="" style={{ fontSize: "clamp(20px, 5vw, 30px)", fontWeight: "bold", color: "#00B0F0" }}>
+                        ĐẶT KHÁM THEO BÁC SĨ
+                        </h2>
+                        <ul className="" style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}>
+                        <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
+                        <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
+                        <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
+                        <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
+                        </ul>
+                    </div>
+                    </Col>
 
-        <Col xs={24} md={12} className="z-0 flex justify-end">
-          <img
-            src="../../public/banner_1-removebg-preview.png"
-            alt="Doctors illustration"
-            className=""
-            style={{ maxHeight: "350px", float: "right", marginTop: "100px", marginRight: "50px" }}
-          />
-        </Col>
-      </Row>
-    </div>
+                    <Col xs={4} md={12} className="z-0 flex justify-end">
+                    <img
+                        src="../../public/banner_1-removebg-preview.png"
+                        alt="Doctors illustration"
+                        className=""
+                        style={{ maxHeight: "350px", float: "right", marginTop: "100px", marginRight: "50px" }}
+                    />
+                    </Col>
+                </Row>
+            </div>
     <Row style={{ marginTop: "20px" }}></Row>
 
         <Row>
@@ -109,16 +109,21 @@ const ChuyenKhoa = () => {
                         dataAllDoctor.map((item, index) => (
                             <Col key={index} span={24} style={{ padding: "10px 15px 0", cursor: "pointer" }} onClick={() => handleRedirectChuyenKhoa(item.maKhoa)}>
                                 <Row>
-                                    <Col span={3}>
+                                    <Col xs={6} sm={5} md={3}>
                                         <Avatar  
-                                        style={{border: "1px solid green"}}
+                                        style={{
+                                            width: "clamp(60px, 10vw, 110px)",
+                                            height: "clamp(60px, 10vw, 110px)",
+                                            border: "1px solid green"
+                                        }}
                                         src={`${import.meta.env.VITE_BACKEND_URL}/public/chuyenkhoa/${item?.hinhAnh}`} 
                                         shape="square" 
-                                        size={120} 
                                         icon={<UserOutlined />} />
                                     </Col>
-                                    <Col span={21} className="box-title-doctor">
-                                        <span className="txt-Title-doctor-noi-bat">
+                                    <Col xs={18}
+                                        sm={19}
+                                        md={21} className="box-title-doctor">
+                                        <span className="txt-Title-doctor-noi-bat" style={{ fontSize: "clamp(16px, 5vw, 22px)" }}>
                                             {item.tenKhoa}
                                         </span> <br />                                       
                                     </Col>

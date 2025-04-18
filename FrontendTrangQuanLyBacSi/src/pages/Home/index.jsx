@@ -45,7 +45,6 @@ const Home = () => {
 
     return (
         <>
-            <Header />
             {/*<div className="account-tab-area-start rts-section-gap">*/}
             <div className="container-fluid">
                 <div className="container-2">
@@ -80,18 +79,25 @@ const Home = () => {
                         {/* Nội dung */}
                         <div className="col-lg-10 content-area">
                             <div className="tab-content" id="v-pills-tabContent">
-                                <div className="tab-pane fade show active" id="lichHen">
-                                    <h3 className="title text-center mb-4">LỊCH HẸN CỦA BÁC SĨ <span style={{ color: "blue" }}>{user.hoTen.toUpperCase()}</span></h3>
-                                    <QuanLyLichHen />
+                                <div className="tab-pane fade show active" id="lichHen" style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}>
+                                    <span className="title text-center mb-4" style={{ marginBottom: "30px", fontWeight: "550", color: "navy" }}>
+                                        LỊCH HẸN CỦA BÁC SĨ <span style={{ color: "blue" }}>{user.hoTen.toUpperCase()}</span>
+                                    </span>
+                                    <div style={{ marginTop: "30px" }}>
+                                        <QuanLyLichHen />
+                                    </div>
                                 </div>
 
-                                <div className="tab-pane fade" id="benhNhan">
-                                    <h3 className="title text-center mb-4">HỒ SƠ BỆNH NHÂN</h3>
-                                    <HoSoBenhNhan />
+
+                                <div className="tab-pane fade" id="benhNhan" style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}>
+                                    <span className="title text-center mb-4" style={{ marginBottom: "30px", fontWeight: "550", color: "navy" }}>HỒ SƠ BỆNH NHÂN</span>
+                                    <div style={{ marginTop: "30px" }}>
+                                        <HoSoBenhNhan />
+                                    </div>
                                 </div>
 
-                                <div className="tab-pane fade" id="phieuKham">
-                                    <h3 className="title text-center mb-4">TẠO PHIẾU KHÁM</h3>
+                                <div className="tab-pane fade" id="phieuKham" style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}>
+                                   <span style={{ fontWeight: "550", color: "navy" }}>PHIẾU KHÁM BỆNH</span>
                                     {/* Tạo phiếu khám component sẽ được thêm vào đây */}
                                 </div>
 

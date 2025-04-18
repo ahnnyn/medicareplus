@@ -169,12 +169,13 @@ export const getTimeSlotsByDoctorAndDate = async (maBacSi, ngayLamViec) => {
 };
 
 // them thoi gian kham benh
-export const dangKyKhungGioKham = (maBS, ngayLam, khungGio) => {
+export const dangKyKhungGioKham = (maBS, ngayLam, khungGio, hinhThucKham) => {
   return axios
     .post("/api/lichlamviec.php?action=dang-ky-gio-kham", {
       maBacSi: maBS,
       ngayLamViec: ngayLam,
       maKhungGio: khungGio,
+      hinhThucKham: hinhThucKham,
     })
     .then((response) => {
       // Xử lý phản hồi thành công

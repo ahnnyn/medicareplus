@@ -28,7 +28,38 @@ const DichVuKham = () => {
     return (
         <>
         <HeaderViewDoctor />
-        <div style={{ height: "150px" }}></div>  
+        <div style={{ height: "120px" }}></div>  
+        <div
+                className=""
+                style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
+                >
+                <Row justify="space-between" align="middle" gutter={16}>
+                    <Col xs={24} md={12} className="">
+                    <div className="" style={{ marginLeft: "70px", padding: "10px 20px", borderRadius: "40px", backgroundColor: "white", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", marginTop: "50px" }}>
+                        <h2 className="" style={{ fontSize: "clamp(20px, 5vw, 30px)", fontWeight: "bold", color: "#00B0F0" }}>
+                        ĐẶT KHÁM THEO BÁC SĨ
+                        </h2>
+                        <ul className="" style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}>
+                        <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
+                        <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
+                        <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
+                        <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
+                        </ul>
+                    </div>
+                    </Col>
+
+                    <Col xs={4} md={12} className="z-0 flex justify-end">
+                    <img
+                        src="../../public/tu-van-voi-bac-si-removebg-preview.png"
+                        alt="Doctors illustration"
+                        className=""
+                        style={{ maxHeight: "350px", float: "right", marginTop: "100px", marginRight: "50px" }}
+                    />
+                    </Col>
+                </Row>
+            </div>
+
+            <Row style={{ marginTop: "20px" }}></Row>
         <Col span={18} className="col-body">
                 <Row>
                     <Col span={24}>
@@ -39,30 +70,7 @@ const DichVuKham = () => {
                 </Row>
             </Col>
 
-
-            {/* <div
-                className="slicer-banner"
-                style={{
-                    position: "relative",
-                    width: "100%",
-                    overflow: "hidden",
-                    paddingTop: "50px"
-                }}
-                >
-                <img
-                    src="../../public/Blue_White_Minimalist_Hospital_Service_Health_Banner.png"
-                    alt="Slicer Banner"
-                    style={{
-                    width: "100%",
-                    height: "auto", // để giữ đúng tỷ lệ ảnh
-                    objectFit: "cover",
-                    borderRadius: "0 0 20px 20px",
-                    display: "block",
-                    }}
-                />
-                </div> */}
-
-                <div className="danh-cho-ban">
+                <div className="danh-cho-ban" style={{marginTop: "0"}}>
                     <Row className="ben-trong" justify="center">
                         <span
                             style={{
@@ -71,7 +79,8 @@ const DichVuKham = () => {
                                 width: "100%",
                                 padding: "4vh 0",
                                 zIndex: "50",
-                                textAlign: "center"
+                                textAlign: "center",
+                                color: "#1E90FF",   
                             }}
                         >
                             Chọn dịch vụ khám phù hợp với bạn
@@ -110,7 +119,7 @@ const DichVuKham = () => {
                     </Row>
                 </div>
 
-        <div style={{ marginBottom: "clamp(20px, 5vw, 100px)" }}></div>
+        <div style={{ marginBottom: "clamp(50px, 10vw, 200px)" }}></div>
         <Footer />      
         </>
     );

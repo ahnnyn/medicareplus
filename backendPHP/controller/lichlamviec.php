@@ -24,7 +24,7 @@ class cLichLamViec {
         echo json_encode($result, JSON_UNESCAPED_UNICODE);
     }
 
-    public function themLichLamViec($maBacSi, $ngayLamViec, $maKhungGio) {
+    public function themLichLamViec($maBacSi, $ngayLamViec, $maKhungGio, $hinhThucKham) {
         header('Content-Type: application/json; charset=utf-8');
         $p = new mLichLamViec();
     
@@ -49,9 +49,10 @@ class cLichLamViec {
         $maBacSi = intval($data['maBacSi']);
         $ngayLamViec = $data['ngayLamViec'];
         $maKhungGio = $data['maKhungGio'];
+        $hinhThucKham = isset($data['hinhThucKham']) ? $data['hinhThucKham'] : null; // Có thể không có
     
         // Gọi model để thêm lịch làm việc
-        $result = $p->themLichLamViecBacSi($maBacSi, $ngayLamViec, $maKhungGio);
+        $result = $p->themLichLamViecBacSi($maBacSi, $ngayLamViec, $maKhungGio, $hinhThucKham);
     
         // Trả về phản hồi JSON
         if (isset($result["error"])) {

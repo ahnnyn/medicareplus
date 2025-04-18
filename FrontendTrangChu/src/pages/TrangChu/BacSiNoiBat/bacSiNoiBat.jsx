@@ -97,7 +97,7 @@ const BacSiNoiBat = () => {
           </div>
         </Col>
 
-        <Col xs={24} md={12} className="z-0 flex justify-end">
+        <Col xs={4} md={12} className="z-0 flex justify-end">
           <img
             src="../../public/banner_3-removebg-preview.png"
             alt="Doctors illustration"

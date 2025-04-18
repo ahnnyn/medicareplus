@@ -126,7 +126,6 @@ const Login = () => {
 
   return (
     <>
-      <Header />
 
       <div className="rts-register-area rts-section-gap bg_light-1">
         <div className="container">
@@ -228,8 +227,6 @@ const Login = () => {
         </div>
       </div>
 
-      <Footer />
-
       <Modal
         title={null}
         centered
@@ -297,9 +294,6 @@ const Login = () => {
           </Form>
         </div>
       </Modal>
-
-
-
     </>
   );
 };

@@ -17,3 +17,9 @@
     // background-color: #e6f7ff; // Màu nền khi được chọn
     background-color: #d3ffa9; // Màu nền khi được chọn
 }
+
+.styles.disabled {
+    pointer-events: none;
+    background-color: #f0f0f0;
+    color: #999;
+}

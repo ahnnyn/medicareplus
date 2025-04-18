@@ -183,8 +183,8 @@ const UpdateDoctor = () => {
     return (
         
         <Row>
-            <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
-                <span style={{ fontWeight: "500", color: "navy" }}>THÔNG TIN CÁ NHÂN</span>
+            <Col span={24} style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}>
+                <span style={{ fontWeight: "550", color: "navy" }}>THÔNG TIN CÁ NHÂN</span>
             </Col>
             <Col span={24}>
                 <Form form={form} name="bacsi" layout="vertical" onFinish={handleUpdateDoctor}>

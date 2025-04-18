@@ -96,8 +96,8 @@ const ModalDoiMK = () => {
     
     <Form form={formDoiMK} layout="vertical" onFinish={onFinishDoiMK}>
       <Row>
-          <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
-                    <span style={{ fontWeight: "500", color: "navy" }}>ĐỔI MẬT KHẨU</span>
+          <Col span={24} style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}>
+                <span style={{ fontWeight: "550", color: "navy" }}>ĐỔI MẬT KHẨU</span>
           </Col>
       </Row>
       {/* <Divider /> */}

@@ -256,7 +256,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                     </Col>   
                     <Col span={24}>
                         <span style={{marginLeft: "15px"}}> 
-                            <div style={{marginTop: "-25px", marginLeft: "10px"}} dangerouslySetInnerHTML={{ __html: dataChuyenKhoaByID?.description }} />
+                            <div style={{marginTop: "-25px", marginLeft: "10px"}} dangerouslySetInnerHTML={{ __html: dataChuyenKhoaByID?.moTa }} />
                         </span>
                     </Col>                                                           
                 </Row>
@@ -295,9 +295,11 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                                                 </p>
                                                     <p style={{ fontSize: "15px", lineHeight: "22px", paddingLeft: "10px" }} dangerouslySetInnerHTML={{ __html: item?.moTa }} />
 
-                                                    <p style={{fontSize: "15px",}}><PhoneOutlined style={{ fontSize: 16, color: '#DB4437' }} />
-                                                        <span style={{marginLeft: "5px"}}>{item?.soDT}</span>  &nbsp; - &nbsp;
-                                                        <span style={{marginLeft: "5px"}}><MailOutlined style={{ fontSize: 16, color: '#DB4437' }} /> {item?.email}</span>
+                                                    <p style={{fontSize: "15px",}}>
+                                                        <PhoneOutlined style={{ fontSize: 16, color: '#DB4437' }} />
+                                                            <span style={{marginLeft: "3px"}}>{item?.soDT}</span>&nbsp; - &nbsp;
+                                                        <MailOutlined style={{ fontSize: 16, color: '#DB4437' }} />
+                                                            <span style={{marginLeft: "3px"}}> {item?.email}</span>
                                                     </p>
                                                 </Col>
                                             </Row>
