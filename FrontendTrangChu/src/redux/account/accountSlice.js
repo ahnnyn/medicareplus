@@ -45,7 +45,8 @@ export const accountSlide = createSlice({
                 gioiTinh: "",
                 ngaySinh: "",
                 hinhAnh: "",
-                id: ""
+                maBenhNhan: "",
+                maTaiKhoan: ""
             }
             // Lưu thông tin vào localStorage
             localStorage.setItem('user', JSON.stringify({
@@ -56,7 +57,8 @@ export const accountSlide = createSlice({
                 gioiTinh: "",
                 ngaySinh: "",
                 hinhAnh: "",
-                id: ""
+                maBenhNhan: "",
+                maTaiKhoan: ""
             }));
         },
 

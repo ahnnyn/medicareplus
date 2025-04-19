@@ -59,7 +59,7 @@
             return $query->execute();
         }
         
-        public function capNhatThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $hinhAnh){
+        public function capNhatThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $hinhAnh){
             $p = new connectdatabase();
             $pdo = $p->connect();
             if ($pdo) {
@@ -69,6 +69,7 @@
                         UPDATE benhnhan
                         SET hoTen = :hoTen, 
                             gioiTinh = :gioiTinh,
+                            ngaySinh = :ngaySinh,
                             soDienThoai = :soDienThoai, 
                             email = :email,
                             diaChi = :diaChi, 
@@ -82,6 +83,7 @@
                     $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
                     $query->bindParam(":hoTen", $hoTen, PDO::PARAM_STR);
                     $query->bindParam(":gioiTinh", $gioiTinh, PDO::PARAM_STR);
+                    $query->bindParam(":ngaySinh", $ngaySinh, PDO::PARAM_STR);
                     $query->bindParam(":soDienThoai", $soDienThoai, PDO::PARAM_STR);
                     $query->bindParam(":email", $email, PDO::PARAM_STR);
                     $query->bindParam(":diaChi", $diaChi, PDO::PARAM_STR);

@@ -6,7 +6,7 @@ import LoginPage from "./pages/TrangChu/Login/Login";
 import RegisterPage from "./pages/TrangChu/Login/Register";
 import LichHen from "./pages/TrangChu/LichHen/lichHen";
 import HoSoCuaToi from "./pages/TrangChu/HoSoCuaToi/HoSoCuaToi";
-import TaoHoSo from "./pages/TrangChu/TaoHoSo/TaoHoSo";
+import TaoHoSo from "./pages/TrangChu/HoSoCuaToi/TaoHoSo";
 import BacSiNoiBat from "./pages/TrangChu/BacSiNoiBat/bacSiNoiBat";
 import ChuyenKhoa from "./pages/TrangChu/ChuyenKhoa/chuyenKhoa";
 import LienHe from "./pages/TrangChu/LienHe/LienHe";

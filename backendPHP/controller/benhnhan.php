@@ -61,15 +61,15 @@
                 echo json_encode(["success" => false, "message" => "Không gửi được email: {$mail->ErrorInfo}"]);
             }
         }
-        public function updateThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $hinhAnh){
+        public function updateThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $hinhAnh) {
             $p = new mBenhNhan();
-            $result = $p->capNhatThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $soDienThoai, $email, $diaChi, $hinhAnh);
-            
+            $result = $p->capNhatThongTinBenhNhan($maBenhNhan, $hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $hinhAnh);
+        
             if (isset($result['success'])) {
-                echo json_encode(["status" => true, "message" => $result['success']]);
+                return ['success' => true];
             } else {
-                echo json_encode(["status" => false, "error" => $result['error']]);
+                return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
             }
-        }
+        }   
     }
 ?>

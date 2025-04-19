@@ -58,7 +58,18 @@ if (isset($_GET["action"])) {
             $result = $p->updateThongTinPhieuKham($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham);
             echo json_encode($result);
             break;
-        
+        case "lay-phieu-kham-benh":
+            header("Content-Type: application/json");
+            $maHoSo = $_GET['maHoSo'] ?? null;
+
+            if (!$maHoSo) {
+                echo json_encode(["error" => "Thiếu mã hồ sơ"]);
+                break;
+            }
+
+            $result = $p->getAllPhieuKhamBenh($maHoSo);
+            echo json_encode($result);
+            break;
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }

@@ -1,7 +1,7 @@
 <?php
- include("../model/lichhen.php");
+include("../model/lichhen.php");
 
- class cLichHen {
+class cLichHen {
     public function layDanhSachLichHen($maBenhNhan) {
         $p = new mLichHen();
         $result = $p->layDanhSachLichHen($maBenhNhan);
@@ -14,11 +14,25 @@
         echo json_encode($result);
     }
 
-    // public function updateTrangThaiLichKham($maBacSi, $maLichKham, $trangThai) {
-    //     $p = new mLichKham();
-    //     $result = $p->capNhatTrangThaiLichKham($maBacSi, $maLichKham, $trangThai);
-    //     return $result;
-    // }
+    public function updateLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham) {
+        $p = new mLichHen();
+        $result = $p->updateLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham);
     
- }
+        if (isset($result['success'])) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
+        }
+    }
+    public function deleteLichHen($maLich) {
+        $p = new mLichHen();
+        $result = $p->deleteLichHen($maLich);
+
+        if (isset($result['success'])) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
+        }
+    }
+}
 ?>

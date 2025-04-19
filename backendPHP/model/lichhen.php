@@ -29,16 +29,18 @@
                             lk.ngayKham, 
                             lk.lyDoKham, 
                             lk.trangThai, 
-                            lk.trangThaiThanhToan
+                            lk.trangThaiThanhToan,
+                            kh.tenKhoa
                         FROM lichkham lk 
                         JOIN bacsi bs ON lk.maBacSi = bs.maBacSi 
                         JOIN khunggio kg ON lk.maKhungGio = kg.maKhungGio
                         JOIN benhnhan bn ON lk.maBenhNhan = bn.maBenhNhan
                         JOIN hosobenhnhan hsb ON bn.maBenhNhan = hsb.maBenhNhan
+                        JOIN khoa kh ON kh.maKhoa = bs.maKhoa
                         WHERE lk.maBenhNhan = :maBenhNhan 
 ");
 
-                    $query->bindParam(":maBenhNhan", $maBacSi, PDO::PARAM_INT);
+                    $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
                     $query->execute();
                     $data = $query->fetchAll(PDO::FETCH_ASSOC);
                     
@@ -54,39 +56,55 @@
                 return ["error" => "Không thể kết nối database"];
             }
         }
-
-        // public function capNhatTrangThaiLichKham($maBacSi, $maLichKham, $trangThai) {
-        //     $validStatuses = ['Chờ khám', 'Đã khám', 'Đã hủy']; // Valid enum values for database
-        //     if (!in_array($trangThai, $validStatuses)) {
-        //         return ["status" => false, "error" => "Trạng thái không hợp lệ"];
-        //     }
-        
-        //     $p = new connectdatabase();
-        //     $pdo = $p->connect();
-        //     if ($pdo) {
-        //         try {
-        //             if (!is_numeric($maLichKham)) {
-        //                 return ["status" => false, "error" => "Mã lịch khám không hợp lệ"];
-        //             }
-        
-        //             $query = $pdo->prepare("UPDATE lichkham SET trangThai = :trangThai WHERE maLich = :maLichKham AND maBacSi = :maBacSi");
-        //             $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
-        //             $query->bindParam(":trangThai", $trangThai, PDO::PARAM_STR);
-        //             $query->bindParam(":maLichKham", $maLichKham, PDO::PARAM_INT);
-        
-        //             $success = $query->execute();
-        //             if ($success) {
-        //                 return ["status" => true];
-        //             } else {
-        //                 return ["status" => false, "error" => "Không thể thực thi câu lệnh UPDATE"];
-        //             }
-        
-        //         } catch (PDOException $e) {
-        //             return ["status" => false, "error" => "Lỗi PDO: " . $e->getMessage()];
-        //         }
-        //     } else {
-        //         return ["status" => false, "error" => "Không thể kết nối CSDL"];
-        //     }
-        // }
+        public function updateLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if (!$pdo) {
+                return ["success" => false, "message" => "Không thể kết nối database"];
+            }
+            try {
+                $queryStr = "
+                    UPDATE lichkham 
+                    SET maBacSi = :maBacSi, maKhungGio = :maKhungGio, ngayKham = :ngayKham, lyDoKham = :lyDoKham
+                ";
+                $queryStr .= "WHERE maLich = :maLich";
+    
+                $query = $pdo->prepare($queryStr);
+    
+                $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
+                $query->bindParam(":maKhungGio", $maKhungGio, PDO::PARAM_INT);
+                $query->bindParam(":ngayKham", $ngayKham);
+                $query->bindParam(":lyDoKham", $lyDoKham);
+                $query->bindParam(":maLich", $maLich, PDO::PARAM_INT);
+    
+                $success = $query->execute();
+                if ($success) {
+                    return ["success" => true, "message" => "Cập nhật lịch hẹn thành công"];
+                } else {
+                    return ["success" => false, "message" => "Cập nhật lịch hẹn thất bại"];
+                }
+            } catch (PDOException $e) {
+                return ["success" => false, "message" => "Lỗi truy vấn: " . $e->getMessage()];
+            }
+        }
+        public function deleteLichHen($maLich) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if (!$pdo) {
+                return ["success" => false, "message" => "Không thể kết nối database"];
+            }
+            try {
+                $query = $pdo->prepare("
+                    UPDATE lichkham 
+                    SET trangThai = 'Hủy' where maLich = :maLich
+                ");
+                $query->bindParam(":maLich", $maLich, PDO::PARAM_INT);
+                $query->execute();
+    
+                return ["success" => true, "message" => "Xóa lịch hẹn thành công"];
+            } catch (PDOException $e) {
+                return ["success" => false, "message" => "Lỗi truy vấn: " . $e->getMessage()];
+            }
+        }
     }
 ?>

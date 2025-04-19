@@ -122,20 +122,19 @@ if (isset($_GET['action'])) {
             // Kiểm tra xem tất cả tham số quan trọng có đủ không
             if (
                 isset($data['maBenhNhan']) && isset($data['hoTen']) && 
-                isset($data['gioiTinh']) && isset($data['soDienThoai']) && 
+                isset($data['gioiTinh']) && 
+                isset($data['ngaySinh']) && isset($data['soDienThoai']) && 
                 isset($data['email']) && isset($data['diaChi']) && 
                 isset($data['hinhAnh'])
             ) {
                         
                 // Gọi controller để cập nhật thông tin bệnh nhân
                 $result = $pd->updateThongTinBenhNhan(
-                    $data['maBenhNhan'], $data['hoTen'], $data['gioiTinh'], 
+                    $data['maBenhNhan'], $data['hoTen'], $data['gioiTinh'], $data['ngaySinh'], 
                     $data['soDienThoai'], $data['email'], 
                     $data['diaChi'], $data['hinhAnh']
                 );
-        
-                // Kiểm tra kết quả từ việc cập nhật thông tin bệnh nhân
-                if (isset($result['success'])) {
+                if (isset($result['success']) && $result['success'] === true) {
                     echo json_encode(["status" => true, "message" => "Cập nhật thông tin bệnh nhân thành công!"]);
                 } else {
                     echo json_encode(["status" => false, "error" => "Cập nhật thông tin bệnh nhân thất bại!"]);

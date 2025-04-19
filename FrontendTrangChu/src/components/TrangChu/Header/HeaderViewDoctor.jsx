@@ -16,8 +16,9 @@ import UpdateBenhNhan from '../ThongTin/UpdateBenhNhan';
 import { RiAccountCircleFill } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { MdOutlineAccountCircle } from "react-icons/md";
-import { FaLock } from "react-icons/fa";
-import { FaBars } from 'react-icons/fa'; // hamburger icon
+import { FaKey } from "react-icons/fa";
+import { FaBars } from 'react-icons/fa';
+import { MdSwitchAccount } from "react-icons/md";
 import ScrollToTop from '../ScrollToTop/ScrollToTop';
 import './header.scss';
 
@@ -69,12 +70,12 @@ const HeaderViewDoctor = () => {
             label: <label onClick={() => handleRedirectLichHen(acc.maBenhNhan)}><IoIosTimer size={20}/> Lịch hẹn</label>,
         },
         {
-            key: '3',
-            label: <label onClick={() => handleRedirectHoSo(acc.maBenhNhan)}><IoIosTimer size={20}/> Hồ sơ của tôi</label>,
+          key: '3',
+          label: <label onClick={() => handleRedirectHoSo(acc.maBenhNhan)}><MdSwitchAccount size={20}/> Hồ sơ của tôi</label>,
         },
         {
             key: '4',
-            label: <label onClick={() => setOpenModalDoiMK(true)}><FaLock  size={20}/> Đổi mật khẩu</label>,
+            label: <label onClick={() => setOpenModalDoiMK(true)}><FaKey  size={20}/> Đổi mật khẩu</label>,
         },
         {
             key: '5',
@@ -153,16 +154,12 @@ const HeaderViewDoctor = () => {
                 <div className="avatar-section" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   {isAuthenticated && dataAcc?.hoTen && (
                     <span
-                      style={{
-                        fontWeight: "500",
-                        fontSize: "clamp(14px, 2vw, 16px)",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        maxWidth: "100px", // hoặc 150px tùy bạn
-                        color: "#333",
-                      }}
-                    >
+                  style={{
+                    fontWeight: "500",
+                    fontSize: "clamp(14px, 2vw, 16px)",
+                    color: "#333",
+                  }}
+                >
                       {dataAcc.hoTen}
                     </span>
                   )}

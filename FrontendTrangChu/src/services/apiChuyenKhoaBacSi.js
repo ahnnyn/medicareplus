@@ -196,9 +196,9 @@ export const capNhatTrangThaiThanhToanLichKham = (data) => {
 
 // get lich kham
 export const fetchLichKham = (maBenhNhan) => {
-    const URL_BACKEND = `/api/lichhen.php?action=lich-hen&maBenhNhan=${maBenhNhan}`
-    return axios.get(URL_BACKEND)
-}
+    const URL_BACKEND = `/api/lichhen.php?action=lich-hen&maBenhNhan=${maBenhNhan}`;
+    return axios.get(URL_BACKEND);
+};
 
 
 export const handleHuyOrder = (query) => {
@@ -247,4 +247,43 @@ export const taoHoSoBenhNhan = (maBenhNhan, hoTenBenhNhan, ngaySinh, gioiTinh, n
         maBenhNhan, hoTenBenhNhan, ngaySinh, gioiTinh, ngheNghiep, CCCD, diaChi
     }
     return axios.post(URL_BACKEND, data);
+};
+export const updateHoSoBenhNhan = (maBenhNhan, hoTenBenhNhan, ngaySinh, gioiTinh, ngheNghiep, CCCD, diaChi) => {
+    const URL_BACKEND = `/api/hosobenhnhan.php?action=updateHoSo`
+    const data = {
+        maBenhNhan, hoTenBenhNhan, ngaySinh, gioiTinh, ngheNghiep, CCCD, diaChi
+    }
+    return axios.post(URL_BACKEND, data);
+};
+export const deleteHoSoBenhNhan = (maBenhNhan) => {
+    return axios.delete(`/api/hosobenhnhan.php?action=xoaHoSo&maBenhNhan=${maBenhNhan}`);
+};
+
+
+export const fetchAllPhieuKhamBenh = (maHoSo) => {
+    const URL_BACKEND = `/api/phieukhambenh.php?action=lay-phieu-kham-benh&maHoSo=${maHoSo}`;
+    return axios.get(URL_BACKEND);
+};
+
+export const updateLichHen = (maLich, maBacSi, maKhungGio, ngayKham, lyDoKham) => {
+    const URL_BACKEND = `/api/lichhen.php?action=updateLichHen`;
+    const data = {
+      maLich,
+      maBacSi,
+      maKhungGio,
+      ngayKham,
+      lyDoKham,
+    };
+  
+    return axios.post(URL_BACKEND, data);
+};
+export const deleteLichHen = (maLich) => {
+    return axios.delete(`/api/lichhen.php?action=xoaLichHen&maLich=${maLich}`);
+};
+
+export const fetchKhungGioBacSiByNgay = (maBacSi, ngayLamViec) => {
+  const URL_BACKEND = `/api/lichlamviec.php?action=getLichLamViecTheoNgay`;
+  return axios.get(URL_BACKEND, {
+    params: { maBacSi, ngayLamViec }
+  });
 };

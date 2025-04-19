@@ -53,9 +53,9 @@ export const doiMatKhau = (_idAcc, idBN, username, matKhau, matKhauMoi) => {
     })
 }
 
-export const updateBenhNhan = (maBenhNhan,hoTen,gioiTinh,soDienThoai,email,diaChi,hinhAnh) => {
+export const updateBenhNhan = (maBenhNhan,hoTen,gioiTinh,ngaySinh,soDienThoai,email,diaChi,hinhAnh) => {
     return axios.post('/api/benhnhan.php?action=updateThongTinBenhNhan', {
-        maBenhNhan,hoTen,gioiTinh,soDienThoai,email,diaChi,hinhAnh
+        maBenhNhan,hoTen,gioiTinh,ngaySinh,soDienThoai,email,diaChi,hinhAnh
     })
 }
 

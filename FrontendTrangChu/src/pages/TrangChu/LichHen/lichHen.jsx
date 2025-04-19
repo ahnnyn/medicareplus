@@ -1,113 +1,298 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Tag, Button, Space, Spin, notification } from "antd";
-import { IoHomeSharp } from "react-icons/io5";
-import { ClockCircleOutlined, CalendarOutlined } from "@ant-design/icons";
-import Footer from "../../../components/TrangChu/Footer/Footer";
-import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
+import {
+  Row,
+  Col,
+  Select,
+  Tag,
+  Tooltip,
+  Spin,
+  notification,
+  Empty,
+  Modal,
+} from "antd";
 import { useSelector } from "react-redux";
-import { fetchLichKham } from "../../../services/apiChuyenKhoaBacSi";
+import {
+  ExclamationCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
+import { FaEye } from "react-icons/fa";
+import { IoHomeSharp } from "react-icons/io5";
+import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
+import Footer from "../../../components/TrangChu/Footer/Footer";
+import { RiEdit2Fill, RiDeleteBin5Line } from "react-icons/ri";
+import { fetchLichKham, deleteLichHen} from "../../../services/apiChuyenKhoaBacSi";
+
+// ✅ Thêm import 2 modal riêng biệt
+import ModalXemChiTietLichHen from "./ModalXemChiTietLichHen";
+import ModalCapNhatLichHen from "./ModalCapNhatLichHen";
 
 const LichHenCard = () => {
-  const [dataLichHen, setDataLichHen] = useState([]);
+  const [dataOrder, setDataOrder] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openViewDH, setOpenViewDH] = useState(false);
+  const [dataViewDH, setDataViewDH] = useState(null);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const acc = useSelector((state) => state.account.user);
 
-  useEffect(() => {
-    if (acc?.user?.maBenhNhan) {
-      fetchLichHenByIdKH();
-    }
-  }, [acc?.user?.maBenhNhan]);
-
-  const fetchLichHenByIdKH = async () => {
+  const fetchOrders = async () => {
+    if (!acc?.user?.maBenhNhan) return;
     setLoading(true);
     try {
       const res = await fetchLichKham(acc.user.maBenhNhan);
-      console.log("Dữ liệu nhận được từ backend:", res);
-      if (res?.data) {
-        setDataLichHen(res.data); // Gán data API trả về
-      }
+      console.log(res); // Log dữ liệu trả về từ API
+
+      if (res && Array.isArray(res)) {
+        // Sắp xếp: Hủy xuống cuối, mới nhất lên đầu
+        const sorted = res
+        .sort((a, b) => {
+          if (a.trangThai === "Hủy" && b.trangThai !== "Hủy") return 1;
+          if (a.trangThai !== "Hủy" && b.trangThai === "Hủy") return -1;
+          // Nếu cùng trạng thái thì so sánh ngày (mới -> cũ)
+          return new Date(b.ngayKham) - new Date(a.ngayKham);
+        });
+
+        setDataOrder(sorted);
+        }
     } catch (error) {
       notification.error({
         message: "Lỗi tải dữ liệu",
-        description: "Không thể tải lịch hẹn.",
+        description: "Không thể tải lịch khám từ hệ thống.",
       });
     }
     setLoading(false);
   };
-  if (loading) {
-    return (
-      <div style={{ textAlign: "center", padding: "50px 0" }}>
-        <Spin tip="Đang tải hồ sơ bệnh nhân..." />
-      </div>
-    );
-  }
-  if (!dataLichHen) {
-    return <p><Empty description="Chưa có lịch khám nào" /></p>;
-  }
+
+  useEffect(() => {
+    fetchOrders();
+  }, [acc?.user?.maBenhNhan]);
+
+  const handleEditClick = (record) => {
+    setEditingRecord(record);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (record) => {
+    Modal.confirm({
+      title: "Hủy lịch hẹn",
+      icon: <ExclamationCircleOutlined />,
+      content: "Bạn có chắc chắn muốn hủy lịch hẹn này không?",
+      okText: "Có",
+      okType: "danger",
+      cancelText: "Không",
+      onOk: async () => {
+        try {
+          const res = await deleteLichHen(record.maLich);
+          if (res?.success) {
+            notification.success({
+              message: res.message || "Hủy lịch hẹn thành công",
+            });
+            fetchOrders(); // Reload danh sách
+          } else {
+            notification.error({
+              message: "Hủy lịch hẹn thất bại",
+              description: res.message || "Không thể hủy lịch hẹn này.",
+            });
+          }
+
+        } catch (error) {
+          notification.error({
+            message: "Lỗi hủy lịch hẹn",
+            description: "Không thể hủy lịch hẹn này.",
+          });
+        }
+      },
+    });
+  };
+
+  const getTrangThaiColor = (status) => {
+    switch (status) {
+      case "Chờ khám":
+        return "processing";
+      case "Đã khám":
+        return "green";
+      case "Hủy":
+        return "red";
+      default:
+        return "default";
+    }
+  };
+
+  const getTrangThaiThanhToanColor = (status) => {
+    switch (status) {
+      case "Chưa thanh toán":
+        return "orange";
+      case "Đã thanh toán":
+        return "green";
+      default:
+        return "default";
+    }
+  };
+
   return (
     <>
       <HeaderViewDoctor />
-      <Row style={{marginBottom: "150px"}}></Row>
+      <Row style={{ marginBottom: "150px" }}></Row>
 
-      <div className="container" >
+      <div className="container">
         <p className="txt-title">
           <IoHomeSharp /> / Lịch hẹn
         </p>
-        <h2 style={{ marginBottom: 24 }}>Lịch hẹn đã đặt</h2>
-        <Card style={{ borderRadius: 12, marginBottom: 24 }}>
-                <Row gutter={[16, 16]} align="middle">
-                  {/* Cột thời gian */}
-                  <Col xs={24} sm={6} style={{ textAlign: "center" }}>
-                    <div style={{ color: "#1890ff", fontWeight: 500 }}>
-                      Thời Gian Khám
-                    </div>
-                    <div>
-                      <ClockCircleOutlined /> {dataLichHen.khungGio}
-                    </div>
-                    <div>
-                      <CalendarOutlined />{dataLichHen.ngayKham}
-                    </div>
-                  </Col>
 
-                  {/* Cột thông tin */}
-                  <Col xs={24} sm={18}>
-                    <Row gutter={[8, 8]}>
-                      <Col span={24}>
-                        <b>Bệnh nhân: {dataLichHen.hoTen}</b> 
+        <h2 style={{ marginBottom: 24 }}>Lịch hẹn đã đặt</h2>
+
+        <Spin spinning={loading}>
+          <Row gutter={[16, 16]}>
+            {dataOrder.map((item, index) => (
+              <Col span={24} key={item.maLich || index}>
+                <div
+                  style={{
+                    border: "1px solid #e8e8e8",
+                    borderRadius: 8,
+                    padding: 16,
+                    backgroundColor: "#fff",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "stretch",
+                    gap: 16,
+                  }}
+                >
+                  {/* Left: Date & Time */}
+                  <div
+                    style={{
+                      minWidth: 160,
+                      textAlign: "center",
+                      padding: 16,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <b style={{ fontSize: 16, fontWeight: "bold" }}>
+                      Thời gian khám
+                    </b>
+                    <h3 style={{ fontSize: 15, color: "#1890ff" }}>
+                      {item.ngayKham}
+                    </h3>
+                    <p
+                      style={{
+                        fontSize: 15,
+                        fontWeight: "bold",
+                        color: "#1890ff",
+                      }}
+                    >
+                      {item.khungGio}
+                    </p>
+                  </div>
+
+                  {/* Right: Details */}
+                  <div style={{ flex: 1, position: "relative" }}>
+                    <Row gutter={[16, 8]}>
+                      <Col span={12}>
+                        <b>Bệnh nhân:</b> {item.hoTen}
                       </Col>
-                      <Col span={24}>
-                        <b>Bác sĩ:</b> {dataLichHen.tenBacSi}
+                      <Col span={12}>
+                        <b>Bác sĩ:</b> {item.tenBacSi || "Chưa rõ"}
                       </Col>
-                      {/* <Col span={24}>
-                        <b>Chuyên khoa</b> {dataLichHen.hoTen}
-                      </Col> */}
-                      <Col span={24}>
-                        <b>Địa chỉ:</b> {dataLichHen.diaChi}
+                      <Col span={12}>
+                        <b>Chuyên khoa:</b> {item.tenKhoa || "Chưa rõ"}
                       </Col>
-                      <Col span={24}>
-                        <b>Lý do khám:</b> {dataLichHen.lyDoKham}
+                      <Col span={12}>
+                        <b>Lý do khám:</b> {item.lyDoKham || "Không ghi"}
                       </Col>
-                      <Col span={24}>
-                        <Space wrap>
-                          {/* <Tag color={daXacNhan ? "green" : "default"}>
-                            {daXacNhan ? "Đã xác nhận" : "Chưa xác nhận"}
-                          </Tag>
-                          <Tag color={daThanhToan ? "green" : "red"}>
-                            {daThanhToan ? "Đã thanh toán" : "Chưa thanh toán"}
-                          </Tag> */}
-                          <Button type="primary" ghost>
-                            Xem bệnh án
-                          </Button>
-                        </Space>
+                      <Col span={12}>
+                        <b>Trạng thái khám:</b>{" "}
+                        <Tag color={getTrangThaiColor(item.trangThai)}>
+                          {item.trangThai}
+                        </Tag>
+                      </Col>
+                      <Col span={12}>
+                        <b>Trạng thái thanh toán:</b>{" "}
+                        <Tag color={getTrangThaiThanhToanColor(item.trangThaiThanhToan)}>
+                          {item.trangThaiThanhToan}
+                        </Tag>
                       </Col>
                     </Row>
-                  </Col>
-                </Row>
-              </Card>
-      </div>
-      <Row style={{marginBottom: "50px"}}></Row>
 
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        display: "flex",
+                        gap: 12,
+                        padding: 8,
+                      }}
+                    >
+                      <Tooltip title="Xem chi tiết">
+                        <FaEye
+                          style={{
+                            color: "green",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => {
+                            setDataViewDH(item);
+                            setOpenViewDH(true);
+                          }}
+                        />
+                      </Tooltip>
+                      <Tooltip title="Chỉnh sửa lịch hẹn">
+                        <RiEdit2Fill
+                          style={{
+                            color: "orange",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => handleEditClick(item)}
+                        />
+                      </Tooltip>
+                      {/* Delete Icon */}
+                      <Tooltip title="Xóa lịch hẹn">
+                        <RiDeleteBin5Line
+                          style={{
+                            color: "red",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => handleDeleteClick(item)}
+                        />
+                      </Tooltip>
+                    </div>
+                  </div>
+                </div>
+              </Col>
+            ))}
+          </Row>
+
+          {!loading && dataOrder.length === 0 && (
+            <div style={{ textAlign: "center", marginTop: 40 }}>
+              <Empty description="Không có lịch hẹn" />
+            </div>
+          )}
+        </Spin>
+      </div>
+
+      <Row style={{ marginBottom: "50px" }}></Row>
       <Footer />
+
+      {/* ✅ Modal xem chi tiết */}
+      <ModalXemChiTietLichHen
+        open={openViewDH}
+        onCancel={() => setOpenViewDH(false)}
+        data={dataViewDH}
+      />
+
+      {/* ✅ Modal cập nhật lịch hẹn */}
+      <ModalCapNhatLichHen
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        data={editingRecord}
+        onReload={fetchOrders}
+      />
     </>
   );
 };

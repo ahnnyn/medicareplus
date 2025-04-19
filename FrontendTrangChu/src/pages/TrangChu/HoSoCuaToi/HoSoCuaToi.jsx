@@ -3,6 +3,7 @@ import Footer from "../../../components/TrangChu/Footer/Footer";
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
 import { useState } from "react";
 import HoSoBenhNhan from "../../../components/TrangChu/HoSoBenhNhan/HoSoBenhNhan";
+import PhieuKhamBenh from "../../../components/TrangChu/PhieuKhamBenh/PhieuKhamBenh";
 import "./hoSoCuaToi.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -30,12 +31,6 @@ const HoSoCuaToi = () => {
                     {/* Sidebar */}
                     <div className="sidebar-left">
                         <div className="sidebar-menu">
-                            <button
-                                className={`sidebar-item`}
-                                onClick={()  => navigate("/user/tao-ho-so")}
-                            >
-                                <i className="fa-solid fa-plus"></i> Thêm hồ sơ
-                            </button>
                             <button
                                 className={`sidebar-item ${activeTab === "hoSoCuaToi" ? "active" : ""}`}
                                 onClick={() => setActiveTab("hoSoCuaToi")}
@@ -68,8 +63,8 @@ const HoSoCuaToi = () => {
                         )}
                         {activeTab === "phieuKham" && (
                             <div>
-                                <h3 className="title">Phiếu khám bệnh</h3>
                                 {/* Component phiếu khám */}
+                                <PhieuKhamBenh />
                             </div>
                         )}
                     </div>

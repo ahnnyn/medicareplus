@@ -53,6 +53,40 @@ if (isset($_GET['action'])) {
             $result = $pd->taoHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi);
             echo json_encode($result);
             break;
+        case 'updateHoSo':
+            $data = json_decode(file_get_contents("php://input"), true);
+            // Kiểm tra xem tất cả tham số quan trọng có đủ không
+            if (
+                isset($data['maBenhNhan']) && isset($data['hoTenBenhNhan']) && 
+                isset($data['gioiTinh']) && 
+                isset($data['ngaySinh']) && isset($data['ngheNghiep']) && 
+                isset($data['CCCD']) && isset($data['diaChi'])
+            ) {
+                        
+                // Gọi controller để cập nhật thông tin bệnh nhân
+                $result = $pd->updateHoSoBenhNhan(
+                    $data['maBenhNhan'], $data['hoTenBenhNhan'], $data['ngaySinh'], $data['gioiTinh'], 
+                    $data['ngheNghiep'], $data['CCCD'], $data['diaChi']
+                );
+                if (isset($result['success']) && $result['success'] === true) {
+                    echo json_encode(["status" => true, "message" => "Cập nhật thông tin hồ sơ bệnh nhân thành công!"]);
+                } else {
+                    echo json_encode(["status" => false, "error" => "Cập nhật thông tin hồ sơ bệnh nhân thất bại!"]);
+                }
+            } else {
+                echo json_encode(["status" => false, "error" => "Thiếu thông tin hồ sơ bệnh nhân"]);
+            }
+            break;
+        case 'xoaHoSo':
+            if (isset($_GET['maBenhNhan'])) {
+                $maBenhNhan = intval($_GET['maBenhNhan']);
+                $result = $pd->deleteHoSoBenhNhan($maBenhNhan);
+                // Kiểm tra nếu 'success' có giá trị true từ backend
+                echo json_encode($result);
+            } else {
+                echo json_encode(["success" => false, "message" => "Thiếu mã bệnh nhân"]);
+            }
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Action không hợp lệ!']);
     }

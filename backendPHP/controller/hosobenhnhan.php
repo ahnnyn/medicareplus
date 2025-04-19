@@ -37,5 +37,25 @@ class cHoSoBenhNhan {
         // Trả về kết quả
         return $result;
     }
+    public function updateHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi) {
+        $p = new mHoSoBenhNhan();
+        $result = $p->updateHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi);
+    
+        if (isset($result['success'])) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
+        }
+    }
+    public function deleteHoSoBenhNhan($maBenhNhan) {
+        $p = new mHoSoBenhNhan();
+        $result = $p->deleteHoSoBenhNhan($maBenhNhan);
+    
+        if (isset($result['success'])) {
+            return ['success' => true];
+        } else {
+            return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
+        }
+    }
 }
 ?>

@@ -81,8 +81,33 @@
                 return ["status" => false, "message" => "Cập nhật phiếu khám thất bại."];
             }
         }
-
-        
-        
+        public function layAllPhieuKhamBenh($maHoSo) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo){
+                try {
+                    $query = $pdo->prepare("
+                    SELECT pkb.*, bs.hoTen, hs.gioiTinh, hs.ngaySinh, hs.ngheNghiep, hs.CCCD, hs.diaChi, lk.giaKham, bn.soDienThoai
+                        FROM phieukhambenh pkb 
+                        JOIN hosobenhnhan hs ON hs.maHoSo = pkb.maHoSo
+                        JOIN bacsi bs ON bs.maBacSi = pkb.maBacSi
+                        JOIN lichkham lk ON lk.maLich = pkb.maLichKham
+                        JOIN benhnhan bn ON bn.maBenhNhan = hs.maBenhNhan
+                        WHERE hs.maHoSo = :maHoSo
+                    ");
+                    $query->bindParam(":maHoSo", $maHoSo, PDO::PARAM_INT);
+                    $query->execute();
+                    $result = $query->fetchAll(PDO::FETCH_ASSOC);
+                    if (!$result) {
+                        return ["error" => "Không có phiếu khám nào"];
+                    }
+                    return $result;
+                }catch(PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }   
     }
 ?>

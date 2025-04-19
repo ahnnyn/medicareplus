@@ -102,7 +102,14 @@ const ChuyenKhoa = () => {
                         <p className="title-lichhen"> Chuyên khoa khám</p>
                     </Col>   
                     <Col span={24} style={{marginBottom: "20px"}}>
-                        <SearchComponent placeholder="Tìm kiếm chuyên khoa" onSearch={onSearch}/>
+                        <div style={{ display: "flex", justifyContent: "center" }}>
+                            <div style={{ width: "800px" }}>
+                            <SearchComponent
+                                placeholder="Tìm kiếm Chuyên khoa"
+                                onSearch={onSearch}
+                            />
+                            </div>
+                        </div>
                     </Col>  
 
                     {dataAllDoctor?.length > 0 ? (

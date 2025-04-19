@@ -28,5 +28,12 @@ class cPhieuKhamBenh {
         $result = $model->capNhatThongTinPhieuKhamBenh($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham);
         return json_encode($result);
     }
+    public function getAllPhieuKhamBenh($maHoSo) {
+        
+        // Xử lý lấy thông tin phiếu khám
+        $model = new mPhieuKhamBenh(); 
+        $result = $model->layAllPhieuKhamBenh($maHoSo);
+        return $result;
+    }
 }
 

@@ -63,5 +63,57 @@ class mHoSoBenhNhan {
             $pdo = null;
         }
     }
+    public function updateHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi) {
+        $p = new connectdatabase();
+        $pdo = $p->connect();
+        if (!$pdo) {
+            return ["success" => false, "message" => "Không thể kết nối database"];
+        }
+        try {
+            $queryStr = "
+                UPDATE hosobenhnhan 
+                SET hoTenBenhNhan = :hoTenBenhNhan, ngaySinh = :ngaySinh, gioiTinh = :gioiTinh, ngheNghiep = :ngheNghiep, CCCD = :CCCD, diaChi = :diaChi
+            ";
+            $queryStr .= " WHERE maBenhNhan = :maBenhNhan";
+
+            $query = $pdo->prepare($queryStr);
+
+            $query->bindParam(":hoTenBenhNhan", $hoTenBenhNhan);
+            $query->bindParam(":ngaySinh", $ngaySinh);
+            $query->bindParam(":gioiTinh", $gioiTinh, PDO::PARAM_INT);
+            $query->bindParam(":ngheNghiep", $ngheNghiep);
+            $query->bindParam(":CCCD", $CCCD);
+            $query->bindParam(":diaChi", $diaChi);
+            $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
+
+            $success = $query->execute();
+            if ($success) {
+                return ["success" => true, "message" => "Cập nhật hồ sơ bệnh nhân thành công"];
+            } else {
+                return ["success" => false, "message" => "Cập nhật hồ sơ bệnh nhân thất bại"];
+            }
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
+
+    public function deleteHoSoBenhNhan($maBenhNhan) {
+        $p = new connectdatabase();
+        $pdo = $p->connect();
+        if (!$pdo) {
+            return ["success" => false, "message" => "Không thể kết nối database"];
+        }
+        try {
+            $query = $pdo->prepare("
+                DELETE FROM hosobenhnhan WHERE maBenhNhan = :maBenhNhan
+            ");
+            $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
+            $query->execute();
+
+            return ["success" => true, "message" => "Xóa hồ sơ bệnh nhân thành công"];
+        } catch (PDOException $e) {
+            return ["success" => false, "message" => "Lỗi truy vấn: " . $e->getMessage()];
+        }
+    }
 }
 ?>
