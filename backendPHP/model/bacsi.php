@@ -26,7 +26,7 @@
                                         bacsi bs 
                                     JOIN 
                                         khoa k ON bs.maKhoa = k.maKhoa
-                                    JOIN 
+                                    LEFT JOIN  
                                         lichlamviec llv ON bs.maBacSi = llv.maBacSi
                                     GROUP BY 
                                         bs.maBacSi

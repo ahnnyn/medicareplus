@@ -1,5 +1,5 @@
 import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Button, Descriptions, Drawer, message } from "antd";
+import { Avatar, Badge, Button, Descriptions, Drawer, message, Modal } from "antd";
 import moment from "moment-timezone";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -21,7 +21,7 @@ const ViewLichHen = ({ openViewDH, dataViewDH, setOpenViewDH, setDataViewDH }) =
             label: "Hình ảnh",
             children: (
                 <Avatar
-                    src={`${import.meta.env.VITE_BACKEND_URL}/uploads/${dataViewDH?.maBenhNhan?.image || "default-avatar.png"}`}
+                    src={`${import.meta.env.VITE_BACKEND_URL}/public/benhnhan/${dataViewDH?.hinhAnh || "default-avatar.png"}`}
                     shape="square"
                     size={100}
                     icon={<UserOutlined />}
@@ -72,7 +72,7 @@ const ViewLichHen = ({ openViewDH, dataViewDH, setOpenViewDH, setDataViewDH }) =
         },
         {
             key: "lyDoKham",
-            label: "Lí do đi khám",
+            label: "Lý do khám",
             children: <Badge status="processing" text={dataViewDH?.lyDoKham || "N/A"} />,
             span: 3,
         },
@@ -120,31 +120,31 @@ const ViewLichHen = ({ openViewDH, dataViewDH, setOpenViewDH, setDataViewDH }) =
     };
 
     return (
-        <Drawer
-            closable
-            destroyOnClose
+        <Modal
             title={
-                <p>
+                <p style={{textAlign: "center", color: "navy", fontWeight: "bold", fontSize: "18px"}}>
                     CHI TIẾT LỊCH HẸN CỦA BỆNH NHÂN:{" "}
                     <span style={{ color: "navy", fontWeight: "bold" }}>
                         {dataViewDH?.hoTen || "N/A"}
                     </span>
                 </p>
             }
-            placement="left"
             open={openViewDH}
-            onClose={cancel}
+            onCancel={cancel}           // ✅ sửa từ onClose => onCancel
+            footer={null}               // ✅ không hiển thị nút footer mặc định
             width={850}
+            destroyOnClose
         >
             <div style={{ textAlign: "center", marginBottom: 10 }}>
-                <Button icon={<FaFileExport />} onClick={exportToPDF} size="large">
+                <Button icon={<FaFileExport />} onClick={exportToPDF} size="large" style={{width:"200px"}}>
                     Xuất PDF
                 </Button>
             </div>
             <div id="drawer-content">
                 <Descriptions bordered items={items} />
             </div>
-        </Drawer>
+        </Modal>
+
     );
 };
 

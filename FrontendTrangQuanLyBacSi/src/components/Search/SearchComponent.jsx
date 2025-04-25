@@ -26,6 +26,7 @@ const SearchComponent = ({ onSearch, placeholder }) => {
             onSearch={onSearch}
             enterButton 
             onChange={(e) => handleSearchChange(e.target.value)}
+            
         />
     );
 };

@@ -19,9 +19,12 @@
         
             try {
                 $query = $pdo->prepare("
-                    SELECT * FROM benhnhan bn 
-                    JOIN taikhoan tk ON bn.maTaiKhoan = tk.maTaiKhoan 
+                    SELECT bn.*, tk.*, hs.maHoSo 
+                    FROM benhnhan bn
+                    JOIN taikhoan tk ON bn.maTaiKhoan = tk.maTaiKhoan
+                    LEFT JOIN hosobenhnhan hs ON bn.maBenhNhan = hs.maBenhNhan
                     WHERE bn.maBenhNhan = :id
+                    LIMIT 1
                 ");
                 $query->bindParam(":id", $id, PDO::PARAM_INT);
                 $query->execute();

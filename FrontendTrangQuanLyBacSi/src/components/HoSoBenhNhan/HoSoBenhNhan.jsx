@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { findAllLichKhamByBacSi } from "../../services/doctorAPI";
-import DrawerBN from "./Drawer";
+import ModalHoSoBenhNhan from "./ModalHoSoBenhNhan";
 import SearchComponent from "../Search/SearchComponent";
 
 const HoSoBenhNhan = () => {
@@ -144,7 +144,7 @@ const HoSoBenhNhan = () => {
                     rowKey={(record) => record.maBenhNhan}
                 />
             </Col>
-            <DrawerBN
+            <ModalHoSoBenhNhan
                 openView={openView}
                 setOpenView={setOpenView}
                 dataView={dataView}

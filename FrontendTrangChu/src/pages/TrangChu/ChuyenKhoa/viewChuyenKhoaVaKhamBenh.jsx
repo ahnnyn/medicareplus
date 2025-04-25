@@ -113,15 +113,20 @@ const ViewChuyenKhoaVaKhamBenh = () => {
             console.error("Lỗi khi lấy lịch khám:", await res?.json?.());
         }
     };
+    
+    
 
     console.log("dataLichLamViec: ", dataLichLamViec);
 
     useEffect(() => {
-        if (selectedBacSi && selectedDate) {
-            fetchKhungGioKhamBacSi(selectedBacSi.maBacSi, selectedDate);
+        if (selectedBacSi) {
+            setDataLichLamViec([]);  // Reset lịch làm việc cũ
+            fetchKhungGioKhamBacSi(selectedBacSi.maBacSi);  // Lấy lịch khám mới
+            setHienThiTime('Chọn ngày khám!'); // Reset ngày khám
         }
-    }, [selectedBacSi, selectedDate]);
-
+    }, [selectedBacSi]);  // Lắng nghe thay đổi của bác sĩ
+    
+    
 
     console.log("dataBacSiByChuyenKhoa: ", dataBacSiByChuyenKhoa);
 
@@ -141,10 +146,21 @@ const ViewChuyenKhoaVaKhamBenh = () => {
         setSelectedBacSi(doctor);
         setSelectedTimeId(null);
         setHienThiTime('Chọn ngày khám!');
-        setkhungGio([]);
-    };
+        setkhungGio([]); // Reset khung giờ khi bác sĩ thay đổi
 
+    };
     
+
+
+useEffect(() => {
+    // Khi hình thức khám thay đổi, reset lại ngày khám
+    setHienThiTime('Chọn ngày khám!');
+    setSelectedTimeId(null); // Reset lại thời gian đã chọn
+    setkhungGio([]); // Reset lại khung giờ
+}, [selectedHinhThucKham]); // Lắng nghe sự thay đổi của hình thức khám
+
+
+
     const onClose = () => {
         setOpen(false);
     };
@@ -309,7 +325,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                                         <Row style={{ marginLeft: "15px" }}>
                                             <Col span={24}>
                                                 <Radio.Group
-                                                    value={selectedHinhThucKham[item.maBacSi] || "chuyenkhoa"}
+                                                    value={selectedHinhThucKham[item.maBacSi] || "Chuyên khoa"}
                                                     onChange={(e) => {
                                                         const newValue = e.target.value;
                                                         console.log("Hình thức khám cho bác sĩ này:", newValue);
@@ -324,8 +340,6 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                                                         fetchKhungGioKhamBacSi(item.maBacSi);
                                                         setHienThiTime('Chọn ngày khám!');
                                                         setSelectedDate(null);
-
-
                                                     }}
                                                 >
                                                     <Radio value="chuyenkhoa">Chuyên khoa</Radio>
@@ -378,6 +392,7 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                                                                     setSelectedDate(value);
                                                                     fetchKhungGioKhamBacSi(selectedBacSi.maBacSi);
                                                                     fetchBacSiByID(selectedBacSi.maBacSi);
+                                                                    
                                                                     const formatted = moment(value).format("DD/MM/YYYY");
                                                                     const dayName = englishToVietnameseDays[moment(value).format("dddd")];
                                                                     setHienThiTime(`${dayName} - ${formatted}`);
@@ -388,15 +403,16 @@ const ViewChuyenKhoaVaKhamBenh = () => {
                                                                 {dataLichLamViec
                                                                     .filter(item => {
                                                                         // Lọc theo hình thức khám
-                                                                        if (selectedHinhThucKham[selectedBacSi?.maBacSi] === 'tructuyen') {
+                                                                        if (selectedHinhThucKham[selectedBacSi?.maBacSi] === 'tructuyen' && item.maBacSi === selectedBacSi?.maBacSi) {
                                                                             return item.hinhThucKham === 'Trực tuyến';
                                                                         }
-                                                                        if (selectedHinhThucKham[selectedBacSi?.maBacSi] === 'chuyenkhoa') {
+                                                                        if (selectedHinhThucKham[selectedBacSi?.maBacSi] === 'chuyenkhoa' && item.maBacSi === selectedBacSi?.maBacSi) {
                                                                             return item.hinhThucKham === 'Chuyên khoa';
                                                                         }
                                                                         return true; // Trường hợp "Tất cả"
                                                                     })
                                                                     .map(item => item.ngayLamViec) // Lấy ngày làm việc
+                                                                        
                                                                     .filter((value, index, self) => self.indexOf(value) === index) // Lọc ra những ngày duy nhất
                                                                     .map((ngayLamViec, index) => {
                                                                         const formatted = moment(ngayLamViec).format("DD/MM/YYYY");
@@ -420,49 +436,95 @@ const ViewChuyenKhoaVaKhamBenh = () => {
 
                                             </Col>
 
-                                            <Col span={24} style={{ backgroundColor: "white", position: "relative", top: "-30px" }}>
-                                                <p style={{
-                                                    color: "gray", fontSize: "16px", fontWeight: "500", padding: "10px 0"
-                                                }}>
+                                            <Col
+                                                span={24}
+                                                style={{ backgroundColor: "white", position: "relative", top: "-30px" }}
+                                                >
+                                                <p
+                                                    style={{
+                                                    color: "gray",
+                                                    fontSize: "16px",
+                                                    fontWeight: "500",
+                                                    padding: "10px 0",
+                                                    }}
+                                                >
                                                     <FaRegCalendarAlt />
                                                     <span style={{ marginLeft: "10px" }}>LỊCH KHÁM</span>
                                                 </p>
-                                                <Row gutter={[16, 16]} justify="start" style={{
-                                                    marginTop: "-10px", marginTop: "-10px", flexWrap: "wrap",
-                                                }}>
-                                                    {selectedBacSi?.maBacSi === item?.maBacSi && selectedDate && hienThiTime !== 'Bấm vào đây để chọn lịch khám' ? (
-                                                        dataLichLamViec.length > 0 ? (
-                                                            dataLichLamViec
-                                                                .filter(item => item.trangThaiDatLich !== 'booked' && item.maBacSi === selectedBacSi?.maBacSi)
-                                                                .map((item, index) => (
-                                                                    <Col
-                                                                        key={index}
-                                                                        xs={24}
-                                                                        sm={12}
-                                                                        md={10}
-                                                                        lg={5}
-                                                                        className='cach-deu'
-                                                                        onClick={() => {
-                                                                            setkhungGio(item?.khungGio);
-                                                                            setSelectedTimeId(item?.maKhungGio);
-                                                                            setHoveredIndex(index);
-                                                                            handleRedirectBacSi(selectedBacSi, item?.maKhungGio, item?.khungGio, selectedDate, selectedBacSi?.giaKham, selectedHinhThucKham[selectedBacSi?.maBacSi]);
-                                                                        }}
-                                                                    >
-                                                                        <div className='lich-kham'>
-                                                                            {item.khungGio}
-                                                                        </div>
-                                                                    </Col>
-                                                                ))
+
+                                                <Row
+                                                    gutter={[16, 16]}
+                                                    justify="start"
+                                                    style={{ marginTop: "-10px", flexWrap: "wrap" }}
+                                                >
+                                                    {selectedBacSi?.maBacSi === item?.maBacSi &&
+                                                    selectedDate &&
+                                                    selectedHinhThucKham[selectedBacSi?.maBacSi] &&
+                                                    hienThiTime !== "Bấm vào đây để chọn lịch khám" ? (
+                                                    <>
+                                                        {dataLichLamViec &&
+                                                        dataLichLamViec.filter(
+                                                        (lich) =>
+                                                            lich.maBacSi === selectedBacSi?.maBacSi &&
+                                                            lich.ngayLamViec === selectedDate &&
+                                                            lich.trangThaiDatLich !== "booked" &&
+                                                            lich.hinhThucKham ===
+                                                            (selectedHinhThucKham[selectedBacSi?.maBacSi] === "tructuyen"
+                                                                ? "Trực tuyến"
+                                                                : selectedHinhThucKham[selectedBacSi?.maBacSi] === "chuyenkhoa"
+                                                                ? "Chuyên khoa"
+                                                                : lich.hinhThucKham)
+                                                        ).length > 0 ? (
+                                                        dataLichLamViec
+                                                            .filter(
+                                                            (lich) =>
+                                                                lich.maBacSi === selectedBacSi?.maBacSi &&
+                                                                lich.ngayLamViec === selectedDate &&
+                                                                lich.trangThaiDatLich !== "booked" &&
+                                                                lich.hinhThucKham ===
+                                                                (selectedHinhThucKham[selectedBacSi?.maBacSi] === "tructuyen"
+                                                                    ? "Trực tuyến"
+                                                                    : selectedHinhThucKham[selectedBacSi?.maBacSi] ===
+                                                                    "chuyenkhoa"
+                                                                    ? "Chuyên khoa"
+                                                                    : lich.hinhThucKham)
+                                                            )
+                                                            .map((lich, index) => (
+                                                            <Col
+                                                                key={index}
+                                                                xs={24}
+                                                                sm={12}
+                                                                md={10}
+                                                                lg={5}
+                                                                className="cach-deu"
+                                                                onClick={() => {
+                                                                setkhungGio(lich?.khungGio);
+                                                                setSelectedTimeId(lich?.maKhungGio);
+                                                                setHoveredIndex(index);
+                                                                handleRedirectBacSi(
+                                                                    selectedBacSi,
+                                                                    lich?.maKhungGio,
+                                                                    lich?.khungGio,
+                                                                    selectedDate,
+                                                                    selectedBacSi?.giaKham,
+                                                                    selectedHinhThucKham[selectedBacSi?.maBacSi]
+                                                                );
+                                                                }}
+                                                            >
+                                                                <div className="lich-kham">{lich.khungGio}</div>
+                                                            </Col>
+                                                            ))
                                                         ) : (
-                                                            <span style={{ color: "red", margin: "0 0 10px" }}>
-                                                                Không có thời gian khám nào.
-                                                                <br /> Chọn <FaRegHandPointUp size={14} /> và đặt (Phí đặt lịch 0đ)
-                                                            </span>
-                                                        )
+                                                        <span style={{ color: "red", margin: "0 0 10px" }}>
+                                                            Không có thời gian khám nào.
+                                                            <br /> Chọn <FaRegHandPointUp size={14} /> và đặt (Phí đặt lịch
+                                                            0đ)
+                                                        </span>
+                                                        )}
+                                                    </>
                                                     ) : null}
                                                 </Row>
-                                            </Col>
+                                                </Col>
 
                                             <Col span={24} style={{backgroundColor: "white", top: "-30px"}}>
                                             {selectedHinhThucKham?.[item?.maBacSi] && (

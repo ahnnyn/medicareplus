@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle, XCircle } from "lucide-react";
+import { Check, X } from "lucide-react";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { CircleCheck, CircleX } from "lucide-react";
+
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
 import Footer from "../../../components/TrangChu/Footer/Footer";
 import {
   getThongBaoThanhToan,
   capNhatTrangThaiThanhToanLichKham,
 } from "../../../services/apiChuyenKhoaBacSi";
+import { Button } from "antd";
+
+import "./ThongBao.css";
 
 const ThongBaoThanhToan = () => {
   const location = useLocation();
@@ -17,10 +23,16 @@ const ThongBaoThanhToan = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
+    const vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
+
+    if (!vnp_ResponseCode) {
+      setMessage("Không có thông tin thanh toán để xử lý.");
+      setStatus(false);
+      return;
+    }
 
     const vnp_TxnRef = queryParams.get("vnp_TxnRef");
     const vnp_Amount = queryParams.get("vnp_Amount");
-    const vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
     const vnp_PayDate = queryParams.get("vnp_PayDate");
     const vnp_BankCode = queryParams.get("vnp_BankCode");
     const vnp_BankTranNo = queryParams.get("vnp_BankTranNo");
@@ -50,22 +62,15 @@ const ThongBaoThanhToan = () => {
           vnp_SecureHash,
         });
 
-        setMessage("🔄 Đang cập nhật trạng thái lịch hẹn...");
-
         await capNhatTrangThaiThanhToanLichKham({
           maLichKham: vnp_TxnRef,
           trangThaiThanhToan: "Đã thanh toán",
         });
 
         setStatus(true);
-        setMessage("🎉 Đặt lịch thành công! Hệ thống sẽ chuyển trang sau vài giây...");
-
-        // ⏳ Chờ 3 giây rồi mới chuyển
-        setTimeout(() => {
-          navigate("/user/lich-hen");
-        }, 3000);
+        setMessage("Thanh toán thành công!");
       } catch (error) {
-        console.error("❌ Lỗi khi xử lý thanh toán:", error?.response?.data || error.message || error);
+        console.error("Lỗi khi xử lý thanh toán:", error?.response?.data || error?.message || error);
         setStatus(false);
         setMessage("Thanh toán thất bại! Vui lòng thử lại hoặc liên hệ hỗ trợ.");
       }
@@ -77,26 +82,43 @@ const ThongBaoThanhToan = () => {
       setStatus(false);
       setMessage("Thanh toán không thành công. Mã phản hồi: " + vnp_ResponseCode);
     }
-  }, [location, navigate]);
+  }, [location]);
 
   return (
     <>
       <HeaderViewDoctor />
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+      <div style={{marginTop: "50px"}}></div>
+      <div className="center-container">
+        <div className="notification-box">
           {status === null ? (
-            <p className="text-gray-600">{message}</p>
+            <p className="message">{message}</p>
           ) : status ? (
             <>
-              <CheckCircle size={60} className="text-green-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-green-600">Đặt lịch thành công!</h2>
-              <p className="text-gray-700 mt-2">{message}</p>
+              <FaCheckCircle size={60} className="icon success" />
+              <h2 className="heading success">Thanh toán thành công!</h2>
+              <p className="message">{message}</p>
+              <div className="button-container">
+                <Button type="primary" className="button" onClick={() => navigate("/")}>
+                  Về trang chủ
+                </Button>
+                <Button className="button" onClick={() => navigate("/user/lich-hen")}>
+                  Tới trang quản lý lịch khám
+                </Button>
+              </div>
             </>
           ) : (
             <>
-              <XCircle size={60} className="text-red-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-red-600">Thanh toán thất bại!</h2>
-              <p className="text-gray-700 mt-2">{message}</p>
+              <FaTimesCircle size={60} className="icon failure" />
+              <h2 className="heading failure">Thanh toán thất bại!</h2>
+              <p className="message">{message}</p>
+              <div className="button-container">
+                <Button type="primary" className="button" onClick={() => navigate("/")}>
+                  Về trang chủ
+                </Button>
+                <Button className="button" onClick={() => navigate("/user/lich-hen")}>
+                  Tới trang quản lý lịch khám
+                </Button>
+              </div>
             </>
           )}
         </div>

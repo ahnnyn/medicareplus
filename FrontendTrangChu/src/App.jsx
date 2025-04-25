@@ -11,6 +11,7 @@ import BacSiNoiBat from "./pages/TrangChu/BacSiNoiBat/bacSiNoiBat";
 import ChuyenKhoa from "./pages/TrangChu/ChuyenKhoa/chuyenKhoa";
 import LienHe from "./pages/TrangChu/LienHe/LienHe";
 import ViewChuyenKhoaVaKhamBenh from "./pages/TrangChu/ChuyenKhoa/viewChuyenKhoaVaKhamBenh";
+import ThongBaoThanhToan from "./pages/TrangChu/ThongBaoThanhToan/ThongBaoThanhToan";
 import { LineHeightOutlined } from "@ant-design/icons";
 import DichVuKham from "./pages/TrangChu/DatLich/DichVuKham";
 
@@ -29,7 +30,8 @@ const App = () => {
     { path: "/user/chuyen-khoa-kham", element: <ChuyenKhoa /> },   
     { path: "/user/view-chuyen-khoa-kham", element: <ViewChuyenKhoaVaKhamBenh /> },
     { path: "user/dich-vu-kham", element: <DichVuKham /> }, // dich vu kham
-    { path: "/user/lien-he", element: <LienHe /> }
+    { path: "/user/lien-he", element: <LienHe /> },
+    {path: "/user/thong-bao-thanh-toan", element: <ThongBaoThanhToan />}, // thong bao thanh toan
   ];
   return (
     <>

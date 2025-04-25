@@ -17,11 +17,10 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
     const [dataAccKH, setDataAccKH] = useState(null);
     const [fileList, setFileList] = useState([]);
     const [imageUrl, setImageUrl] = useState("");
-    // const [genderBenhNhan, setGenderBenhNhan] = useState(null);
+    const [genderBenhNhan, setGenderBenhNhan] = useState(null);
     const [isSubmit, setIsSubmit] = useState(false);
     const [loading, setLoading] = useState(false);
     const acc = useSelector((state) => state.account.user);
-    console.log("dataAccKH: ", dataAccKH);
     console.log("Thông tin tài khoản:", acc);
 
     const cancel = () => {
@@ -43,6 +42,7 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
     
         try {
             const res = await fetchOneAccKH(query.maBenhNhan);
+            console.log("API Response:", res); // Log the API response to check the data structure
             // Kiểm tra sự tồn tại của res và res.data
             if (res) {
                 setDataAccKH(res.data); // Lưu trữ đúng dữ liệu vào state
@@ -60,6 +60,16 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
             });
         }
     };
+
+useEffect(() => {
+    if(dataAccKH) {
+        console.log("Dữ liệu tài khoản:", dataAccKH); // Log the account data
+    } else {
+
+        console.log("Chưa có dữ liệu tài khoản"); // Log when data is not available
+    }
+}, [dataAccKH]); // Log whenever dataAccKH changes
+
     
     // Khi modal mở thì gọi lại thông tin tài khoản
     useEffect(() => {
@@ -92,7 +102,8 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
                 ngaySinh: dataAccKH.ngaySinh ? dayjs(dataAccKH.ngaySinh) : null,
             });
 
-            // setGenderBenhNhan(dataAccKH.gioiTinh);
+            setGenderBenhNhan(dataAccKH.gioiTinh);
+
         }
     }, [dataAccKH]);
 
@@ -292,16 +303,16 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
                     </Col>
                     <Col span={12}>
                         <Form.Item label="Giới tính" name="gioiTinh">
-                            {/* <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
+                            <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
                                 <Radio value={"0"}>Nam</Radio>
                                 <Radio value={"1"}>Nữ</Radio>
                                 <Radio value={"2"}>Khác</Radio>
-                            </Radio.Group> */}
-                            <Radio.Group>
+                            </Radio.Group>
+                            {/* <Radio.Group>
                                 <Radio value={0}>Nam</Radio>
                                 <Radio value={1}>Nữ</Radio>
                                 <Radio value={2}>Khác</Radio>
-                                </Radio.Group>
+                                </Radio.Group> */}
                         </Form.Item>
                     </Col>
                     <Col span={12}>

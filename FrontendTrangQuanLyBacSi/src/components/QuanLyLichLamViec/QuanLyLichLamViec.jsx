@@ -1,4 +1,4 @@
-import { Badge, Button, Calendar, Checkbox, Col, DatePicker, Divider, Form, message, notification, Row, Select, Space, Table } from "antd"
+import { Badge, Button, Calendar, Checkbox, Col, DatePicker, Divider, Form, message, notification, Row, Select, Space, Table, Tag } from "antd"
 import { useEffect, useState } from "react"
 import moment from "moment"
 import './css.scss'
@@ -18,7 +18,7 @@ const QuanLyLichLamViec = () => {
     const [dataLichLamViec, setDataLichLamViec] = useState([]);
     const [currentDoctorId, setCurrentDoctorId] = useState('');
     const [appointmentDate, setAppointmentDate] = useState(null);
-    const [hinhThucKham, setHinhThucKham] = useState('null');
+    const [hinhThucKham, setHinhThucKham] = useState();
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     const [selectedTimesByType, setSelectedTimesByType] = useState({
@@ -152,13 +152,13 @@ const QuanLyLichLamViec = () => {
       
               setDataTime(finalTimeList);
       
-              // ⚠️ Luôn cập nhật selectedTimesByType cho hình thức hiện tại
+              // Luôn cập nhật selectedTimesByType cho hình thức hiện tại
               setSelectedTimesByType(prev => ({
                 ...prev,
                 [hinhThucKham]: selected,
               }));
       
-              // 🟢 Đặt selectedTimes & giá trị form từ dữ liệu mới cập nhật
+              // Đặt selectedTimes & giá trị form từ dữ liệu mới cập nhật
               setSelectedTimes(selected);
               form.setFieldsValue({
                 time: selected,
@@ -209,10 +209,10 @@ const QuanLyLichLamViec = () => {
     const handleDateChange = (date, dateString) => {
         setAppointmentDate(dateString);
     
-        // ✅ Reset trạng thái khung giờ đã chọn theo từng hình thức
+        // Reset trạng thái khung giờ đã chọn theo từng hình thức
         setSelectedTimesByType({});
     
-        // ✅ Cũng nên reset selectedTimes (khung giờ đang chọn hiển thị)
+        // Cũng nên reset selectedTimes (khung giờ đang chọn hiển thị)
         setSelectedTimes([]);
     
         fetchDoctorTimes();
@@ -255,12 +255,10 @@ const QuanLyLichLamViec = () => {
 
     useEffect(() => {
         if (!Array.isArray(dataLichLamViec)) return;
-    
-        // 1. Sắp xếp ngày tăng dần
+      
         const sortedDates = Array.from(new Set(dataLichLamViec.map(item => item.ngayLamViec)))
           .sort((a, b) => moment(a).diff(moment(b)));
-    
-        // 2. Tạo cột theo ngày
+      
         const dynamicColumns = [
           {
             title: 'Giờ khám',
@@ -273,50 +271,55 @@ const QuanLyLichLamViec = () => {
             key: ngay,
             render: value =>
               value ? (
-                <div>
+                <Space direction="vertical">
                   {value.map((item, index) => (
-                    <Badge
+                    <Tag
                       key={index}
-                      color={item.hinhThucKham === 'Chuyên khoa' ? 'hsl(102, 53%, 61%)' : 'hsl(0, 100%, 50%)'} // Màu xanh cho Chuyên khoa, đỏ cho Trực tuyến
-                      text={item.khungGio}
-                    />
+                      color={item.hinhThucKham === 'Chuyên khoa' ? 'green' : 'red'}
+                    >
+                      {item.khungGio}
+                    </Tag>
                   ))}
-                </div>
+                </Space>
               ) : null,
           })),
         ];
-    
-        // 3. Tạo hàng theo khung giờ
+      
         const allTimeSlots = Array.from(new Set(dataLichLamViec.map(item => item.khungGio))).sort();
-    
+      
         const tableData = allTimeSlots.map((khungGio, index) => {
           const row = { key: index, time: khungGio };
-    
+      
           sortedDates.forEach(date => {
             const matchingItems = dataLichLamViec.filter(
               item => item.ngayLamViec === date && item.khungGio === khungGio
             );
+      
             if (matchingItems.length > 0) {
-              row[date] = matchingItems.map(item => ({
+              const uniqueByHinhThuc = Array.from(
+                new Map(matchingItems.map(item => [`${item.hinhThucKham}`, item])).values()
+              );
+      
+              row[date] = uniqueByHinhThuc.map(item => ({
                 khungGio: item.khungGio,
-                hinhThucKham: item.hinhThucKham, // Thêm thông tin hình thức khám
+                hinhThucKham: item.hinhThucKham,
               }));
             }
           });
-    
+      
           return row;
         });
-    
-        // 4. Cập nhật state
+      
         setColumns(dynamicColumns);
         setData(tableData);
-    }, [dataLichLamViec]);
+      }, [dataLichLamViec]);
+      
     
     // Thêm chú thích màu sắc dưới bảng
     const renderColorLegend = () => (
-      <div style={{ marginTop: 10 }}>
-        <span style={{ color: 'hsl(101, 39.80%, 48.20%)' }}>🟢 Khám Chuyên khoa</span>
-        <span style={{ marginLeft: 20, color: 'hsl(0, 100%, 50%)' }}>🔴 Khám Trực tuyến</span>
+        <div style={{ textAlign: 'center', marginTop: 10 }}>
+        <Tag color="green">🟢 Khám Chuyên khoa</Tag>
+        <Tag color="red">🔴 Khám Trực tuyến</Tag>
       </div>
     );
     

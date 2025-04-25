@@ -200,7 +200,7 @@ const HeaderViewDoctor = () => {
                     <Nav.Link onClick={() => navigate("/")}>TRANG CHỦ</Nav.Link>
                     <Nav.Link onClick={() => navigate("/user/chuyen-khoa-kham")}>CHUYÊN KHOA</Nav.Link>
                     <Nav.Link onClick={() => navigate("/user/bac-si-noi-bat")}>BÁC SĨ</Nav.Link>
-                    <Nav.Link onClick={() => navigate("/user/dich-vu-kham")}>ĐẶT LỊCH KHÁM</Nav.Link>
+                    <Nav.Link onClick={() => navigate("/user/dich-vu-kham")}>DỊCH VỤ</Nav.Link>
                     <Nav.Link onClick={() => navigate("/user/lien-he")}>LIÊN HỆ</Nav.Link>
                   </Nav>
                 </Navbar>

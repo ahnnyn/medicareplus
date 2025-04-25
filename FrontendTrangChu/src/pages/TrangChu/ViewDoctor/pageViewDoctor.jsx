@@ -38,6 +38,8 @@ const PageViewDoctor = () => {
     const hinhThucKham = params.get("hinhThucKham");
     const [selectedHinhThucKham, setSelectedHinhThucKham] = useState(hinhThucKham || 'tatca');
 
+    console.log("hinhThucKham:", hinhThucKham);
+    console.log("selectedHinhThucKham: ", selectedHinhThucKham);
     console.log("check id bác sĩ: ", maBacSi);
 
     useEffect(() => {
@@ -68,15 +70,12 @@ const PageViewDoctor = () => {
 
     useEffect(() => {
         const fetchBacSiTimes = async () => {
-
             if (!maBacSi) {
                 console.warn("maBacSi is null or undefined");
                 return;
             }
     
-            // const appointmentDate = selectedDate; // Ngày đã chọn từ Drawer
-            // console.log("appointmentDate: ", appointmentDate);    
-            // const res = await getTimeSlotsByDoctorAndDate(doctorId, appointmentDate);
+            // Fetch data by doctor ID
             const res = await getTimeSlotsByDoctor(maBacSi);
             console.log("res fetch: ", res);
     
@@ -132,7 +131,6 @@ const today = moment().startOf('day');
 //     .filter(date => moment(date).isSameOrAfter(today));
 
 
-// Lọc danh sách lịch làm việc theo hình thức khám và lấy danh sách ngày không trùng lặp từ hôm nay trở đi
 const danhSachNgayLamViec = Array.from(new Set(
     dataLichLamViec
       .filter(item => {
@@ -146,8 +144,11 @@ const danhSachNgayLamViec = Array.from(new Set(
       })
       .map(item => item.ngayLamViec)
       .filter(ngay => moment(ngay, 'YYYY-MM-DD').isSameOrAfter(today))
-  ));
+));
 
+
+console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
+console.log("dataLichLamViec: ", dataLichLamViec);
 
 console.log("selectedHinhThucKham: ", selectedHinhThucKham);
 
@@ -156,8 +157,7 @@ useEffect(() => {
       setSelectedHinhThucKham(hinhThucKham);
     }
   }, [hinhThucKham]);
-  
-console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
+
 
     const styleTime = (index) => ({
         cursor: "pointer",
@@ -266,6 +266,8 @@ console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
                                                                 setHienThiTime(displayTime);
                                                                 setSelectedTimeId(time);
                                                                 setSelectedDate(time);
+
+                                                                console.log("selectedDate: ", time);
                                                                 onClose();
                                                             }}
                                                             onMouseEnter={() => setHoveredIndex(index)}
@@ -296,7 +298,12 @@ console.log("danhSachNgayLamViec: ", danhSachNgayLamViec);
                                                 const khungGioTheoNgay = dataLichLamViec.filter(
                                                     item =>
                                                         item.trangThaiDatLich !== 'booked' &&
-                                                        item.ngayLamViec === selectedDate
+                                                        item.ngayLamViec === selectedDate && 
+                                                        item.hinhThucKham === (selectedHinhThucKham === 'tructuyen' ? 'Trực tuyến' :
+                                                            selectedHinhThucKham === 'chuyenkhoa' ? 'Chuyên khoa' : item.hinhThucKham)
+
+
+
                                                 );
                                                 if (khungGioTheoNgay.length > 0) {
                                                     return khungGioTheoNgay.map((item, index) => (

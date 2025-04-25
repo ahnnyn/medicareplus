@@ -7,13 +7,13 @@ import { IoHomeSharp } from "react-icons/io5";
 import { UserOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { fetchAllBacSi } from "../../../services/apiChuyenKhoaBacSi";
-import { findBacSiByTen } from "../../../services/apiChuyenKhoaBacSi";
 import { useNavigate } from "react-router-dom";
 import SearchComponent from "../../../components/TrangChu/SearchComponent/SearchComponent";
+
 const BacSiNoiBat = () => {
   const [dataAllDoctor, setDataAllDoctor] = useState([]);
   const [dataSearch, setDataSearch] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("chuyenkhoa");
+  const [selectedStatus, setSelectedStatus] = useState("tatca"); // Default value "tatca"
 
   const navigate = useNavigate();
 
@@ -21,25 +21,28 @@ const BacSiNoiBat = () => {
     fetchListDoctor(dataSearch, selectedStatus);
   }, [dataSearch, selectedStatus]);
 
-  const fetchListDoctor = async (search = "", status = "chuyenkhoa") => {
+  const fetchListDoctor = async (search = "", status = "tatca") => {
     try {
       let res = await fetchAllBacSi(""); // Luôn lấy tất cả để lọc frontend
+
+      console.log("res", res);
   
-      if (res && res.data) {
+      if (res && res.data && Array.isArray(res.data)) {
         let filteredData = res.data;
   
-        // 1. Lọc theo hình thức khám
-        filteredData = filteredData.filter((item) => {
-          const hinhThucArr = item?.hinhThucKham?.toLowerCase().split(",") || [];
+        // 1. Kiểm tra điều kiện lọc theo hình thức khám chỉ khi không chọn "Tất cả"
+        if (status !== "tatca") {
+          filteredData = filteredData.filter((item) => {
+            const hinhThucArr = item?.hinhThucKham?.toLowerCase().split(",") || [];
   
-          if (status === "chuyenkhoa") {
-            return hinhThucArr.includes("chuyên khoa");
-          } else if (status === "tructuyen") {
-            return hinhThucArr.includes("trực tuyến");
-          }
-  
-          return true;
-        });
+            if (status === "chuyenkhoa") {
+              return hinhThucArr.includes("chuyên khoa");
+            } else if (status === "tructuyen") {
+              return hinhThucArr.includes("trực tuyến");
+            }
+            return true;  // Điều này sẽ bảo đảm giữ lại những bác sĩ có hình thức khác nếu cần
+          });
+        }
   
         // 2. Lọc theo từ khóa tìm kiếm (nếu có)
         if (search) {
@@ -49,18 +52,23 @@ const BacSiNoiBat = () => {
           );
         }
   
-        setDataAllDoctor(filteredData);
+        // Nếu không có bác sĩ nào sau khi lọc, xử lý trường hợp này
+        if (filteredData.length === 0) {
+          setDataAllDoctor([]);  // Hoặc thông báo không có bác sĩ
+        } else {
+          setDataAllDoctor(filteredData); // Cập nhật danh sách bác sĩ
+        }
       } else {
-        setDataAllDoctor([]);
+        setDataAllDoctor([]); // Trường hợp không có dữ liệu
       }
     } catch (error) {
       console.error("Lỗi khi gọi API:", error);
-      setDataAllDoctor([]);
+      setDataAllDoctor([]); // Xử lý khi có lỗi
     }
   };
   
-
-  console.log("dataAllDoctor", dataAllDoctor);
+  
+  
 
   const handleRedirectDoctor = (maBacSi, hinhThucKham) => {
     navigate(`/view-doctor?maBacSi=${maBacSi}&hinhThucKham=${hinhThucKham}`);
@@ -79,36 +87,61 @@ const BacSiNoiBat = () => {
       <HeaderViewDoctor />
       <Row style={{ marginTop: "120px" }}></Row>
       <div
-      className=""
-      style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
-    >
-      <Row justify="space-between" align="middle" gutter={16}>
-        <Col xs={24} md={12} className="">
-          <div className="" style={{ marginLeft: "70px", padding: "10px 20px", borderRadius: "40px", backgroundColor: "white", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", marginTop: "50px" }}>
-            <h2 className="" style={{ fontSize: "clamp(20px, 5vw, 30px)", fontWeight: "bold", color: "#00B0F0" }}>
-              ĐẶT KHÁM THEO BÁC SĨ
-            </h2>
-            <ul className="" style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}>
-              <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
-              <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
-              <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
-              <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
-            </ul>
-          </div>
-        </Col>
+        className=""
+        style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
+      >
+        <Row justify="space-between" align="middle" gutter={16}>
+          <Col xs={24} md={12} className="">
+            <div
+              className=""
+              style={{
+                marginLeft: "70px",
+                padding: "10px 20px",
+                borderRadius: "40px",
+                backgroundColor: "white",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                marginTop: "50px",
+              }}
+            >
+              <h2
+                className=""
+                style={{
+                  fontSize: "clamp(20px, 5vw, 30px)",
+                  fontWeight: "bold",
+                  color: "#00B0F0",
+                }}
+              >
+                ĐẶT KHÁM THEO BÁC SĨ
+              </h2>
+              <ul
+                className=""
+                style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}
+              >
+                <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
+                <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
+                <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
+                <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
+              </ul>
+            </div>
+          </Col>
 
-        <Col xs={4} md={12} className="z-0 flex justify-end">
-          <img
-            src="../../public/banner_3-removebg-preview.png"
-            alt="Doctors illustration"
-            className=""
-            style={{ maxHeight: "350px", float: "right", marginTop: "100px", marginRight: "50px" }}
-          />
-        </Col>
-      </Row>
-    </div>
+          <Col xs={4} md={12} className="z-0 flex justify-end">
+            <img
+              src="../../public/banner_3-removebg-preview.png"
+              alt="Doctors illustration"
+              className=""
+              style={{
+                maxHeight: "350px",
+                float: "right",
+                marginTop: "100px",
+                marginRight: "50px",
+              }}
+            />
+          </Col>
+        </Row>
+      </div>
 
-    <Row style={{ marginTop: "20px" }}></Row>
+      <Row style={{ marginTop: "20px" }}></Row>
 
       <Row>
         <Col span={18} className="col-body">
@@ -128,20 +161,18 @@ const BacSiNoiBat = () => {
                 onChange={handleStatusFilter}
                 style={{ width: "100%" }}
                 options={[
+                  { value: "tatca", label: "Tất cả" },
                   { value: "chuyenkhoa", label: "Chuyên khoa" },
                   { value: "tructuyen", label: "Trực tuyến" },
                 ]}
               />
             </Col>
             <Col span={18}>
-              <SearchComponent
-                placeholder="Tìm kiếm tên bác sĩ"
-                onSearch={onSearch}
-              />
+              <SearchComponent placeholder="Tìm kiếm tên bác sĩ" onSearch={onSearch} />
             </Col>
 
             {dataAllDoctor?.length > 0 ? (
-              dataAllDoctor.map((item, index) => (
+              dataAllDoctor?.map((item, index) => (
                 <Col
                   key={index}
                   span={24}
