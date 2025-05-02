@@ -14,7 +14,7 @@ class mUser {
         if ($pdo) {
             try {
                 // Use Prepared Statement to prevent SQL Injection
-                $stmt = $pdo->prepare("SELECT tk.*, bs.* FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan WHERE tk.username = :username");
+                $stmt = $pdo->prepare("SELECT tk.*, bs.*, vt.tenVaiTro FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan JOIN vaitro vt ON vt.maVaiTro = tk.maVaiTro WHERE tk.username = :username");
                 $stmt->bindParam(':username', $username);
                 $stmt->execute();
                 

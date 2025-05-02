@@ -11,11 +11,16 @@ import {
   Modal,
 } from "antd";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import {
   ExclamationCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
+import { BsCameraVideoFill } from "react-icons/bs";
+import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
+
 import { FaEye } from "react-icons/fa";
 import { IoHomeSharp } from "react-icons/io5";
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
@@ -28,6 +33,8 @@ import ModalXemChiTietLichHen from "./ModalXemChiTietLichHen";
 import ModalCapNhatLichHen from "./ModalCapNhatLichHen";
 
 const LichHenCard = () => {
+  const navigate = useNavigate();
+
   const [dataOrder, setDataOrder] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openViewDH, setOpenViewDH] = useState(false);
@@ -189,8 +196,8 @@ const LichHenCard = () => {
                   </div>
 
                   {/* Right: Details */}
-                  <div style={{ flex: 1, position: "relative" }}>
-                    <Row gutter={[16, 8]}>
+                  <div style={{ flex: 1, paddingRight: 150, position: "relative" }}>
+                  <Row gutter={[16, 8]}>
                       <Col span={12}>
                         <b>Bệnh nhân:</b> {item.hoTen}
                       </Col>
@@ -218,50 +225,83 @@ const LichHenCard = () => {
                     </Row>
 
                     <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        right: 0,
-                        display: "flex",
-                        gap: 12,
-                        padding: 8,
-                      }}
-                    >
-                      <Tooltip title="Xem chi tiết">
-                        <FaEye
-                          style={{
-                            color: "green",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => {
-                            setDataViewDH(item);
-                            setOpenViewDH(true);
-                          }}
-                        />
-                      </Tooltip>
-                      <Tooltip title="Chỉnh sửa lịch hẹn">
-                        <RiEdit2Fill
-                          style={{
-                            color: "orange",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => handleEditClick(item)}
-                        />
-                      </Tooltip>
-                      {/* Delete Icon */}
-                      <Tooltip title="Xóa lịch hẹn">
-                        <RiDeleteBin5Line
-                          style={{
-                            color: "red",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => handleDeleteClick(item)}
-                        />
-                      </Tooltip>
-                    </div>
+  style={{
+    position: "absolute",
+    top: 0,
+    right: 0,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 12,
+    padding: 8,
+  }}
+>
+  <Tooltip title="Xem chi tiết">
+    <FaEye
+      style={{
+        color: "green",
+        cursor: "pointer",
+        fontSize: 18,
+      }}
+      onClick={() => {
+        setDataViewDH(item);
+        setOpenViewDH(true);
+      }}
+    />
+  </Tooltip>
+
+  <Tooltip title="Chỉnh sửa lịch hẹn">
+    <RiEdit2Fill
+      style={{
+        color: "orange",
+        cursor: "pointer",
+        fontSize: 18,
+      }}
+      onClick={() => handleEditClick(item)}
+    />
+  </Tooltip>
+
+  <Tooltip title="Xóa lịch hẹn">
+    <RiDeleteBin5Line
+      style={{
+        color: "red",
+        cursor: "pointer",
+        fontSize: 18,
+      }}
+      onClick={() => handleDeleteClick(item)}
+    />
+  </Tooltip>
+
+  {/* Nút gọi video */}
+  <Tooltip title="Gọi video">
+    <BsCameraVideoFill
+      style={{
+        color: "#1890ff",
+        cursor: "pointer",
+        fontSize: 18,
+      }}
+      onClick={() => {
+        const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+        window.open(videoCallUrl, "_blank"); // Mở ở tab mới
+      }}
+    />
+  </Tooltip>
+
+  {/* Nút nhắn tin */}
+  <Tooltip title="Nhắn tin">
+    <IoChatbubbleEllipsesSharp
+      style={{
+        color: "#52c41a",
+        cursor: "pointer",
+        fontSize: 18,
+      }}
+      onClick={() => {
+        const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+        window.open(chatUrl, "_blank"); // Mở ở tab mới
+      }}
+    />
+  </Tooltip>
+</div>
+
                   </div>
                 </div>
               </Col>

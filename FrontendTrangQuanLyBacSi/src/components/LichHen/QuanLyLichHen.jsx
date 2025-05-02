@@ -2,19 +2,23 @@ import { Col, Divider, Form, Input, message, Modal, notification, Row, Select, S
 import { useEffect, useRef, useState } from "react"
 import moment from 'moment-timezone';
 import { ExclamationCircleOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { BsCameraVideoFill } from "react-icons/bs";
+import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaEye } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { findAllLichKhamByBacSi } from "../../services/doctorAPI";
 import ViewLichHen from "./ViewLichHen";
 import React from "react";
 import { RiEdit2Fill } from "react-icons/ri";
-import { updateThongTinlichKham } from "../../services/apiDoctor";
+import { updateThongTinlichKham, createConsultationRoom } from "../../services/apiDoctor";
 import './custom.css'
 import SearchComponent from "../Search/SearchComponent";
 import ModalEdit from "./ModalEdit";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { IoMdCloseCircle } from "react-icons/io";
+import { Button } from "antd";
+import { VideoCameraOutlined } from "@ant-design/icons";
 import ModalTaoPhieuKham from "../PhieuKhamBenh/ModalTaoPhieuKham";
 
 const QuanLyLichHen = () => {
@@ -35,7 +39,7 @@ const QuanLyLichHen = () => {
 
 
     const user = useSelector(state => state.accountDoctor.user);
-
+    console.log("User", user); // Kiểm tra thông tin người dùng
 
     const fetchOrders = async () => {
         if (!user?.maBacSi) return;
@@ -153,8 +157,9 @@ const QuanLyLichHen = () => {
         paginateData();
     }, [originalData, current, pageSize, searchValue, selectedStatus]);
     
-    
 
+
+    
     // Cập nhật trạng thái lịch khám
     const handleStatusChange = async (value, record) => {
         const statusMapping = {
@@ -197,7 +202,6 @@ const QuanLyLichHen = () => {
             lyDoKham: record.lyDoKham
         });
     };
-    
 
     const getStatusTagThanhToan = (trangThaiThanhToan) => {
         if (trangThaiThanhToan === "Đã thanh toán") {
@@ -247,7 +251,7 @@ const QuanLyLichHen = () => {
         },
         {
             title: "Chức năng", render: (_, record) => (
-                <div>
+                <div style={{ display: "flex", gap: "10px" }}>
                     <Tooltip title="Xem chi tiết" style={{ marginRight: 10 }}>
                         <FaEye
                             style={{ color: "green", cursor: "pointer", fontSize: "18px" }}
@@ -266,6 +270,36 @@ const QuanLyLichHen = () => {
                         <RiEdit2Fill
                             style={{ color: "orange", cursor: "pointer", fontSize: "18px" }}
                             onClick={() => handleEditClick(record)} // Mở modal khi bấm vào bút
+                        />
+                    </Tooltip>
+
+                    {/* Nút gọi video */}
+                    <Tooltip title="Gọi video">
+                        <BsCameraVideoFill
+                        style={{
+                            color: "#1890ff",
+                            cursor: "pointer",
+                            fontSize: 18,
+                        }}
+                        onClick={() => {
+                            const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${record.maLich}&patientId=${record.maBenhNhan}&doctorId=${record.maBacSi}&currentUserID=${user?.maBacSi}&currentRole=${user?.tenVaiTro}`;
+                            window.open(videoCallUrl, "_blank"); // Mở ở tab mới
+                        }}
+                        />
+                    </Tooltip>
+
+                    {/* Nút nhắn tin */}
+                    <Tooltip title="Nhắn tin">
+                        <IoChatbubbleEllipsesSharp
+                        style={{
+                            color: "#52c41a",
+                            cursor: "pointer",
+                            fontSize: 18,
+                        }}
+                        onClick={() => {
+                            const chatUrl = `http://localhost:3003/chat?appointmentId=${record.maLich}&patientId=${record.maBenhNhan}&doctorId=${record.maBacSi}&currentUserID=${user?.maBacSi}&currentRole=${user?.tenVaiTro}`;
+                            window.open(chatUrl, "_blank"); // Mở ở tab mới
+                        }}
                         />
                     </Tooltip>
                 </div>

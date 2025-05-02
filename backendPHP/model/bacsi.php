@@ -81,8 +81,9 @@
                 return ["error" => "Không thể kết nối database"];
             }
             try {
-                $query = $pdo->prepare("SELECT bs.maBacSi, bs.hoTen, bs.gioiTinh, bs.ngaySinh, bs.soDienThoai, bs.email, bs.diaChi, bs.giaKham, bs.hinhAnh, bs.moTa, bs.maKhoa, k.tenKhoa,tk.maTaiKhoan, tk.username, tk.matKhau, GROUP_CONCAT(DISTINCT llv.ngayLamViec) AS danhSachNgayLamViec
+                $query = $pdo->prepare("SELECT bs.maBacSi, bs.hoTen, bs.gioiTinh, bs.ngaySinh, bs.soDienThoai, bs.email, bs.diaChi, bs.giaKham, bs.hinhAnh, bs.moTa, bs.maKhoa, k.tenKhoa,tk.maTaiKhoan, tk.username, tk.matKhau, vt.tenVaiTro, GROUP_CONCAT(DISTINCT llv.ngayLamViec) AS danhSachNgayLamViec
                                         FROM bacsi bs join khoa k on bs.maKhoa = k.maKhoa join taiKhoan tk on bs.maTaiKhoan = tk.maTaiKhoan
+                                        JOIN vaitro vt ON tk.maVaiTro = vt.maVaiTro
                                         LEFT JOIN lichlamviec llv ON bs.maBacSi = llv.maBacSi WHERE bs.maBacSi = :id GROUP BY bs.maBacSi");
                 $query->bindParam(":id", $id, PDO::PARAM_INT);
                 $query->execute();

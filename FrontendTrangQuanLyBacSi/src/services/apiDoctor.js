@@ -350,3 +350,15 @@ export const updateTTPhieuKhamBenh = (idPhieuKham, tienSu, chuanDoan, lyDoKham) 
   );
 };
 
+export const  createConsultationRoom = async (doctorInfo, patientInfo) => {
+  try {
+      const res = await axios.post('/api/message.php?action=tao-phong-tu-van', {
+          doctorInfo,
+          patientInfo
+      });
+      return res;  // Đảm bảo trả về res.data (chứ không phải res)
+  } catch (error) {
+      throw new Error('Không thể tạo phòng tư vấn hoặc gửi email.');
+  }
+};
+

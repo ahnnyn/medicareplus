@@ -3,6 +3,7 @@ $allowed_origins = [
     'http://localhost:3000',
     'http://localhost:3003',
     'http://localhost:3001',
+    
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {

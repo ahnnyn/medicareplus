@@ -19,9 +19,10 @@
         
             try {
                 $query = $pdo->prepare("
-                    SELECT bn.*, tk.*, hs.maHoSo 
+                    SELECT bn.*, tk.*, hs.maHoSo, vt.tenVaiTro
                     FROM benhnhan bn
                     JOIN taikhoan tk ON bn.maTaiKhoan = tk.maTaiKhoan
+                    JOIN vaitro vt ON tk.maVaiTro = vt.maVaiTro
                     LEFT JOIN hosobenhnhan hs ON bn.maBenhNhan = hs.maBenhNhan
                     WHERE bn.maBenhNhan = :id
                     LIMIT 1
