@@ -59,7 +59,7 @@ const ChatList = () => {
         <img src={getAvatarUrl()} alt="avatar" />
         <div className="texts">
           <span>{targetUser?.hoTen || "Đang tải..."}</span>
-          <p>Xin chào</p>
+          <p></p>
         </div>
       </div>
     </div>

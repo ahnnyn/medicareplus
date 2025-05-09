@@ -3,27 +3,6 @@ include("../model/message.php");
 
 class cMessage {
 
-    public function createTroChuyen() {
-        $p = new mMessage();
-        $result = $p->taoTroChuyen();
-    
-        echo json_encode($result);
-    }
-    
-
-    public function getTroChuyen($cuoctrochuyen_id) {
-        $p = new mMessage();
-        $result = $p->layTroChuyen($cuoctrochuyen_id);
-
-        if (isset($result["error"])) {
-            echo json_encode(["error" => $result["error"]]);
-            return;
-        }
-
-        return json_encode($result);
-
-
-    }
 
     public function saveTinNhan(){
         $p = new mMessage();
@@ -33,22 +12,26 @@ class cMessage {
             echo json_encode(["error" => $result["error"]]);
             return;
         }
-
         return json_encode($result);
 
     }
 
-    public function endTroChuyen(){
+    public function fetchTinNhan($lichhen_id) {
         $p = new mMessage();
-        $result = $p->ketThucTroChuyen();
-
+        $result = $p->layTinNhan($lichhen_id);
+        
         if (isset($result["error"])) {
-            echo json_encode(["error" => $result["error"]]);
+            echo json_encode(["success" => false, "error" => $result["error"]]);
             return;
         }
-
-        return json_encode($result);
+    
+        echo json_encode([
+            "success" => true,
+            "data" => $result
+        ]);
     }
+    
+    
 
 }
 

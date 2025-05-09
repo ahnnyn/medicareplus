@@ -1,9 +1,6 @@
 <?php
 include("../config/database.php");
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/autoload.php'; // Nếu bạn sử dụng Composer
 class mMessage {
     
     private $pdo;
@@ -12,166 +9,74 @@ class mMessage {
         $db = new connectdatabase();
         $this->pdo = $db->connect();
     }
-
-    // Tạo cuộc trò chuyện mới
-    public function taoTroChuyen() {
-        if (!$this->pdo) {
-            return ['success' => false, 'message' => 'Không thể kết nối database'];
-        }
-    
-        // Lấy dữ liệu từ POST (đảm bảo dữ liệu đúng)
-        $doctorInfo = json_decode(file_get_contents("php://input"), true)["doctorInfo"];
-        $patientInfo = json_decode(file_get_contents("php://input"), true)["patientInfo"];
-    
-        // Kiểm tra thông tin bác sĩ và bệnh nhân
-        if (!$doctorInfo['maBacSi'] || !$patientInfo['emailBenhNhan']) {
-            return ['success' => false, 'message' => 'Thông tin bác sĩ hoặc bệnh nhân không hợp lệ'];
-        }
-    
-        $start_time = date("Y-m-d H:i:s");
-        $status = 'in_progress';
-    
-        try {
-            // Thêm cuộc trò chuyện vào database
-            $query = $this->pdo->prepare("INSERT INTO cuoctrochuyen (bacsi_id, benhnhan_id, start_time, status) 
-                                          VALUES (:bacsi_id, :benhnhan_id, :start_time, :status)");
-    
-            // Liên kết tham số
-            $query->bindParam(':bacsi_id', $doctorInfo['maBacSi']);
-            $query->bindParam(':benhnhan_id', $patientInfo['hoTenBenhNhan']); // Có thể cần sửa để lấy ID bệnh nhân
-            $query->bindParam(':start_time', $start_time);
-            $query->bindParam(':status', $status);
-    
-            if ($query->execute()) {
-                $cuoctrochuyen_id = $this->pdo->lastInsertId();
-    
-                // Gửi email cho bệnh nhân
-                $this->guiEmailThongBao($patientInfo['emailBenhNhan'], $cuoctrochuyen_id, $start_time);
-    
-                return [
-                    'success' => true,
-                    'cuoctrochuyen_id' => $cuoctrochuyen_id,
-                    'start_time' => $start_time,
-                    'status' => $status
-                ];
-            } else {
-                return ['success' => false, 'message' => 'Tạo cuộc trò chuyện thất bại'];
-            }
-        } catch (PDOException $e) {
-            return ['success' => false, 'message' => 'Lỗi: ' . $e->getMessage()];
-        }
-    }
-    
-    
-    // Hàm gửi email
-    private function guiEmailThongBao($benhnhan_id, $cuoctrochuyen_id, $start_time) {
-        $query = $this->pdo->prepare("SELECT email FROM benhnhan WHERE id = :benhnhan_id");
-        $query->bindParam(':benhnhan_id', $benhnhan_id);
-        $query->execute();
-        $benhnhan = $query->fetch(PDO::FETCH_ASSOC);
-    
-        if (!$benhnhan) {
-            return false;
-        }
-    
-        $mail = new PHPMailer(true);
-    
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.example.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = 'your-email@example.com';
-            $mail->Password = 'your-email-password';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
-    
-            $mail->setFrom('your-email@example.com', 'Hệ thống Tư vấn');
-            $mail->addAddress($benhnhan['email']);
-            $mail->isHTML(true);
-            $mail->Subject = 'Thông báo tạo phòng trò chuyện';
-            $mail->Body = 'Chào bạn, <br>Cuộc trò chuyện với bác sĩ đã được tạo thành công. <br>ID: ' . $cuoctrochuyen_id . '<br>Thời gian bắt đầu: ' . $start_time . '<br>Chúc bạn sức khỏe!';
-    
-            $mail->send();
-            return true;
-        } catch (Exception $e) {
-            // Không echo lỗi, chỉ return false
-            return false;
-        }
-    }
-    
-
-    // Lấy thông tin cuộc trò chuyện
-    public function layTroChuyen($cuoctrochuyen_id) {
-        if (!$this->pdo) {
-            return ["error" => "Không thể kết nối database"];
-        }
-
-        try {
-            $query = $this->pdo->prepare("SELECT * FROM cuoctrochuyen WHERE id = :id");
-            $query->bindParam(":id", $cuoctrochuyen_id);
-            $query->execute();
-            return $query->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
-        }
-    }
-
-    // Lưu tin nhắn
     public function luuTinNhan() {
-        if (!$this->pdo) {
-            return ["error" => "Không thể kết nối database"];
-        }
-
+        if (!$this->pdo) return ["error" => "Không thể kết nối database"];
+    
         try {
-            $cuoctrochuyen_id = $_POST['cuoctrochuyen_id'];
-            $nguoigui = $_POST['nguoigui'];
-            $noidung = $_POST['noidung'];
-            $loaitinnhan = $_POST['loaitinnhan']; // dạng text, image, file, video
-            $thoigian = date("Y-m-d H:i:s");
-
-            $query = $this->pdo->prepare("INSERT INTO tinnhan (cuoctrochuyen_id, nguoigui, noidung, loaitinnhan, thoigian) 
-                VALUES (:cuoctrochuyen_id, :nguoigui, :noidung, :loaitinnhan, :thoigian)");
-            $query->bindParam(":cuoctrochuyen_id", $cuoctrochuyen_id);
-            $query->bindParam(":nguoigui", $nguoigui);
-            $query->bindParam(":noidung", $noidung);
-            $query->bindParam(":loaitinnhan", $loaitinnhan);
-            $query->bindParam(":thoigian", $thoigian);
-
-            if ($query->execute()) {
-                return ["success" => "Tin nhắn đã được lưu thành công"];
-            } else {
-                return ["error" => "Lỗi khi lưu tin nhắn"];
+            // Nhận dữ liệu JSON từ body request
+            $data = json_decode(file_get_contents("php://input"), true);
+    
+            // Lấy các giá trị từ JSON
+            $lichhen_id = $data['lichhen_id'] ?? null;
+            $nguoigui_id = $data['nguoigui_id'] ?? null;
+            $role = $data['role'] ?? null;
+            $noidung = $data['noidung'] ?? '';
+            $loaitinnhan = $data['loaitinnhan'] ?? 'text';
+            $file_url = $data['file_url'] ?? null;
+            $thoigian = $data['thoigian'] ?? date("Y-m-d H:i:s");
+    
+            // Kiểm tra đầu vào
+            if (empty($lichhen_id) || empty($nguoigui_id) || empty($role)) {
+                return ["error" => "Thiếu thông tin bắt buộc (appointmentId, senderId, role)"];
             }
+    
+            $validRoles = ['bacsi', 'benhnhan'];
+            $validTypes = ['text', 'file', 'image', 'video'];
+    
+            if (!in_array($role, $validRoles) || !in_array($loaitinnhan, $validTypes)) {
+                return ["error" => "Giá trị 'role' hoặc 'loaitinnhan' không hợp lệ"];
+            }
+    
+            $query = $this->pdo->prepare("
+                INSERT INTO tinnhan (lichhen_id, nguoigui_id, role, noidung, loaitinnhan, file_url, thoigian)
+                VALUES (:lichhen_id, :nguoigui_id, :role, :noidung, :loaitinnhan, :file_url, :thoigian)
+            ");
+    
+            $query->bindParam(":lichhen_id", $lichhen_id, PDO::PARAM_INT);
+            $query->bindParam(":nguoigui_id", $nguoigui_id, PDO::PARAM_INT);
+            $query->bindParam(":role", $role, PDO::PARAM_STR);
+            $query->bindParam(":noidung", $noidung, PDO::PARAM_STR);
+            $query->bindParam(":loaitinnhan", $loaitinnhan, PDO::PARAM_STR);
+            $query->bindParam(":file_url", $file_url, PDO::PARAM_STR);
+            $query->bindParam(":thoigian", $thoigian, PDO::PARAM_STR);
+    
+            $query->execute();
+            return ["success" => true];
+    
         } catch (PDOException $e) {
+            error_log("Lỗi khi lưu tin nhắn: " . $e->getMessage());
             return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
         }
     }
+    
+    
+      
 
-    // Kết thúc cuộc trò chuyện
-    public function ketThucTroChuyen() {
-        if (!$this->pdo) {
-            echo json_encode(['success' => false, 'message' => 'Không thể kết nối database']);
-            return;
-        }
+public function layTinNhan($lichhen_id) {
+    if (!$this->pdo) return ["error" => "Không thể kết nối database"];
 
-        $cuoctrochuyen_id = $_POST['cuoctrochuyen_id'];
-        $end_time = date("Y-m-d H:i:s");
-        $status = 'completed';
-
-        try {
-            $query = $this->pdo->prepare("UPDATE cuoctrochuyen SET end_time = :end_time, status = :status WHERE id = :id");
-            $query->bindParam(":end_time", $end_time);
-            $query->bindParam(":status", $status);
-            $query->bindParam(":id", $cuoctrochuyen_id);
-
-            if ($query->execute()) {
-                echo ['success' => true];
-            } else {
-                echo ['success' => false];
-            }
-        } catch (PDOException $e) {
-            echo ['success' => false, 'message' => 'Lỗi: ' . $e->getMessage()];
-        }
+    try {
+        $query = $this->pdo->prepare("SELECT * FROM tinnhan WHERE lichhen_id = :lichhen_id ORDER BY thoigian ASC");
+        $query->bindParam(":lichhen_id", $lichhen_id);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
     }
+}
+
+    
+
+
 }
 ?>

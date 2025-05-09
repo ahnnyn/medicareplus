@@ -3,6 +3,7 @@ $allowed_origins = [
     'http://localhost:3000',
     'http://localhost:3002',
     'http://localhost:3001',
+    'http://localhost:3003',
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins)) {
@@ -22,12 +23,19 @@ $p = new cMessage();
 
 if (isset($_GET["action"])) {
     switch ($_GET["action"]) {
-        case "tao-phong-tu-van":
-            $p->createTroChuyen();
+        case "luu-tin-nhan":
+            $p->saveTinNhan();
             break;
-        
-            default:
-                echo json_encode(["error" => "Thao tác không hợp lệ"]);
+        case "lay-tin-nhan":
+            $lichhen_id = $_GET["appointmentId"] ?? null;
+            if (!$lichhen_id) {
+                echo json_encode(["error" => "Thiếu appointmentId"]);
+                return;
+            }
+            $p->fetchTinNhan($lichhen_id);
+            break;
+        default:
+            echo json_encode(["error" => "Thao tác không hợp lệ"]);
         }
 } else {
     echo json_encode(["error" => "Thiếu tham số action"]);

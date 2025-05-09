@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import EmojiPicker from "emoji-picker-react";
+import { Download } from "lucide-react";
+
 import { format } from "timeago.js";
-import { fetchOneAccKH, fetchBacSiByMaBS } from "../../services/api";
+import { fetchOneAccKH, fetchBacSiByMaBS, callUploadChatFile, saveMessage, fetchMessages } from "../../services/api";
 import { useSearchParams } from "react-router-dom";
 import "./Chat.css";
 
@@ -63,48 +65,207 @@ const Chat = () => {
     };
   }, [currentUserID]);
 
-  // Gửi tin nhắn
-  const handleSendMessage = () => {
-    if (text.trim() !== "") {
-      const newMessage = {
-        senderId: currentUserID,
-        receiverId: currentUserRole === "benhnhan" ? doctorId : patientId,
-        text: text,
-        img: img.url || null,
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const res = await fetchMessages(appointmentId);
+        if (res.success && Array.isArray(res.data)) {
+          const formattedMessages = res.data.map((msg) => {
+            const isImage = msg.loaitinnhan === "image";
+            const isFile = msg.loaitinnhan === "file";
+          
+            return {
+              senderId: msg.nguoigui_id,
+              receiverId: currentUserRole === "benhnhan" ? doctorId : patientId,
+              text: msg.noidung,
+              img: isImage ? msg.file_url : null,
+              file_url: isFile ? msg.file_url : null,
+              createdAt: msg.thoigian,
+              role: msg.role,
+            };
+          });
+          
+          setChatMessages(formattedMessages);
+        } else {
+          console.warn("Không lấy được tin nhắn từ API");
+        }
+
+      } catch (err) {
+        console.error("Lỗi khi lấy tin nhắn:", err);
+      }
+    };
+  
+    if (appointmentId) {
+      getMessages();
+    }
+  }, [appointmentId, currentUserRole, doctorId, patientId]);
+  
+
+  useEffect(() => {
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+  
+
+  const handleSendMessage = async () => {
+    if (text.trim() !== "" || img.file) {
+      const receiverId = currentUserRole === "benhnhan" ? doctorId : patientId;
+      const now = new Date().toISOString();
+  
+      // Thiết lập tin nhắn cơ bản, ban đầu lấy nội dung là text (nếu có)
+      const baseMessage = {
+        nguoigui_id: currentUserID,
+        role: currentUserRole,
+        lichhen_id: appointmentId,
+        noidung: text, // Nếu không có text, sau này sẽ cập nhật thành filename
+        file_url: null,
+        loaitinnhan: img.file ? "image" : "text", // tạm thời set là "text" nếu không có file
+        thoigian: now,
       };
-
-      // Gửi qua socket
-      socket.emit("sendMessage", newMessage);
-
-      // Hiển thị local ngay
-      setChatMessages((prev) => [
-        ...prev,
-        { ...newMessage, createdAt: new Date() },
-      ]);
-      setText("");
-      setImg({ file: null, url: "" });
-      setEmojiOpen(false);
+  
+      // Payload gửi qua socket
+      let socketPayload = {
+        senderId: currentUserID,
+        receiverId,
+        text: text || null, // Nếu không có text, sẽ cập nhật thành filename nếu gửi file
+        img: null,
+        createdAt: now,
+        role: currentUserRole,
+      };
+  
+      try {
+        // Nếu có file, upload file trước
+        if (img.file) {
+          const res = await callUploadChatFile(img.file);
+          const data = res;
+          if (!data?.url) throw new Error("Lỗi upload file");
+  
+          baseMessage.file_url = data.url;
+          console.log("File URL:", data.url);
+          // Kiểm tra xem file upload có phải ảnh không:
+          const isImage = /^image\//.test(data.type);
+  
+          // Cập nhật loại tin nhắn: "image" nếu là ảnh, "file" nếu không phải ảnh
+          baseMessage.loaitinnhan = isImage ? "image" : "file";
+  
+          // Nếu người dùng không nhập text, dùng tên file để lưu nội dung cho tin nhắn
+          if (!text.trim()) {
+            baseMessage.noidung = data.filename;
+          }
+  
+          // Cập nhật socketPayload:
+          socketPayload.img = isImage ? data.url : null;
+          socketPayload.text = text.trim() || data.filename;
+          socketPayload.file_url = data.url;
+        }
+        
+        // Nếu không có file thì vẫn là tin nhắn văn bản
+        if (!img.file) {
+          socketPayload.img = null;
+        }
+  
+        // Gửi tin nhắn qua socket để hiển thị ngay cho cả hai bên
+        socket.emit("sendMessage", socketPayload);
+        setChatMessages((prev) => [...prev, socketPayload]);
+        // Reset giao diện
+        setText("");
+        setImg({ file: null, url: "" });
+        setEmojiOpen(false);
+  
+        // Lưu tin nhắn vào DB
+        const saveRes = await saveMessage(baseMessage);
+        if (!saveRes.success) throw new Error(saveRes.error || "Lỗi lưu DB");
+      } catch (err) {
+        console.error("Lỗi gửi/lưu tin nhắn:", err);
+        // Optional: roll back UI nếu cần
+      }
     }
   };
-
+  
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
   };
 
-  const handleImg = (e) => {
-    if (e.target.files[0]) {
-      setImg({
-        file: e.target.files[0],
-        url: URL.createObjectURL(e.target.files[0]),
-      });
+  const handleImg = async (e, type) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+  
+    const isImage = /^image\//.test(selectedFile.type);
+  
+    if (type === "image" && !isImage) {
+      alert("Chỉ được chọn file ảnh!");
+      return;
+    }
+  
+    if (type === "file" && isImage) {
+      alert("Chỉ được chọn file tài liệu!");
+      return;
+    }
+  
+    const previewUrl = isImage ? URL.createObjectURL(selectedFile) : "";
+  
+    // Cập nhật ảnh đã chọn (chỉ để preview tạm thời nếu là ảnh)
+    setImg({
+      file: selectedFile,
+      url: previewUrl,
+    });
+  
+    // Gửi tin nhắn tự động
+    try {
+      const receiverId = currentUserRole === "benhnhan" ? doctorId : patientId;
+      const now = new Date().toISOString();
+  
+      const uploadRes = await callUploadChatFile(selectedFile);
+      const data = uploadRes;
+      if (!data?.url) throw new Error("Lỗi upload file");
+  
+      const isImageFile = /^image\//.test(data.type);
+      const fileUrl = data.url;
+      const displayName = text || data.filename;
+  
+      const socketPayload = {
+        senderId: currentUserID,
+        receiverId,
+        text: displayName,
+        img: isImageFile ? fileUrl : null,
+        file_url: fileUrl,
+        createdAt: now,
+        role: currentUserRole,
+      };
+  
+      const baseMessage = {
+        nguoigui_id: currentUserID,
+        role: currentUserRole,
+        lichhen_id: appointmentId,
+        noidung: displayName,
+        file_url: fileUrl,
+        loaitinnhan: isImageFile ? "image" : "file",
+        thoigian: now,
+      };
+  
+      socket.emit("sendMessage", socketPayload);
+      setChatMessages((prev) => [...prev, socketPayload]);
+      setText("");
+      setImg({ file: null, url: "" });
+      setEmojiOpen(false);
+  
+      const saveRes = await saveMessage(baseMessage);
+      if (!saveRes.success) throw new Error(saveRes.error || "Lỗi lưu DB");
+    } catch (err) {
+      console.error("Lỗi gửi/lưu file:", err);
     }
   };
+  
+  
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault(); // Ngăn form submit hoặc reload
       handleSendMessage();
     }
   };
+  
 
   const avatarUrl = (user) => {
     if (!user || !user.hinhAnh) return "./avatar.png";
@@ -130,36 +291,102 @@ const Chat = () => {
       </div>
 
       <div className="center">
-        {chatMessages.map((msg, index) => (
-          <div
-            key={index}
-            ref={scrollRef}
-            className={msg.senderId === currentUserID ? "message own" : "message"}
-          >
-            <div className="texts">
-              {msg.img && <img src={msg.img} alt="img" />}
-              <p>{msg.text}</p>
-              <span>{format(msg.createdAt)}</span>
-            </div>
-          </div>
-        ))}
-        {img.url && (
-          <div className="message own">
-            <div className="texts">
-              <img src={img.url} alt="preview" />
-            </div>
-          </div>
-        )}
-      </div>
+        {chatMessages.map((msg, index) => {
+          const isOwn = msg.senderId === currentUserID;
+          const fileName = decodeURIComponent(msg.text || msg.file_url?.split("/").pop());
 
+          return (
+            <div
+              key={index}
+              ref={scrollRef}
+              className={isOwn ? "message own" : "message"}
+            >
+              <div className="texts">
+                {/* Hiển thị hình ảnh nếu có */}
+                {msg.img && (
+                  <img
+                    src={
+                      msg.img.startsWith("http")
+                        ? msg.img
+                        : import.meta.env.VITE_BACKEND_URL + msg.img
+                    }
+                    alt="chat-img"
+                    className="chat-image"
+                    style={{ maxWidth: "300px", borderRadius: "8px" }}
+                  />
+                )}
+
+                {/* Hiển thị file nếu là tài liệu */}
+                {(() => {
+                  if (msg.img) {
+                    return (
+                      <img
+                        src={
+                          msg.img.startsWith("http")
+                            ? msg.img
+                            : import.meta.env.VITE_BACKEND_URL + msg.img
+                        }
+                        alt="chat-img"
+                        className="chat-image"
+                        style={{ maxWidth: "300px", borderRadius: "8px" }}
+                      />
+                    );
+                  } else if (msg.file_url) {
+                    return (
+                      <div className="file-message" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ wordBreak: "break-word", color: "#007bff" }}>
+                          📎 {fileName}
+                        </span>
+                        <a
+                          href={import.meta.env.VITE_BACKEND_URL + msg.file_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                          title="Tải xuống"
+                        >
+                          <Download size={18} />
+                        </a>
+                      </div>
+                    );
+                  } else if (msg.text) {
+                    return <p>{msg.text}</p>;
+                  } else {
+                    return null;
+                  }
+                })()}
+
+                <span>{format(msg.createdAt)}</span>
+              </div>
+            </div>
+          );
+        })}
+    </div>
       <div className="bottom">
         <div className="icons">
-          <label htmlFor="file">
-            <img src="./img.png" alt="upload" />
+          {/* Gửi ảnh */}
+          <label htmlFor="img-upload">
+            <img src="./img.png" alt="upload-image" title="Gửi ảnh" />
           </label>
-          <input type="file" id="file" style={{ display: "none" }} onChange={handleImg} />
-          <img src="./camera.png" alt="" />
-          <img src="./mic.png" alt="" />
+          <input
+            type="file"
+            id="img-upload"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => handleImg(e, "image")}
+          />
+
+          {/* Gửi file */}
+          <label htmlFor="file-upload">
+            <img src="./attach_file_24dp_FFFF.png" alt="upload-file" title="Gửi file" />
+          </label>
+          <input
+            type="file"
+            id="file-upload"
+            style={{ display: "none" }}
+            onChange={(e) => handleImg(e, "file")}
+          />
+          {/* <img src="./camera.png" alt="" />
+          <img src="./mic.png" alt="" /> */}
         </div>
         <input
           type="text"
