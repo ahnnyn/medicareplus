@@ -272,7 +272,7 @@ useEffect(() => {
                     </Col>   
                     <Col span={24}>
                         <span style={{marginLeft: "15px"}}> 
-                            <div style={{marginTop: "-25px", marginLeft: "10px"}} dangerouslySetInnerHTML={{ __html: dataChuyenKhoaByID?.moTa }} />
+                            <div style={{marginTop: "15px", marginLeft: "10px", fontSize: "17px"}} dangerouslySetInnerHTML={{ __html: dataChuyenKhoaByID?.moTa }} />
                         </span>
                     </Col>                                                           
                 </Row>

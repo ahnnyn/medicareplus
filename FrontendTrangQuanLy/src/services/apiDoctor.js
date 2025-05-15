@@ -299,7 +299,8 @@ export const updateThongTinlichKham = (maBacSi, maLichKham, trangThai) => {
   return axios.put(`/api/lichkham.php?action=update-trang-thai-lich-kham&maBacSi=${maBacSi}&maLichKham=${maLichKham}&trangThai=${trangThai}`);
 };
 
-export const taoPhieuKhamBenh = (idHoSo, idBS, idLK, hoTen, ngayKham, khungGio, tienSu, chuanDoan, lyDoKham) => {
+export const taoPhieuKhamBenh = (idHoSo, idBS, idLK, hoTen, ngayKham, khungGio, tienSu, chuanDoan, lyDoKham, danhSachDonThuoc) => {
+  console.log('danhSachDonThuoc', danhSachDonThuoc);
   return axios.post('/api/phieukhambenh.php?action=tao-phieu-kham', {
     idHoSo,
     idBS,
@@ -309,7 +310,8 @@ export const taoPhieuKhamBenh = (idHoSo, idBS, idLK, hoTen, ngayKham, khungGio, 
     khungGio,
     tienSu,
     chuanDoan,
-    lyDoKham
+    lyDoKham,
+    danhSachDonThuoc
   }, {
     headers: {
       'Content-Type': 'application/json' // Đảm bảo gửi với Content-Type là application/json
@@ -333,14 +335,15 @@ export const fetchLayTTPhieuKhamBenh = (idLK,ngayKham, khungGio) => {
   );
 };
 
-export const updateTTPhieuKhamBenh = (idPhieuKham, tienSu, chuanDoan, lyDoKham) => {
+export const updateTTPhieuKhamBenh = (idPhieuKham, tienSu, chuanDoan, lyDoKham, danhSachDonThuoc) => {
   return axios.post(
     '/api/phieukhambenh.php?action=cap-nhat-thong-tin-phieu-kham',
     {
       idPhieuKham,
       tienSu,
       chuanDoan,
-      lyDoKham
+      lyDoKham,
+      danhSachDonThuoc
     },
     {
       headers: {

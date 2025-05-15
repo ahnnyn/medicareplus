@@ -257,8 +257,6 @@ const Chat = () => {
     }
   };
   
-  
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // Ngăn form submit hoặc reload
@@ -266,7 +264,6 @@ const Chat = () => {
     }
   };
   
-
   const avatarUrl = (user) => {
     if (!user || !user.hinhAnh) return "./avatar.png";
     const isDoctor = Object.prototype.hasOwnProperty.call(user, "maBacSi");

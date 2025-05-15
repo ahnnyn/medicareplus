@@ -3,13 +3,17 @@ import {
   Col,
   Form,
   Input,
+  InputNumber,
   message,
   notification,
   Row,
   Modal,
+  Card,
+  Tag,
 } from "antd";
 import { useEffect, useState } from "react";
 import { FaSave } from "react-icons/fa";
+import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchBacSiByMaBS, fetchLayTTPhieuKhamBenh, updateTTPhieuKhamBenh } from "../../services/apiDoctor";
@@ -86,7 +90,8 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
       ngayKham: editingRecord?.ngayKham || '',
       tienSu: editingRecord?.tienSu || '',
       chuanDoan: editingRecord?.chuanDoan || '',
-      lyDoKham: editingRecord?.lyDoKham || ''
+      lyDoKham: editingRecord?.lyDoKham || '',
+      donThuoc: editingRecord?.danhSachDonThuoc || []
     };
     
     // Set form values từ editingRecord nếu có
@@ -94,7 +99,9 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
   }
 
   // Nếu đã có dataPhieuKham, thì update lại các giá trị trong form
-  if (dataPhieuKham && typeof dataPhieuKham === 'object' && dataPhieuKham.maPhieu) {
+  if (dataPhieuKham && typeof dataPhieuKham === 'object' && dataPhieuKham?.maPhieu && dataPhieuKham?.maDonThuoc) {
+    const donThuoc = dataPhieuKham?.maDonThuoc ? dataPhieuKham?.danhSachDonThuoc : [];
+
     formPhieuKham.setFieldsValue({
       idPK: dataPhieuKham?.maPhieu,
       idHoSo: dataPhieuKham?.maHoSo,
@@ -105,7 +112,8 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
       ngayKham: dataPhieuKham?.ngayKham,
       tienSu: dataPhieuKham?.tienSu,
       chuanDoan: dataPhieuKham?.chanDoan,
-      lyDoKham: dataPhieuKham?.lyDoKham
+      lyDoKham: dataPhieuKham?.lyDoKham,
+      donThuoc: donThuoc // Chỉ gán nếu maDonThuoc tồn tại
     });
   }
 }, [editingRecord, dataAccBS, dataPhieuKham]);
@@ -118,11 +126,20 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
       const maHoSo = parseInt(values.idHoSo, 10);
       const maBacSi = parseInt(values.idBS, 10);
       const maLichKham = parseInt(values.idLK, 10);
-  
-      if (isNaN(maHoSo) || isNaN(maBacSi)) {
+      const danhSachDonThuoc = values.donThuoc || [];
+      console.log("Danh sách đơn thuốc: ", danhSachDonThuoc);
+      if (!values.idHoSo || isNaN(values.idHoSo)) {
         notification.error({
-          message: "❌ Tạo phiếu khám thất bại!",
-          description: "Mã hồ sơ hoặc mã bác sĩ không hợp lệ.",
+          message: "Mã hồ sơ không hợp lệ!",
+          description: "Vui lòng kiểm tra lại mã hồ sơ.",
+        });
+        return;
+      }
+
+      if (!values.idBS || isNaN(values.idBS)) {
+        notification.error({
+          message: "Mã bác sĩ không hợp lệ!",
+          description: "Vui lòng kiểm tra lại mã bác sĩ.",
         });
         return;
       }
@@ -136,7 +153,8 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
         ngayKham: values.ngayKham,
         tienSu: values.tienSu,
         chuanDoan: values.chuanDoan,
-        lyDoKham: values.lyDoKham
+        lyDoKham: values.lyDoKham,
+        donThuoc: danhSachDonThuoc
       });
   
       // Gửi request để tạo mới hoặc cập nhật phiếu khám
@@ -147,7 +165,8 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
           dataPhieuKham.maPhieu, // id phiếu khám
           values.tienSu,
           values.chuanDoan,
-          values.lyDoKham
+          values.lyDoKham,
+          danhSachDonThuoc
         );
       } else {
         // Nếu phiếu khám chưa tồn tại, tạo mới
@@ -160,14 +179,12 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
           values.khungGio,
           values.tienSu,
           values.chuanDoan,
-          values.lyDoKham
+          values.lyDoKham,
+          danhSachDonThuoc
         );
       }
   
       let res = result;
-      if (typeof res === "string") {
-        res = JSON.parse(res); // 🔥 ép JSON string thành object
-      }
       if (res && res.status) {
         message.success(res.message || (dataPhieuKham.maPhieu ? "Cập nhật phiếu khám thành công!" : "Tạo phiếu khám thành công!"));
   
@@ -192,7 +209,7 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
         setIsModalOpen(false);
       } else {
         notification.error({
-          message: "❌ Tạo/ Cập nhật phiếu khám thất bại!",
+          message: "Tạo/ Cập nhật phiếu khám thất bại!",
           description: res?.message || "Có lỗi xảy ra, vui lòng thử lại.",
         });
       }
@@ -217,7 +234,8 @@ return (
     visible={isModalOpen}
     onCancel={handleCancel}
     footer={null}
-    width={800}
+    width={1200}
+    bodyStyle={{ maxHeight: '75vh', overflowY: 'auto', overflowX: 'hidden', padding: '10px' }}
   >
     <Form form={formPhieuKham} layout="vertical" onFinish={onFinishTaoPhieuKham}>
       <Row>
@@ -279,6 +297,88 @@ return (
           </Form.Item>
         </Col>
 
+        <hr />
+        <Col span={24}>
+          <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
+            <span style={{ fontWeight: "500", color: "navy" }}>ĐƠN THUỐC</span>
+          </Col>
+          <Form.List name="donThuoc">
+            {(fields, { add, remove }) => (
+              <>
+                <Row gutter={[16, 16]}>
+                  <Col span={24}>
+                    <Button type="dashed" onClick={() => add()} icon={<FaPlus />} style={{ width: "100%", marginBottom: 10 }}>
+                      Thêm thuốc
+                    </Button>
+                  </Col>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Col span={24} key={key}>
+                      <Card size="small" style={{ marginBottom: 10 }}>
+                        <Row gutter={16}>
+                          <Col span={6}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, "tenThuoc"]}
+                              label="Tên thuốc"
+                              rules={[{ required: true, message: "Nhập tên thuốc" }]}
+                            >
+                              <Input placeholder="Paracetamol" />
+                            </Form.Item>
+                          </Col>
+                          <Col span={4}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, "lieuLuong"]}
+                              label="Liều lượng"
+                              rules={[{ required: true, message: "Nhập liều" }]}
+                            >
+                              <Input placeholder="500mg" />
+                            </Form.Item>
+                          </Col>
+                          <Col span={4}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, "soLanDungTrongNgay"]}
+                              label="Số lần/ngày"
+                              rules={[{ required: true, message: "Bắt buộc" }]}
+                            >
+                              <InputNumber min={1} max={10} />
+                            </Form.Item>
+                          </Col>
+                          <Col span={4}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, "soNgayDung"]}
+                              label="Số ngày"
+                              rules={[{ required: true, message: "Bắt buộc" }]}
+                            >
+                              <InputNumber min={1} />
+                            </Form.Item>
+                          </Col>
+                          <Col span={5}>
+                            <Form.Item
+                              {...restField}
+                              name={[name, "ghiChu"]}
+                              label="Ghi chú"
+                            >
+                              <Input placeholder="Sau ăn..." />
+                            </Form.Item>
+                          </Col>
+                          <Col span={1} style={{ display: "flex", alignItems: "center" }}>
+                            <Button type="text" danger icon={<FaTrashAlt />} onClick={() => remove(name)} />
+                          </Col>
+                        </Row>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </>
+            )}
+          </Form.List>
+
+        </Col>
+
+
 
         <Col span={24} style={{ display: "flex", justifyContent: "center" }}>
           <Button
@@ -290,6 +390,7 @@ return (
           >
              {isExistingPhieuKham ? "CẬP NHẬT PHIẾU KHÁM" : "TẠO PHIẾU KHÁM"}
           </Button>
+
         </Col>
       </Row>
     </Form>

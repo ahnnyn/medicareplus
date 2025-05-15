@@ -342,7 +342,7 @@ const QuanLyLichHen = () => {
                         total,
                         showSizeChanger: true,
                         pageSizeOptions: ['3', '5', '10'],
-                        // showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng ${total} lịch khám`,
+                        showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng ${total} lịch khám`,
                         onChange: (page, size) => {
                         setCurrent(page);
                         setPageSize(size);

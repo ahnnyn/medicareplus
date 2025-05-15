@@ -32,9 +32,12 @@ if (isset($_GET["action"])) {
             $tienSu = $data['tienSu'] ?? null;
             $chuanDoan = $data['chuanDoan'] ?? null;
             $lyDoKham = $data['lyDoKham'] ?? null;
+            $donThuoc = $data['danhSachDonThuoc'] ?? null;
+
         
-            $result = $p->taoPhieuKhamMoi($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham);
+            $result = $p->taoPhieuKhamMoi($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham, $donThuoc);
             echo json_encode($result);
+            exit;
             break;
         case "lay-thong-tin-phieu-kham":
             $data = json_decode(file_get_contents("php://input"), true);
@@ -54,8 +57,10 @@ if (isset($_GET["action"])) {
             $tienSu = $data['tienSu'];
             $chuanDoan = $data['chuanDoan'];
             $lyDoKham = $data['lyDoKham'];
+            $donThuoc = $data['danhSachDonThuoc'] ?? null;
+
         
-            $result = $p->updateThongTinPhieuKham($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham);
+            $result = $p->updateThongTinPhieuKham($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham, $donThuoc);
             echo json_encode($result);
             break;
         case "lay-phieu-kham-benh":
