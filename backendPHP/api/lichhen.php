@@ -22,32 +22,50 @@ if (isset($_GET["action"])) {
     switch ($_GET["action"]) {
         case "lich-hen":
             if (isset($_GET["maBenhNhan"]) && !empty($_GET["maBenhNhan"])) { 
-                $p->layDanhSachLichHen($_GET["maBenhNhan"]);
+                $p->getDanhSachLichHen($_GET["maBenhNhan"]);
             } else {
                 echo json_encode(["error" => "Thiếu hoặc sai mã bệnh nhân"]);
             }
             break;
         case 'updateLichHen':
             $data = json_decode(file_get_contents("php://input"), true);
-            // Kiểm tra xem tất cả tham số quan trọng có đủ không
+
             if (
-                isset($data['maBacSi']) && isset($data['ngayKham']) && 
-                isset($data['maKhungGio']) && 
-                isset($data['lyDoKham']) && isset($data['maLich'])
+                !empty($data['maLich']) &&
+                !empty($data['maBacSi']) &&
+                !empty($data['maKhungGio']) &&
+                !empty($data['ngayKham']) &&
+                isset($data['lyDoKham']) &&
+                !empty($data['hinhThucKham'])
             ) {
-                        
-                // Gọi controller để cập nhật thông tin bệnh nhân
                 $result = $p->updateLichHen(
-                    $data['maLich'], $data['maBacSi'], $data['maKhungGio'], $data['ngayKham'], 
-                    $data['lyDoKham']
+                    $data['maLich'],
+                    $data['maBacSi'],
+                    $data['maKhungGio'],
+                    $data['ngayKham'],
+                    $data['lyDoKham'],
+                    $data['hinhThucKham']
                 );
+
                 if (isset($result['success']) && $result['success'] === true) {
-                    echo json_encode(["status" => true, "message" => "Cập nhật lịch hẹn thành công!"]);
+                    http_response_code(200);
+                    echo json_encode([
+                        "status" => true,
+                        "message" => "Cập nhật lịch hẹn thành công!"
+                    ], JSON_UNESCAPED_UNICODE);
                 } else {
-                    echo json_encode(["status" => false, "error" => "Cập nhật lịch hẹn thất bại!"]);
+                    http_response_code(500);
+                    echo json_encode([
+                        "status" => false,
+                        "error" => $result['error'] ?? "Cập nhật lịch hẹn thất bại!"
+                    ], JSON_UNESCAPED_UNICODE);
                 }
             } else {
-                echo json_encode(["status" => false, "error" => "Thiếu thông tin lịch hẹn"]);
+                http_response_code(400);
+                echo json_encode([
+                    "status" => false,
+                    "error" => "Thiếu thông tin lịch hẹn"
+                ], JSON_UNESCAPED_UNICODE);
             }
             break;
         case 'xoaLichHen':
@@ -59,6 +77,8 @@ if (isset($_GET["action"])) {
                 echo json_encode(["success" => false, "message" => "Thiếu mã lịch"]);
             }
             break;
+        
+        
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }

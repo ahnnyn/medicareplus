@@ -63,7 +63,7 @@ class mHoSoBenhNhan {
             $pdo = null;
         }
     }
-    public function updateHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi) {
+    public function capNhatHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi) {
         $p = new connectdatabase();
         $pdo = $p->connect();
         if (!$pdo) {
@@ -97,7 +97,7 @@ class mHoSoBenhNhan {
         }
     }
 
-    public function deleteHoSoBenhNhan($maBenhNhan) {
+    public function xoaHoSoBenhNhan($maBenhNhan) {
         $p = new connectdatabase();
         $pdo = $p->connect();
         if (!$pdo) {

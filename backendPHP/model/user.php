@@ -7,45 +7,98 @@ use Firebase\JWT\JWT;
 class mUser {
     private $secret_key = "your_secret_key"; // Thay bằng key bảo mật của bạn
 
-    public function layThongTinBacSi($username, $matKhau) {
+    public function layThongTinNguoiDung($username, $matKhau) {
         $db = new connectdatabase();
         $pdo = $db->connect();
     
         if ($pdo) {
             try {
                 // Use Prepared Statement to prevent SQL Injection
-                $stmt = $pdo->prepare("SELECT tk.*, bs.*, vt.tenVaiTro FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan JOIN vaitro vt ON vt.maVaiTro = tk.maVaiTro WHERE tk.username = :username");
-                $stmt->bindParam(':username', $username);
-                $stmt->execute();
+                // $stmt = $pdo->prepare("SELECT tk.*, bs.* FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan WHERE tk.username = :username and tk.maVaiTro = 2");
+                // $stmt->bindParam(':username', $username);
+                // $stmt->execute();
                 
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                // $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-                if ($user && password_verify($matKhau, $user['matKhau'])) {
-                    // Remove the password from the user data before returning
-                    unset($user['matKhau']);
+                // if ($user && password_verify($matKhau, $user['matKhau'])) {
+                //     // Remove the password from the user data before returning
+                //     unset($user['matKhau']);
     
-                    // Create payload for JWT
-                    $payload = [
-                        "iat" => time(),
-                        "exp" => time() + 3600, // Token expires after 1 hour
-                        "data" => [
-                            "maTaiKhoan" => $user['maTaiKhoan'],
-                            "username" => $user['username'],
-                        ]
-                    ];
+                //     // Create payload for JWT
+                //     $payload = [
+                //         "iat" => time(),
+                //         "exp" => time() + 3600, // Token expires after 1 hour
+                //         "data" => [
+                //             "maTaiKhoan" => $user['maTaiKhoan'],
+                //             "username" => $user['username'],
+                //         ]
+                //     ];
     
-                    // Generate JWT token
-                    $jwt = JWT::encode($payload, $this->secret_key, 'HS256');
+                //     // Generate JWT token
+                //     $jwt = JWT::encode($payload, $this->secret_key, 'HS256');
     
-                    return [
-                        "success" => true,
-                        "message" => "Đăng nhập thành công",
-                        "user" => $user,
-                        "token" => $jwt
-                    ];
-                } else {
-                    return ["success" => false, "message" => "Sai tài khoản hoặc mật khẩu"];
-                }
+                //     return [
+                //         "success" => true,
+                //         "message" => "Đăng nhập thành công",
+                //         "user" => $user,
+                //         "token" => $jwt
+                //     ];
+                // } else {
+                //     return ["success" => false, "message" => "Sai tài khoản hoặc mật khẩu"];
+                // }
+            $stmt = $pdo->prepare("SELECT * FROM taikhoan WHERE username = :username");
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user || !password_verify($matKhau, $user['matKhau'])) {
+                return ["success" => false, "message" => "Sai tài khoản hoặc mật khẩu"];
+            }
+
+            unset($user['matKhau']);
+
+// Lấy thông tin chi tiết theo vai trò
+if ($user['maVaiTro'] == 2) {
+    // Bác sĩ
+    $stmt = $pdo->prepare("SELECT * FROM bacsi WHERE maTaiKhoan = :maTaiKhoan");
+    $stmt->bindParam(':maTaiKhoan', $user['maTaiKhoan']);
+    $stmt->execute();
+    $detail = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($detail) {
+        $user = array_merge($user, $detail);
+    }
+} elseif ($user['maVaiTro'] == 1) {
+    // Quản trị viên
+    $stmt = $pdo->prepare("SELECT * FROM quantrivien WHERE maTaiKhoan = :maTaiKhoan");
+    $stmt->bindParam(':maTaiKhoan', $user['maTaiKhoan']);
+    $stmt->execute();
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($admin) {
+        $user = array_merge($user, $admin);
+    }
+}
+
+            $payload = [
+                "iat" => time(),
+                "exp" => time() + 3600,
+                "data" => [
+                    "maTaiKhoan" => $user['maTaiKhoan'],
+                    "username" => $user['username'],
+                    "maVaiTro" => $user['maVaiTro']
+                ]
+            ];
+
+            $jwt = JWT::encode($payload, $this->secret_key, 'HS256');
+
+            return [
+                "success" => true,
+                "message" => "Đăng nhập thành công",
+                "user" => $user,
+                "token" => $jwt
+            ];
             } catch (PDOException $e) {
                 return ["success" => false, "message" => "Lỗi hệ thống", "error" => $e->getMessage()];
             }

@@ -26,6 +26,19 @@ if (isset($_GET["action"])) {
         case "getKhungGio":
             $p->getKhungGio();
             break;
+        case "getKhungGioByNgay":
+            $maBacSi = $_GET["maBacSi"] ?? null;
+            $hinhThucKham = $_GET["hinhThucKham"] ?? null;
+            $ngayLamViec = $_GET["ngayLamViec"] ?? null;
+            $maLichDangSua = $_GET["maLichDangSua"] ?? null;
+
+            if (!empty($maBacSi) && !empty($hinhThucKham) && !empty($ngayLamViec)) {
+                $p->getKhungGioTheoNgay($maBacSi, $hinhThucKham, $ngayLamViec, $maLichDangSua);
+            } else {
+                http_response_code(400);
+                echo json_encode(["error" => "Thiếu mã bác sĩ, hình thức khám hoặc ngày làm việc"], JSON_UNESCAPED_UNICODE);
+            }
+            break;
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }

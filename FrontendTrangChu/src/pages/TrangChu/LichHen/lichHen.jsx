@@ -26,7 +26,7 @@ import { IoHomeSharp } from "react-icons/io5";
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
 import Footer from "../../../components/TrangChu/Footer/Footer";
 import { RiEdit2Fill, RiDeleteBin5Line } from "react-icons/ri";
-import { fetchLichKham, deleteLichHen} from "../../../services/apiChuyenKhoaBacSi";
+import { fetchLichKham, deleteLichHen, taoVnPayUrl} from "../../../services/apiChuyenKhoaBacSi";
 
 // ✅ Thêm import 2 modal riêng biệt
 import ModalXemChiTietLichHen from "./ModalXemChiTietLichHen";
@@ -55,8 +55,8 @@ const LichHenCard = () => {
         // Sắp xếp: Hủy xuống cuối, mới nhất lên đầu
         const sorted = res
         .sort((a, b) => {
-          if (a.trangThai === "Hủy" && b.trangThai !== "Hủy") return 1;
-          if (a.trangThai !== "Hủy" && b.trangThai === "Hủy") return -1;
+          if (a.trangThai === "Đã hủy" && b.trangThai !== "Đã hủy") return 1;
+          if (a.trangThai !== "Đã hủy" && b.trangThai === "Đã hủy") return -1;
           // Nếu cùng trạng thái thì so sánh ngày (mới -> cũ)
           return new Date(b.ngayKham) - new Date(a.ngayKham);
         });
@@ -114,13 +114,38 @@ const LichHenCard = () => {
     });
   };
 
+  const handlePayment = async (record) => {
+  try {
+    const res = await taoVnPayUrl(
+      record.maLich,
+      record.giaKham,
+      record.hoTen
+    );
+
+    if (res?.status && res.payment_url) {
+      window.location.href = res.payment_url; // Chuyển sang trang VNPAY
+    } else {
+      notification.error({
+        message: "Lỗi tạo thanh toán",
+        description: res?.message || "Không thể tạo link thanh toán VNPAY.",
+      });
+    }
+  } catch (error) {
+    console.error("Lỗi gọi API VNPAY:", error);
+    notification.error({
+      message: "Lỗi kết nối VNPAY",
+      description: "Không thể kết nối đến máy chủ. Vui lòng thử lại.",
+    });
+  }
+};
+
   const getTrangThaiColor = (status) => {
     switch (status) {
       case "Chờ khám":
         return "processing";
       case "Đã khám":
         return "green";
-      case "Hủy":
+      case "Đã hủy":
         return "red";
       default:
         return "default";
@@ -216,11 +241,31 @@ const LichHenCard = () => {
                           {item.trangThai}
                         </Tag>
                       </Col>
-                      <Col span={12}>
-                        <b>Trạng thái thanh toán:</b>{" "}
-                        <Tag color={getTrangThaiThanhToanColor(item.trangThaiThanhToan)}>
-                          {item.trangThaiThanhToan}
-                        </Tag>
+                      <Col span={12} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div>
+                          <b>Trạng thái thanh toán:</b>{" "}
+                          <Tag color={getTrangThaiThanhToanColor(item.trangThaiThanhToan)}>
+                            {item.trangThaiThanhToan}
+                          </Tag>
+                        </div>
+
+                        {item.trangThai === "Chờ khám" && item.trangThaiThanhToan === "Chưa thanh toán" && (
+                          <Tooltip title="Thanh toán ngay">
+                            <a
+                              style={{
+                                backgroundColor: "#1890ff",
+                                color: "#fff",
+                                padding: "4px 8px",
+                                borderRadius: 4,
+                                fontSize: 12,
+                                textDecoration: "none",
+                              }}
+                              onClick={() => handlePayment(item)}
+                            >
+                              Thanh toán
+                            </a>
+                          </Tooltip>
+                        )}
                       </Col>
                     </Row>
 

@@ -37,7 +37,7 @@ if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case 'getHoSoBenhNhan':
             if (isset($_GET['maBenhNhan'])) {
-                $pd->layHoSoBenhNhan($_GET['maBenhNhan']);
+                $pd->getHoSoBenhNhan($_GET['maBenhNhan']);
             } else {
                 echo json_encode(["error" => "Thiếu hoặc sai mã bệnh nhân"]);
             }
@@ -50,7 +50,7 @@ if (isset($_GET['action'])) {
             $ngheNghiep = $data['ngheNghiep'] ?? null;
             $CCCD = $data['CCCD'] ?? null;
             $diaChi = $data['diaChi'] ?? null;
-            $result = $pd->taoHoSoBenhNhan($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi);
+            $result = $pd->taoHoSo($maBenhNhan, $hoTenBenhNhan, $ngaySinh, $gioiTinh, $ngheNghiep, $CCCD, $diaChi);
             echo json_encode($result);
             break;
         case 'updateHoSo':

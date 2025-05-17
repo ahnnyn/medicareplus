@@ -63,6 +63,44 @@ class cLichLamViec {
             return $result;
         }
     }
+    public function getNgayLamViecTheoBacSi($maBacSi, $hinhThucKham) {
+        header('Content-Type: application/json; charset=utf-8');
+
+        // Kiểm tra phương thức
+        if ($_SERVER["REQUEST_METHOD"] !== "GET") {
+            http_response_code(405); // Phương thức không được phép
+            echo json_encode(["error" => "Chỉ chấp nhận yêu cầu GET"]);
+            return;
+        }
+
+        // Kiểm tra dữ liệu đầu vào
+        if (empty($maBacSi) || empty($hinhThucKham)) {
+            http_response_code(400); // Yêu cầu không hợp lệ
+            echo json_encode(["error" => "Thiếu mã bác sĩ hoặc hình thức khám"]);
+            return;
+        }
+
+        // Gọi model để lấy ngày làm việc
+        $p = new mLichLamViec();
+        $result = $p->layNgayLamViecTheoBacSi($maBacSi, $hinhThucKham);
+
+        // Xử lý kết quả từ model
+        if (isset($result["error"])) {
+            http_response_code(500); // Lỗi server
+            echo json_encode($result, JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        if (empty($result)) {
+            http_response_code(404); // Không tìm thấy dữ liệu
+            echo json_encode(["error" => "Không có ngày làm việc phù hợp"], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        // Trả về kết quả thành công
+        http_response_code(200);
+        echo json_encode($result, JSON_UNESCAPED_UNICODE);
+    }
     
 }
 ?>

@@ -27,42 +27,6 @@ const LoginPage = (props) => {
     const [openQuenMK, setOpenQuenMK] = useState(false);
     const [formLayMK] = Form.useForm()
 
-    const handleLayMK = async (values) => {
-        const email_doimk = values.email;
-        console.log("email_doimk: ", email_doimk);
-
-        if (!email_doimk) {
-            notification.error({
-                message: "Lỗi",
-                description: "Vui lòng nhập email!"
-            });
-            return;
-        }
-
-        try {
-            const res = await handleQuenPassword(email_doimk);
-            console.log("res: ", res);
-
-            if (res.data) {
-                notification.success({
-                    message: "Lấy lại mật khẩu thành công!",
-                    description: res.message
-                });
-            } else {
-                notification.error({
-                    message: "Lấy lại mật khẩu thất bại!",
-                    description: res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-                    duration: 5,
-                });
-            }
-        } catch (error) {
-            notification.error({
-                message: "Lấy lại mật khẩu thất bại!",
-                description: error.message,
-            });
-        }
-    };
-
     useEffect(() => {
         const rememberedAccountBenhNhan = localStorage.getItem("rememberedAccountBenhNhan");
         if (rememberedAccountBenhNhan) {
@@ -207,9 +171,6 @@ const LoginPage = (props) => {
                             checked={remember}
                             onChange={(e) => setRemember(e.target.checked)}
                         >Ghi nhớ tài khoản</Checkbox>
-
-                        {/* <Link onClick={() => setOpenQuenMK(true)}>Quên mật khẩu</Link> */}
-                        <a className="forgot-password" onClick={() => setOpenQuenMK(true)}>Quên mật khẩu</a>
                     </div>
                     
                 </Form.Item>
@@ -238,52 +199,6 @@ const LoginPage = (props) => {
                 setOpenRegisterKH={setOpenRegisterKH}
                 openRegisterKH={openRegisterKH}
             />
-
-            <Modal
-                title="Lấy mật khẩu"
-                centered
-                // loading={isLoadingDoiMK}
-                open={openQuenMK}
-                onOk={() => formLayMK.submit()}
-                okText={"Lấy mật khẩu"}
-                cancelText="Huỷ"
-                width={500}
-                maskClosable={false}
-                onCancel={() => {
-                    setOpenQuenMK(false)
-                    formLayMK.resetFields()
-                }}>
-                <Divider />
-                
-                <Form
-                    form={formLayMK}
-                    className="registration-form"
-                    layout="vertical"
-                    onFinish={handleLayMK}
-                >
-                    <Row>
-                        <Col span={24}>
-                            <Form.Item
-                                label="Nhập Email cần lấy mật khẩu"
-                                name="email"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Nhập email chính xác để lấy lại mật khẩu!',
-                                    },
-                                    {
-                                        type: "email",
-                                        message: 'Vui lòng nhập đúng định dạng địa chỉ email',
-                                    },
-
-                                ]}
-                                hasFeedback
-                            ><Input placeholder="Email của bạn..." />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
-            </Modal>
         </Modal>
 
 

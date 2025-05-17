@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { message } from "antd";
-import Footer from "../../components/Footer/Footer";
-import Header from "../../components/Header/Header";
+import Footer from "../../components/BacSi/Footer/Footer";
+import Header from "../../components/BacSi/Header/Header";
 import { handleLogouDoctort } from "../../services/loginAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { doLogoutAction } from "../../redux/account/accountSlice";
-import QuanLyLichHen from "../../components/LichHen/QuanLyLichHen";
-import UpdateDoctor from "../../components/ThongTin/UpdateDoctor";
+import QuanLyLichHen from "../../components/BacSi/LichHen/QuanLyLichHen";
+import UpdateDoctor from "../../components/BacSi/ThongTin/UpdateDoctor";
 import { fetchAllDoctorByID } from "../../services/apiDoctor";
-import ModalDoiMK from "../../components/ModalDoiMK/ModalDoiMK";
-import HoSoBenhNhan from "../../components/HoSoBenhNhan/HoSoBenhNhan";
-import QuanLyLichLamViec from "../../components/QuanLyLichLamViec/QuanLyLichLamViec";
+import ModalDoiMK from "../../components/BacSi/ModalDoiMK/ModalDoiMK";
+import HoSoBenhNhan from "../../components/BacSi/HoSoBenhNhan/HoSoBenhNhan";
+import QuanLyLichLamViec from "../../components/BacSi/QuanLyLichLamViec/QuanLyLichLamViec";
 import "./home.css";
 
 const Home = () => {
@@ -39,11 +39,11 @@ const Home = () => {
     if (res) {
       dispatch(doLogoutAction());
       message.success(res.message);
-      navigate("/login-doctor");
+      navigate("/login");
     }
   };
 
-  if (!isAuthenticated) return <Navigate to="/login-doctor" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
     <>

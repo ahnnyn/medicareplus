@@ -2,7 +2,11 @@ import { Badge, Button, Calendar, Checkbox, Col, DatePicker, Divider, Form, mess
 import { useEffect, useState } from "react"
 import moment from "moment"
 import './css.scss'
+<<<<<<< HEAD:FrontendTrangQuanLy/src/components/QuanLyLichLamViec/QuanLyLichLamViec.jsx
 import { dangKyKhungGioKham, fetchBacSiByMaBS, fetchKhungGio, getTimeSlotsByDoctor } from "../../services/apiDoctor"
+=======
+import { dangKyKhungGioKham, fetchBacSiByMaBS, fetchCaLamViec, fetchKhungGioByCaLamViec, fetchKhungGio, getTimeSlotsByDoctorAndDate } from "../../../services/apiDoctor"
+>>>>>>> 3e843d67000a70ce33b906cc8777859b922c31b7:FrontendTrangQuanLy/src/components/BacSi/QuanLyLichLamViec/QuanLyLichLamViec.jsx
 import { useSelector } from "react-redux"
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';

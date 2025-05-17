@@ -1,8 +1,9 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import Home from "./pages/BacSi";
+import AdminHome from "./pages/Admin";
 import Login from "./pages/Login";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
+import Header from "./components/BacSi/Header/Header";
+import Footer from "./components/BacSi/Footer/Footer";
 
 const App = () => {
   return (
@@ -10,7 +11,8 @@ const App = () => {
       <Header /> {/* Header luôn hiển thị */}
       <Routes>
         <Route path="/doctor" element={<Home />} />
-        <Route path="/login-doctor" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<AdminHome />} />
       </Routes>
     </>
   );

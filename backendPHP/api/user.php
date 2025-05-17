@@ -61,7 +61,7 @@ if ($requestMethod === 'POST' && isset($_GET['action'])) {
 
     if ($action === 'login') {
         $data = json_decode(file_get_contents("php://input"), true);
-        echo json_encode($p->getThongTinBacSi($data['username'], $data['password']));
+        echo json_encode($p->getThongTinNguoiDung($data['username'], $data['password']));
 
     } elseif ($action === 'currentUser') {
         $user = verifyJWT();

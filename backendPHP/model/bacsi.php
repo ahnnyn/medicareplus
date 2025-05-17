@@ -20,7 +20,8 @@
                                         bs.moTa, 
                                         bs.maKhoa, 
                                         bs.maTaiKhoan, 
-                                        k.tenKhoa, 
+                                        bs.trangThai,
+                                        k.tenKhoa,  
                                         GROUP_CONCAT(DISTINCT llv.hinhThucKham) AS hinhThucKham
                                     FROM 
                                         bacsi bs 
@@ -190,7 +191,7 @@
             }
         }    
         // Tìm kiếm bác sĩ trong cơ sở dữ liệu
-        public function searchBacSi($name) {
+        public function timBacSi($name) {
             $p = new connectdatabase();
             $pdo = $p->connect();
             if ($pdo) {
@@ -210,5 +211,72 @@
                 return ["error" => "Không thể kết nối database"];
             }
         }  
+        public function themBacSi($hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa,$username, $matKhau, $maVaiTro) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+
+            if ($pdo) {
+                try {
+                    // Bắt đầu transaction để đảm bảo dữ liệu nhất quán
+                    $pdo->beginTransaction();
+                    $hashedPassword = password_hash($matKhau, PASSWORD_BCRYPT);
+                    // 1. Thêm tài khoản
+                    $queryTaiKhoan = $pdo->prepare("INSERT INTO taikhoan (username, matKhau, maVaiTro) VALUES (:username, :matKhau, :maVaiTro)");
+                    $queryTaiKhoan->bindParam(':username', $username);
+                    $queryTaiKhoan->bindParam(':matKhau', $hashedPassword); // Nên hash trước khi gọi hàm này
+                    $queryTaiKhoan->bindParam(':maVaiTro', $maVaiTro);
+                    $queryTaiKhoan->execute();
+
+                    // Lấy id tài khoản vừa thêm
+                    $maTaiKhoan = $pdo->lastInsertId();
+
+                    // 2. Thêm bác sĩ
+                    $queryBacSi = $pdo->prepare("INSERT INTO bacsi 
+                        (hoTen, gioiTinh, ngaySinh, soDienThoai, email, diaChi, giaKham, hinhAnh, moTa, maKhoa, maTaiKhoan, trangThai)
+                        VALUES
+                        (:hoTen, :gioiTinh, :ngaySinh, :soDienThoai, :email, :diaChi, :giaKham, :hinhAnh, :moTa, :maKhoa, :maTaiKhoan, 'Đang hoạt động')
+                    ");
+                    $queryBacSi->bindParam(':hoTen', $hoTen);
+                    $queryBacSi->bindParam(':gioiTinh', $gioiTinh);
+                    $queryBacSi->bindParam(':ngaySinh', $ngaySinh);
+                    $queryBacSi->bindParam(':soDienThoai', $soDienThoai);
+                    $queryBacSi->bindParam(':email', $email);
+                    $queryBacSi->bindParam(':diaChi', $diaChi);
+                    $queryBacSi->bindParam(':giaKham', $giaKham);
+                    $queryBacSi->bindParam(':hinhAnh', $hinhAnh);
+                    $queryBacSi->bindParam(':moTa', $moTa);
+                    $queryBacSi->bindParam(':maKhoa', $maKhoa);
+                    $queryBacSi->bindParam(':maTaiKhoan', $maTaiKhoan);
+                    $queryBacSi->execute();
+
+                    // Commit transaction
+                    $pdo->commit();
+
+                    return true;
+                } catch (PDOException $e) {
+                    // Rollback nếu có lỗi
+                    $pdo->rollBack();
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }
+
+        public function xoaBacSi($maBacSi) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    $stmt = $pdo->prepare("UPDATE bacsi SET trangThai = 'Ẩn' WHERE maBacSi = :maBacSi");
+                    $stmt->bindParam(':maBacSi', $maBacSi, PDO::PARAM_INT);
+                    $stmt->execute(); 
+                    return ["success" => true, "message" => "Xóa bác sĩ thành công"];
+                } catch (PDOException $e) {
+                    return ["success" => false, "message" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            }
+            return ["success" => false, "message" => "Không thể kết nối database"];
+        }
     }
 ?>

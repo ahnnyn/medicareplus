@@ -127,6 +127,7 @@
                     $query->bindParam(":lyDoKham", $lyDoKham, PDO::PARAM_STR);
                     $query->bindParam(":phuongthucthanhtoan", $hinhThucThanhToan, PDO::PARAM_STR);
                     $query->bindParam(":hinhThucKham", $hinhThucKham, PDO::PARAM_STR);
+                    // $query->bindParam(":roomID", $roomID, PDO::PARAM_STR);
         
                     $success = $query->execute();
                     $maLichKham = $pdo->lastInsertId();

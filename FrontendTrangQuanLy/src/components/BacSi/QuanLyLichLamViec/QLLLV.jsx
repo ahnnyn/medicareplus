@@ -2,7 +2,7 @@ import { Badge, Button, Calendar, Checkbox, Col, DatePicker, Divider, Form, mess
 import { useEffect, useState } from "react"
 import moment from "moment"
 import './css.scss'
-import { dangKyKhungGioKham, fetchBacSiByMaBS, fetchCaLamViec, fetchKhungGioByCaLamViec, fetchKhungGio, getTimeSlotsByDoctorAndDate } from "../../services/apiDoctor"
+import { dangKyKhungGioKham, fetchBacSiByMaBS, fetchCaLamViec, fetchKhungGioByCaLamViec, fetchKhungGio, getTimeSlotsByDoctorAndDate } from "../../../services/apiDoctor"
 import { useSelector } from "react-redux"
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';

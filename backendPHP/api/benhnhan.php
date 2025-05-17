@@ -59,11 +59,11 @@ if (isset($_GET['action'])) {
 
     switch ($_GET['action']) {
         case 'login':
-            echo json_encode($p->layThongTinBenhNhan($data['username'], $data['matKhau']));
+            echo json_encode($p->getThongTinBenhNhan($data['username'], $data['matKhau']));
             break;
 
         case 'register':
-            echo json_encode($p->luuThongTinBenhNhan($data['email'], $data['hoTen'], $data['soDienThoai'], $data['username'], $data['matKhau']));
+            echo json_encode($p->luuThongTin($data['email'], $data['hoTen'], $data['soDienThoai'], $data['username'], $data['matKhau']));
             break;
 
         case 'currentUser':
@@ -77,18 +77,10 @@ if (isset($_GET['action'])) {
 
         case 'getThongTinBenhNhan':
             if (isset($_GET['maBenhNhan'])) {
-                $pd->layThongTinCaNhanBenhNhan($_GET['maBenhNhan']);
+                $pd->getThongTinCaNhanBenhNhan($_GET['maBenhNhan']);
             }else {
                 echo json_encode(["error" => "Thiếu hoặc sai mã bệnh nhân"]);
             }
-            break;
-        case 'quenMatKhau':
-            $email = $_GET["email_doimk"] ?? '';
-            if (empty($email)) {
-                echo json_encode(["success" => false, "message" => "Vui lòng nhập email"]);
-                exit;
-            }
-                $pd->quenMatKhau($email);
             break;
         case 'doiMatKhau':
             header("Content-Type: application/json"); // Đảm bảo API trả về JSON
@@ -142,6 +134,9 @@ if (isset($_GET['action'])) {
             } else {
                 echo json_encode(["status" => false, "error" => "Thiếu thông tin bệnh nhân"]);
             }
+            break;
+        case "getAllBenhNhan":
+            $pd->getDanhSachBenhNhan();
             break;
         default:
             echo json_encode(['success' => false, 'message' => 'Action không hợp lệ!']);

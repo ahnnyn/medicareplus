@@ -1,18 +1,12 @@
 import {
   Button,
   Checkbox,
-  Col,
-  Divider,
   Form,
   Input,
-  message,
   Modal,
   notification,
-  Row,
 } from "antd";
 
-import Footer from "../../components/Footer/Footer";
-import Header from "../../components/Header/Header";
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,7 +25,9 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const isAuthenticated = useSelector((state) => state.accountDoctor.isAuthenticated);
+  const { maVaiTro } = useSelector((state) => state.accountDoctor.user);
 
+  // Lấy thông tin đăng nhập từ localStorage nếu có
   useEffect(() => {
     const rememberedDoctor = localStorage.getItem("rememberedDoctor");
     if (rememberedDoctor) {
@@ -45,9 +41,21 @@ const Login = () => {
     }
   }, [form]);
 
-  if (isAuthenticated) {
-    return <Navigate to="/doctor" replace />;
-  }
+  // Điều hướng sau khi đăng nhập thành công
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (maVaiTro === 2) {
+        navigate("/doctor");
+      } else if (maVaiTro === 1) {
+        navigate("/admin");
+      } else {
+        notification.warning({
+          message: "Không xác định vai trò!",
+          description: "Vui lòng liên hệ quản trị viên.",
+        });
+      }
+    }
+  }, [isAuthenticated, maVaiTro, navigate]);
 
   const onFinish = async (values) => {
     setIsLoading(true);
@@ -69,13 +77,22 @@ const Login = () => {
 
         notification.success({
           message: "Đăng nhập thành công!",
-          description: `Chào mừng ${res.user.fullName || "bác sĩ"} quay lại.`,
+          description: `Chào mừng ${res.user.fullName || "người dùng"} quay lại.`,
           duration: 3,
         });
 
-        setTimeout(() => {
+        // ✅ Điều hướng dựa vào maVaiTro
+        const { maVaiTro } = res.user;
+        if (maVaiTro === 2) {
           navigate("/doctor");
-        }, 2000);
+        } else if (maVaiTro === 1) {
+          navigate("/admin");
+        } else {
+          notification.warning({
+            message: "Không xác định vai trò!",
+            description: "Vui lòng liên hệ quản trị viên.",
+          });
+        }
       } else {
         notification.error({
           message: "Đăng nhập không thành công!",
@@ -126,7 +143,6 @@ const Login = () => {
 
   return (
     <>
-
       <div className="rts-register-area rts-section-gap bg_light-1">
         <div className="container">
           <div
@@ -148,9 +164,7 @@ const Login = () => {
               <Form.Item
                 label="Tên đăng nhập"
                 name="username"
-                rules={[
-                  { required: true, message: "Vui lòng nhập tên đăng nhập!" },
-                ]}
+                rules={[{ required: true, message: "Vui lòng nhập tên đăng nhập!" }]}
                 hasFeedback
               >
                 <Input size="large" placeholder="Nhập username" />
@@ -257,14 +271,8 @@ const Login = () => {
               label="Địa chỉ Email"
               name="email"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập email!",
-                },
-                {
-                  type: "email",
-                  message: "Email không hợp lệ!",
-                },
+                { required: true, message: "Vui lòng nhập email!" },
+                { type: "email", message: "Email không hợp lệ!" },
               ]}
               hasFeedback
             >

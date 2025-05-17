@@ -51,7 +51,17 @@ if (isset($_GET["action"])) {
                 $result = $p->themLichLamViec($maBacSi, $ngayLamViec, $maKhungGio, $hinhThucKham);
             
                 echo json_encode($result);
-                break;            
+                break; 
+            case "getNgayLamViecByBacSi":
+                // Kiểm tra tham số từ URL
+                if (!empty($_GET["maBacSi"]) && !empty($_GET["hinhThucKham"])) {
+                    $maBacSi = $_GET["maBacSi"];
+                    $hinhThucKham = $_GET["hinhThucKham"];
+                    $p->getNgayLamViecTheoBacSi($maBacSi, $hinhThucKham);
+                } else {
+                    echo json_encode(["error" => "Thiếu mã bác sĩ hoặc hình thức khám"]);
+                }
+                break;           
         default:
             echo json_encode(["error" => "Thao tác không hợp lệ"]);
     }

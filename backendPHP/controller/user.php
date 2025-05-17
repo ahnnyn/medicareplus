@@ -8,8 +8,8 @@ class cUser {
         $this->userModel = new mUser();
     }
 
-    public function getThongTinBacSi($username, $matKhau) {
-        return $this->userModel->layThongTinBacSi($username, $matKhau);
+    public function getThongTinNguoiDung($username, $matKhau) {
+        return $this->userModel->layThongTinNguoiDung($username, $matKhau);
     }
     public function logout() {
         if (session_status() == PHP_SESSION_NONE) {

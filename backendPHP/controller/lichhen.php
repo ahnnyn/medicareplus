@@ -2,7 +2,7 @@
 include("../model/lichhen.php");
 
 class cLichHen {
-    public function layDanhSachLichHen($maBenhNhan) {
+    public function getDanhSachLichHen($maBenhNhan) {
         $p = new mLichHen();
         $result = $p->layDanhSachLichHen($maBenhNhan);
 
@@ -14,19 +14,20 @@ class cLichHen {
         echo json_encode($result);
     }
 
-    public function updateLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham) {
+    public function updateLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham, $hinhThucKham) {
         $p = new mLichHen();
-        $result = $p->updateLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham);
-    
-        if (isset($result['success'])) {
+        $result = $p->capNhatLichHen($maLich, $maBacSi, $maKhungGio, $ngayKham, $lyDoKham, $hinhThucKham);
+
+        if (isset($result['success']) && $result['success'] === true) {
             return ['success' => true];
         } else {
             return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
         }
     }
+
     public function deleteLichHen($maLich) {
         $p = new mLichHen();
-        $result = $p->deleteLichHen($maLich);
+        $result = $p->xoaLichHen($maLich);
 
         if (isset($result['success'])) {
             return ['success' => true];
@@ -34,5 +35,6 @@ class cLichHen {
             return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
         }
     }
+    
 }
 ?>

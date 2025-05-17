@@ -51,7 +51,7 @@ class mUser {
         }
         return ["success" => false, "message" => "Lỗi kết nối CSDL"];
     }
-    public function luuThongTinBenhNhan($email, $hoTen, $soDienThoai, $username, $matKhau) {
+    public function dangKy($email, $hoTen, $soDienThoai, $username, $matKhau) {
         $db = new connectdatabase();
         $pdo = $db->connect();
     

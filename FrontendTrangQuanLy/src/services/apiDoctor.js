@@ -1,8 +1,8 @@
 import axios from "../utils/axios-customize";
 
 // doctor
-export const fetchAllDoctor = (query) => {
-  const URL_BACKEND = `/api/doctor/fetch-all-doctor?${query}`;
+export const fetchAllDoctor = async () => {
+  const URL_BACKEND = `/api/bacsi.php?action=getAllDoctors`;
   return axios.get(URL_BACKEND);
 };
 export const fetchAllDoctorByID = (maBacSi) => {
@@ -383,3 +383,21 @@ export const  createConsultationRoom = async (doctorInfo, patientInfo) => {
   }
 };
 
+export const deleteBacSi = async (maBacSi) => {
+  return axios.delete(`/api/bacsi.php?action=xoaBacSi&maBacSi=${ maBacSi }`);
+};
+export const fetchAllBenhNhan = async () => {
+    const URL_BACKEND = `/api/benhnhan.php?action=getAllBenhNhan`;
+    return axios.get(URL_BACKEND)
+};
+export const fetchOneAccKH = (maBenhNhan) => {
+    const URL_BACKEND = `/api/benhnhan.php?action=getThongTinBenhNhan&maBenhNhan=${maBenhNhan}`;
+    return axios.get(URL_BACKEND);
+};
+export const themBacSi = (hoTen, gioiTinh, ngaySinh, soDienThoai, email, diaChi, giaKham, hinhAnh, moTa, maKhoa, username, matKhau, maVaiTro) => {
+    const URL_BACKEND = '/api/bacsi.php?action=themBacSi'
+    const data = {
+        hoTen, gioiTinh, ngaySinh, soDienThoai, email, diaChi, giaKham, hinhAnh, moTa, maKhoa, username, matKhau, maVaiTro
+    }
+    return axios.post(URL_BACKEND, data)
+}

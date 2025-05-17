@@ -303,16 +303,16 @@ useEffect(() => {
                     </Col>
                     <Col span={12}>
                         <Form.Item label="Giới tính" name="gioiTinh">
-                            <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
+                            {/* <Radio.Group value={genderBenhNhan} onChange={(e) => setGenderBenhNhan(e.target.value)}>
                                 <Radio value={"0"}>Nam</Radio>
                                 <Radio value={"1"}>Nữ</Radio>
                                 <Radio value={"2"}>Khác</Radio>
-                            </Radio.Group>
-                            {/* <Radio.Group>
+                            </Radio.Group> */}
+                            <Radio.Group>
                                 <Radio value={0}>Nam</Radio>
                                 <Radio value={1}>Nữ</Radio>
                                 <Radio value={2}>Khác</Radio>
-                                </Radio.Group> */}
+                                </Radio.Group>
                         </Form.Item>
                     </Col>
                     <Col span={12}>
