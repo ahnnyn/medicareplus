@@ -1,0 +1,15 @@
+/* Cho tất cả input text, password, date picker, v.v. */
+::placeholder {
+  color: #999 !important;
+  opacity: 1; /* Đảm bảo không bị mờ */
+}
+
+/* Ant Design Select placeholder */
+.ant-select-selection-placeholder {
+  color: #999 !important;
+}
+
+/* Ant Design DatePicker placeholder */
+.ant-picker-input > input::placeholder {
+  color: #999 !important;
+}

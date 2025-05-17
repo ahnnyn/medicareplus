@@ -8,7 +8,7 @@ class cUser {
         $this->userModel = new mUser();
     }
 
-    public function layThongTinBenhNhan($username, $matKhau) {
+    public function getThongTinBenhNhan($username, $matKhau) {
         return $this->userModel->layThongTinBenhNhan($username, $matKhau);
     }
     public function logout() {
@@ -22,8 +22,8 @@ class cUser {
         }
         return ['success' => false, 'message' => 'Chưa đăng nhập'];
     }
-    public function luuThongTinBenhNhan($email, $hoTen, $soDienThoai, $username, $matKhau) {  
-        $result = $this->userModel->luuThongTinBenhNhan($email, $hoTen, $soDienThoai, $username, $matKhau);
+    public function luuThongTin($email, $hoTen, $soDienThoai, $username, $matKhau) {  
+        $result = $this->userModel->dangKy($email, $hoTen, $soDienThoai, $username, $matKhau);
         if ($result) {
             return ['success' => true, 'message' => 'Đăng ký thành công'];
         } else {

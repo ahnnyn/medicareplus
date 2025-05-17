@@ -6,11 +6,11 @@ import { BsCameraVideoFill } from "react-icons/bs";
 import { IoChatbubbleEllipsesSharp } from "react-icons/io5";
 import { FaEye } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { findAllLichKhamByBacSi } from "../../services/doctorAPI";
+import { findAllLichKhamByBacSi } from "../../../services/doctorAPI";
 import ViewLichHen from "./ViewLichHen";
 import React from "react";
 import { RiEdit2Fill } from "react-icons/ri";
-import { updateThongTinlichKham, createConsultationRoom } from "../../services/apiDoctor";
+import { updateThongTinlichKham, createConsultationRoom } from "../../../services/apiDoctor";
 import './custom.css'
 import SearchComponent from "../Search/SearchComponent";
 import ModalEdit from "./ModalEdit";

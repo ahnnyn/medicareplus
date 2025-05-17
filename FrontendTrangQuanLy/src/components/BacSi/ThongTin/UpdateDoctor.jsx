@@ -4,7 +4,7 @@ import { Button, Checkbox, Col, Divider, Form, Input, InputNumber, message, Moda
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { fetchBacSiByMaBS, fetchAllChuyenKhoa, updateDoctor, callUploadDoctorImg } from "../../services/apiDoctor";
+import { fetchBacSiByMaBS, fetchAllChuyenKhoa, updateDoctor, callUploadDoctorImg } from "../../../services/apiDoctor";
 import { FaSave } from "react-icons/fa";
 import './scss.scss'
 

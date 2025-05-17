@@ -24,25 +24,25 @@ $p = new cBacSi();
 if (isset($_GET["action"])) {
     switch ($_GET["action"]) {
         case "getAllDoctors":
-            $p->layDanhSachBacSi();
+            $p->getDanhSachBacSi();
             break;
         case "getBacSiByChuyenKhoa":
             if (isset($_GET["maKhoa"])) {
-                $p->layThongTinBacSiByKhoa($_GET["maKhoa"]);
+                $p->getThongTinBacSiByKhoa($_GET["maKhoa"]);
             } else {
                 echo json_encode(["error" => "Thiếu mã khoa"]);
             }
             break;
         case "getBacSiByID":
             if (isset($_GET["maBacSi"])) {
-                $p->layThongTinBacSiByMaBS($_GET["maBacSi"]);
+                $p->getThongTinBacSiByMaBS($_GET["maBacSi"]);
             } else {
                 echo json_encode(["error" => "Thiếu mã bác sĩ"]);
             }
             break;
         case "getAvailableTimeSlots":
             if (isset($_GET["maBacSi"]) && isset($_GET["ngayKham"])) {
-                $p->layKhungGioKham($_GET["maBacSi"], $_GET["ngayKham"]);
+                $p->getKhungGioKham($_GET["maBacSi"], $_GET["ngayKham"]);
             } else {
                 echo json_encode(["error" => "Thiếu mã bác sĩ hoặc ngày khám"]);
             }
@@ -82,11 +82,48 @@ if (isset($_GET["action"])) {
             case "search":
                 if (isset($_GET["hoTen"])) {
                     $tenBacSi = $_GET["hoTen"];
-                    $p->search($tenBacSi);
+                    $p->searchBacSi($tenBacSi);
                 } else {
                     echo json_encode(["error" => "Thiếu tên bác sĩ để tìm kiếm"]);
                 }
                 break;
+            case "xoaBacSi":
+            if (isset($_GET['maBacSi'])) {
+                    $maBacSi = intval($_GET['maBacSi']);
+                    $result = $p->deleteBacSi($maBacSi);
+                    echo json_encode($result); 
+                } else {
+                    echo json_encode(["success" => false, "message" => "Thiếu mã bác sĩ"]);
+                }
+            break;
+        case 'themBacSi':
+            // Nhận dữ liệu JSON từ frontend
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if ($data) {
+                $hoTen = $data['hoTen'] ?? '';
+                $gioiTinh = $data['gioiTinh'] ?? 0;
+                $ngaySinh = $data['ngaySinh'] ?? '';
+                $soDienThoai = $data['soDienThoai'] ?? '';
+                $email = $data['email'] ?? '';
+                $diaChi = $data['diaChi'] ?? '';
+                $giaKham = $data['giaKham'] ?? 0;
+                $hinhAnh = $data['hinhAnh'] ?? '';
+                $moTa = $data['moTa'] ?? '';
+                $maKhoa = $data['maKhoa'] ?? 0;
+                $username = $data['username'] ?? '';
+                $matKhau = $data['matKhau'] ?? '';
+                $maVaiTro = $data['maVaiTro'] ?? 2;
+
+                
+                $response = $p->insertBacSi($hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa, $username, $matKhau, $maVaiTro);
+
+                echo json_encode($response);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+            }
+            break;
+
             default:
                 echo json_encode(["error" => "Thao tác không hợp lệ"]);
         }

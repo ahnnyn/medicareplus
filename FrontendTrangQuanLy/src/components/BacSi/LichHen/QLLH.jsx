@@ -4,11 +4,11 @@ import moment from 'moment-timezone';
 import { CheckCircleOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { FaEye } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { findAllLichKhamByBacSi } from "../../services/doctorAPI";
+import { findAllLichKhamByBacSi } from "../../../services/doctorAPI";
 import ViewLichHen from "./ViewLichHen";
 import React from "react";
 import { RiEdit2Fill } from "react-icons/ri";
-import { deleteLichHenn, updateThongTinlichKham } from "../../services/apiDoctor";
+import { deleteLichHenn, updateThongTinlichKham } from "../../../services/apiDoctor";
 import './custom.css'
 import SearchComponent from "../Search/SearchComponent";
 import ModalEdit from "./ModalEdit";

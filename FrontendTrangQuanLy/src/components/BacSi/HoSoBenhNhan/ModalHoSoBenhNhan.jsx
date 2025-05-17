@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Tabs, Descriptions, Table, Tag } from 'antd';
-import { fetchLayTTPhieuKhamBenh } from "../../services/apiDoctor";
+import { fetchLayTTPhieuKhamBenh } from "../../../services/apiDoctor";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 

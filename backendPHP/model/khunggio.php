@@ -71,5 +71,64 @@
                 return ['error' => 'Lỗi truy vấn: ' . $e->getMessage()];
             }
         }
+        public function layKhungGioTheoNgay($maBacSi, $hinhThucKham, $ngayLamViec, $maLichDangSua = null) {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if (!$pdo) {
+                return ["success" => false, "message" => "Không thể kết nối database"];
+            }
+
+            try {
+                $query = "
+                    SELECT kg.maKhungGio, kg.khungGio 
+                    FROM khunggio kg 
+                    JOIN chitiet_lichlamviec ctlv ON ctlv.khungGio_ID = kg.maKhungGio 
+                    JOIN lichlamviec llv ON llv.maLichLamViec = ctlv.lichLamViec_ID 
+                    WHERE llv.maBacSi = :maBacSi
+                    AND llv.ngayLamViec = :ngayLamViec 
+                    AND llv.hinhThucKham = :hinhThucKham
+                    AND (
+                        ctlv.trangThaiDatLich = 'available'
+                ";
+
+                // Nếu đang sửa lịch => giữ lại khung giờ đã đặt cho lịch đó
+                if ($maLichDangSua !== null) {
+                    $query .= "
+                        OR ctlv.khungGio_ID IN (
+                            SELECT lh2.maKhungGio
+                            FROM lichkham lh2
+                            WHERE lh2.maLich = :maLich
+                        )
+                    ";
+                }
+
+                $query .= ") ORDER BY kg.maKhungGio";
+
+                $stmt = $pdo->prepare($query);
+
+                // Truyền tham số phù hợp
+                $params = [
+                    ':maBacSi' => $maBacSi,
+                    ':hinhThucKham' => $hinhThucKham,
+                    ':ngayLamViec' => $ngayLamViec
+                ];
+
+                if ($maLichDangSua !== null) {
+                    $params[':maLich'] = $maLichDangSua;
+                }
+
+                $stmt->execute($params);
+
+                $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if (empty($data)) {
+                    return ["message" => "Không có khung giờ phù hợp"];
+                }
+
+                return $data;
+            } catch (PDOException $e) {
+                return ["error" => $e->getMessage()];
+            }
+        }
     }
 ?>

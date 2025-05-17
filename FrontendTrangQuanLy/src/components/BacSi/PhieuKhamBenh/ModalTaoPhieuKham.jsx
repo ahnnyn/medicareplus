@@ -16,9 +16,9 @@ import { FaSave } from "react-icons/fa";
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchBacSiByMaBS, fetchLayTTPhieuKhamBenh, updateTTPhieuKhamBenh } from "../../services/apiDoctor";
-import { doLogoutAction } from "../../redux/account/accountSlice";
-import { taoPhieuKhamBenh } from "../../services/apiDoctor";
+import { fetchBacSiByMaBS, fetchLayTTPhieuKhamBenh, updateTTPhieuKhamBenh } from "../../../services/apiDoctor";
+import { doLogoutAction } from "../../../redux/account/accountSlice";
+import { taoPhieuKhamBenh } from "../../../services/apiDoctor";
 
 const ModalTaoPhieuKham = ({ isModalOpen, setIsModalOpen, editingRecord}) => {
   const dispatch = useDispatch();

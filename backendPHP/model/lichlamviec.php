@@ -245,6 +245,28 @@ class mLichLamViec {
             return ["error" => "Lỗi: " . $e->getMessage()];
         }
     }
-      
+    public function layNgayLamViecTheoBacSi($maBacSi, $hinhThucKham)  {
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if (!$pdo) {
+                return ["success" => false, "message" => "Không thể kết nối database"];
+            }
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT ngayLamViec
+                    FROM lichlamviec
+                    WHERE maBacSi = :maBacSi AND hinhThucKham = :hinhThucKham
+                ");
+                $stmt->execute([
+                    ':maBacSi' => $maBacSi,
+                    ':hinhThucKham' => $hinhThucKham
+                ]);
+
+                $ngayList = $stmt->fetchAll(PDO::FETCH_COLUMN); // trả về mảng các ngày
+                return $ngayList;
+            } catch (PDOException $e) {
+                return ["error" => $e->getMessage()];
+            }
+        }
 }
 ?>

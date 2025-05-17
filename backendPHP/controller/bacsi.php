@@ -2,7 +2,7 @@
     include("../model/bacsi.php");
     
     class cBacSi {
-        public function layDanhSachBacSi() {
+        public function getDanhSachBacSi() {
             $p = new mBacSi();
             $result = $p->layDanhSachBacSi();
             
@@ -28,7 +28,7 @@
             echo json_encode(["data" => $bacSiList]);
         }
 
-        public function layThongTinBacSiByKhoa($maKhoa) {
+        public function getThongTinBacSiByKhoa($maKhoa) {
             if (!$maKhoa) {
                 echo json_encode(["error" => "Thiếu mã khoa"]);
                 return;
@@ -64,7 +64,7 @@
             return;
         }
 
-        public function layThongTinBacSiByMaBS($maBacSi) {
+        public function getThongTinBacSiByMaBS($maBacSi) {
             if (!$maBacSi) {
                 echo json_encode(["error" => "Thiếu mã bác sĩ"]);
                 return;
@@ -84,7 +84,7 @@
         }
         
         
-        public function layKhungGioKham($maBacSi, $ngayKham){
+        public function getKhungGioKham($maBacSi, $ngayKham){
             $p = new mBacSi();
             $result = $p->layKhungGioKham($maBacSi, $ngayKham);
             
@@ -119,14 +119,14 @@
                 echo json_encode(["status" => false, "error" => $result['error']]);
             }
         }
-        public function search() {
+        public function searchBacSi() {
             // Kiểm tra xem có tham số 'hoTen' không
             if (isset($_GET['hoTen']) && !empty($_GET['hoTen'])) {
                 $tenBacSi = $_GET['hoTen'];  // Lấy giá trị tên bác sĩ từ query string
 
                 $p = new mBacSi();
                 // Gọi phương thức tìm kiếm bác sĩ theo tên và truyền tham số vào
-                $result = $p->searchBacSi($tenBacSi);  
+                $result = $p->timBacSi($tenBacSi);  
 
                 // Kiểm tra nếu có lỗi trong quá trình tìm kiếm
                 if (isset($result['error'])) {
@@ -139,6 +139,37 @@
             } else {
                 // Nếu không có tham số tenkhoa, trả về lỗi
                 echo json_encode(["error" => "Thiếu tên bác sĩ để tìm kiếm"]);
+            }
+        }
+        public function deleteBacSi($maBacSi) {
+            $p = new mBacSi();
+                $result = $p->xoaBacSi($maBacSi);
+
+                if (isset($result['success'])) {
+                    return ['success' => true];
+                } else {
+                    return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
+                }
+            }     
+        public function insertBacSi($hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa,$username, $matKhau, $maVaiTro){
+            $p = new mBacSi();
+            $result = $p->themBacSi($hoTen, $gioiTinh, $ngaySinh, $soDienThoai, $email, $diaChi, $giaKham, $hinhAnh, $moTa, $maKhoa,$username, $matKhau, $maVaiTro);
+            if ($result === true) {
+                // Gửi email thông báo
+                require '../helpers/sendemail.php'; // Đường dẫn đến file gửi mail
+                $sendMailResult = guiEmailThongBao($email, $hoTen, $username, $matKhau);
+
+                if ($sendMailResult === true) {
+                    return ['success' => true, 'message' => 'Thêm bác sĩ thành công và gửi mail thành công'];
+                } else {
+                    return ['success' => true, 'message' => 'Thêm bác sĩ thành công nhưng gửi mail thất bại: ' . $sendMailResult];
+                }
+            } else {
+                // Nếu lỗi trả về mảng có key 'error'
+                if (is_array($result) && isset($result['error'])) {
+                    return ['success' => false, 'message' => 'Thêm bác sĩ thất bại: ' . $result['error']];
+                }
+                return ['success' => false, 'message' => 'Thêm bác sĩ thất bại'];
             }
         }
     }

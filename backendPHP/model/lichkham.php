@@ -114,9 +114,9 @@
         
                     // INSERT lịch khám
                     $query = $pdo->prepare("INSERT INTO lichkham 
-                        (maBenhNhan, maBacSi, maKhungGio, hoTenBenhNhan, giaKham, ngayKham, lyDoKham, phuongthucthanhtoan, hinhThucKham, roomID) 
+                        (maBenhNhan, maBacSi, maKhungGio, hoTenBenhNhan, giaKham, ngayKham, lyDoKham, phuongthucthanhtoan, hinhThucKham) 
                         VALUES 
-                        (:maBenhNhan, :maBacSi, :maKhungGio, :tenBenhNhan, :giaKham, :ngayKham, :lyDoKham, :phuongthucthanhtoan, :hinhThucKham, :roomID)");
+                        (:maBenhNhan, :maBacSi, :maKhungGio, :tenBenhNhan, :giaKham, :ngayKham, :lyDoKham, :phuongthucthanhtoan, :hinhThucKham)");
         
                     $query->bindParam(":maBenhNhan", $maBenhNhan, PDO::PARAM_INT);
                     $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
@@ -127,7 +127,7 @@
                     $query->bindParam(":lyDoKham", $lyDoKham, PDO::PARAM_STR);
                     $query->bindParam(":phuongthucthanhtoan", $hinhThucThanhToan, PDO::PARAM_STR);
                     $query->bindParam(":hinhThucKham", $hinhThucKham, PDO::PARAM_STR);
-                    $query->bindParam(":roomID", $roomID, PDO::PARAM_STR);
+                    // $query->bindParam(":roomID", $roomID, PDO::PARAM_STR);
         
                     $success = $query->execute();
                     $maLichKham = $pdo->lastInsertId();

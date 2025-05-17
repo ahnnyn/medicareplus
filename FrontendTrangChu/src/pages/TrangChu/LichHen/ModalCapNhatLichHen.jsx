@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, DatePicker, message, Button } from "antd";
+import { Modal, Form, Input, Select, message, Button } from "antd";
 import moment from "moment";
 import {
   fetchAllBacSi,
-  fetchKhungGioBacSiByNgay,
+  fetchNgayLamViecByBacSi,
+  getKhungGioByNgay,
   updateLichHen,
 } from "../../../services/apiChuyenKhoaBacSi";
 
@@ -11,6 +12,7 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [danhSachBacSi, setDanhSachBacSi] = useState([]);
+  const [danhSachNgayKham, setDanhSachNgayKham] = useState([]);
   const [danhSachKhungGio, setDanhSachKhungGio] = useState([]);
 
   useEffect(() => {
@@ -21,18 +23,29 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
 
   useEffect(() => {
     if (data) {
+      const { maBacSi, lyDoKham, ngayKham, maKhungGio, hinhThucKham } = data;
+
       form.setFieldsValue({
-        maBacSi: data.maBacSi,
-        lyDoKham: data.lyDoKham,
-        ngayKham: moment(data.ngayKham),
-        maKhungGio: data.maKhungGio,
+        maBacSi,
+        lyDoKham,
+        hinhThucKham,
+        ngayKham: moment(ngayKham).format("YYYY-MM-DD"),
+        maKhungGio,
       });
 
-      if (data.maBacSi && data.ngayKham) {
-        fetchKhungGio(data.maBacSi, moment(data.ngayKham).format("YYYY-MM-DD"));
+      if (maBacSi && hinhThucKham) {
+        fetchNgayKham(maBacSi, hinhThucKham, ngayKham);
       }
+
+      if (maBacSi && ngayKham && hinhThucKham) {
+        fetchKhungGio(maBacSi, hinhThucKham, ngayKham, true);
+      }
+    } else {
+      form.resetFields();
+      setDanhSachNgayKham([]);
+      setDanhSachKhungGio([]);
     }
-  }, [data]);
+  }, [data, form]);
 
   const fetchDanhSachBacSi = async () => {
     try {
@@ -45,29 +58,82 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
     }
   };
 
-  const fetchKhungGio = async (maBacSi, ngay) => {
+  const fetchNgayKham = async (maBacSi, hinhThucKham, ngayKhamDaChon = null) => {
     try {
-      const res = await fetchKhungGioBacSiByNgay(maBacSi, ngay);
+      const res = await fetchNgayLamViecByBacSi(maBacSi, hinhThucKham);
+      if (Array.isArray(res)) {
+        const ngayHienTai = moment().startOf("day");
+        let ngayHopLe = res.filter((ngay) =>
+          moment(ngay, "YYYY-MM-DD").isSameOrAfter(ngayHienTai)
+        );
+
+        if (ngayKhamDaChon && !ngayHopLe.includes(ngayKhamDaChon)) {
+          ngayHopLe = [ngayKhamDaChon, ...ngayHopLe];
+        }
+
+        setDanhSachNgayKham(ngayHopLe);
+
+        if (!ngayHopLe.includes(ngayKhamDaChon)) {
+          form.setFieldsValue({ ngayKham: undefined, maKhungGio: undefined });
+          setDanhSachKhungGio([]);
+        }
+      } else {
+        setDanhSachNgayKham([]);
+        setDanhSachKhungGio([]);
+      }
+    } catch (err) {
+      message.error("Không thể tải ngày khám");
+    }
+  };
+
+  const fetchKhungGio = async (maBacSi, hinhThucKham, ngay, isInitialLoad = false) => {
+    try {
+      const res = await getKhungGioByNgay(maBacSi, hinhThucKham, ngay, data?.maLich);
       if (Array.isArray(res)) setDanhSachKhungGio(res);
       else setDanhSachKhungGio([]);
+
+      if (!isInitialLoad) {
+        form.setFieldsValue({ maKhungGio: undefined });
+      }
     } catch (err) {
       message.error("Không thể tải khung giờ");
     }
   };
 
   const handleBacSiChange = (maBacSi) => {
-    const ngayKham = form.getFieldValue("ngayKham");
-    form.setFieldsValue({ maKhungGio: undefined });
-    if (ngayKham) {
-      fetchKhungGio(maBacSi, ngayKham.format("YYYY-MM-DD"));
+    const hinhThucKham = form.getFieldValue("hinhThucKham");
+    if (maBacSi && hinhThucKham) {
+      fetchNgayKham(maBacSi, hinhThucKham);
+      form.setFieldsValue({ ngayKham: undefined, maKhungGio: undefined });
+      setDanhSachKhungGio([]);
+    } else {
+      form.setFieldsValue({ ngayKham: undefined, maKhungGio: undefined });
+      setDanhSachNgayKham([]);
+      setDanhSachKhungGio([]);
     }
   };
 
-  const handleNgayChange = (ngayMoment) => {
+  const handleHinhThucKhamChange = (hinhThucKham) => {
     const maBacSi = form.getFieldValue("maBacSi");
-    form.setFieldsValue({ maKhungGio: undefined });
-    if (maBacSi && ngayMoment) {
-      fetchKhungGio(maBacSi, ngayMoment.format("YYYY-MM-DD"));
+    if (maBacSi && hinhThucKham) {
+      fetchNgayKham(maBacSi, hinhThucKham);
+      form.setFieldsValue({ ngayKham: undefined, maKhungGio: undefined });
+      setDanhSachKhungGio([]);
+    } else {
+      form.setFieldsValue({ ngayKham: undefined, maKhungGio: undefined });
+      setDanhSachNgayKham([]);
+      setDanhSachKhungGio([]);
+    }
+  };
+
+  const handleNgayChange = (ngayStr) => {
+    const maBacSi = form.getFieldValue("maBacSi");
+    const hinhThucKham = form.getFieldValue("hinhThucKham");
+    if (maBacSi && ngayStr && hinhThucKham) {
+      fetchKhungGio(maBacSi, hinhThucKham, ngayStr);
+    } else {
+      form.setFieldsValue({ maKhungGio: undefined });
+      setDanhSachKhungGio([]);
     }
   };
 
@@ -78,8 +144,9 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
         maLich: data.maLich,
         maBacSi: values.maBacSi,
         maKhungGio: values.maKhungGio,
-        ngayKham: values.ngayKham.format("YYYY-MM-DD"),
+        ngayKham: values.ngayKham,
         lyDoKham: values.lyDoKham,
+        hinhThucKham: values.hinhThucKham,
       };
 
       setLoading(true);
@@ -88,7 +155,8 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
         payload.maBacSi,
         payload.maKhungGio,
         payload.ngayKham,
-        payload.lyDoKham
+        payload.lyDoKham,
+        payload.hinhThucKham
       );
       message.success("Cập nhật thành công!");
       onCancel();
@@ -109,12 +177,7 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
         <Button key="cancel" onClick={onCancel}>
           Hủy
         </Button>,
-        <Button
-          key="submit"
-          type="primary"
-          loading={loading}
-          onClick={handleOk}
-        >
+        <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
           Cập nhật
         </Button>,
       ]}
@@ -135,15 +198,32 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
         </Form.Item>
 
         <Form.Item
+          label="Hình thức khám"
+          name="hinhThucKham"
+          rules={[{ required: true, message: "Vui lòng chọn hình thức khám" }]}
+        >
+          <Select onChange={handleHinhThucKhamChange} placeholder="Chọn hình thức khám">
+            <Select.Option value="Trực tuyến">Trực tuyến</Select.Option>
+            <Select.Option value="Chuyên khoa">Chuyên khoa</Select.Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
           label="Ngày khám"
           name="ngayKham"
           rules={[{ required: true, message: "Vui lòng chọn ngày khám" }]}
         >
-          <DatePicker
+          <Select
+            placeholder="Chọn ngày khám"
             onChange={handleNgayChange}
-            style={{ width: "100%" }}
-            format="DD/MM/YYYY"
-          />
+            disabled={danhSachNgayKham.length === 0}
+          >
+            {danhSachNgayKham.map((ngay) => (
+              <Select.Option key={ngay} value={ngay}>
+                {moment(ngay, "YYYY-MM-DD").format("DD/MM/YYYY")}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
@@ -151,7 +231,7 @@ const ModalCapNhatLichHen = ({ open, onCancel, data, onReload }) => {
           name="maKhungGio"
           rules={[{ required: true, message: "Vui lòng chọn khung giờ" }]}
         >
-          <Select placeholder="Chọn khung giờ">
+          <Select placeholder="Chọn khung giờ" disabled={danhSachKhungGio.length === 0}>
             {danhSachKhungGio.map((kg) => (
               <Select.Option key={kg.maKhungGio} value={kg.maKhungGio}>
                 {kg.khungGio}

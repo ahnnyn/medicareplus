@@ -265,18 +265,24 @@ export const fetchAllPhieuKhamBenh = (maHoSo) => {
     return axios.get(URL_BACKEND);
 };
 
-export const updateLichHen = (maLich, maBacSi, maKhungGio, ngayKham, lyDoKham) => {
-    const URL_BACKEND = `/api/lichhen.php?action=updateLichHen`;
-    const data = {
-      maLich,
-      maBacSi,
-      maKhungGio,
-      ngayKham,
-      lyDoKham,
-    };
-  
-    return axios.post(URL_BACKEND, data);
+export const updateLichHen = (maLich, maBacSi, maKhungGio, ngayKham, lyDoKham, hinhThucKham) => {
+  const URL_BACKEND = `/api/lichhen.php?action=updateLichHen`;
+  const data = {
+    maLich,
+    maBacSi,
+    maKhungGio,
+    ngayKham,
+    lyDoKham,
+    hinhThucKham,
+  };
+
+  return axios.post(URL_BACKEND, data, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
+
 export const deleteLichHen = (maLich) => {
     return axios.delete(`/api/lichhen.php?action=xoaLichHen&maLich=${maLich}`);
 };
@@ -285,5 +291,23 @@ export const fetchKhungGioBacSiByNgay = (maBacSi, ngayLamViec) => {
   const URL_BACKEND = `/api/lichlamviec.php?action=getLichLamViecTheoNgay`;
   return axios.get(URL_BACKEND, {
     params: { maBacSi, ngayLamViec }
+  });
+};
+export const getKhungGioByNgay = (maBacSi, hinhThucKham, ngayLamViec, maLichDangSua = null) => {
+  const URL_BACKEND = `/api/khunggio.php?action=getKhungGioByNgay`;
+  const params = { maBacSi, hinhThucKham, ngayLamViec };
+
+  if (maLichDangSua) {
+    params.maLichDangSua = maLichDangSua;
+  }
+
+  return axios.get(URL_BACKEND, { params });
+};
+
+
+export const fetchNgayLamViecByBacSi = (maBacSi, hinhThucKham) => {
+  const URL_BACKEND = `/api/lichlamviec.php?action=getNgayLamViecByBacSi`;
+  return axios.get(URL_BACKEND, {
+    params: {maBacSi, hinhThucKham }
   });
 };

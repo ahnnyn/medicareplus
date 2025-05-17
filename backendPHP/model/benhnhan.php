@@ -19,10 +19,9 @@
         
             try {
                 $query = $pdo->prepare("
-                    SELECT bn.*, tk.*, hs.maHoSo, vt.tenVaiTro
+                    SELECT bn.*, tk.*, hs.maHoSo 
                     FROM benhnhan bn
                     JOIN taikhoan tk ON bn.maTaiKhoan = tk.maTaiKhoan
-                    JOIN vaitro vt ON tk.maVaiTro = vt.maVaiTro
                     LEFT JOIN hosobenhnhan hs ON bn.maBenhNhan = hs.maBenhNhan
                     WHERE bn.maBenhNhan = :id
                     LIMIT 1
@@ -41,16 +40,6 @@
             } finally {
                 $pdo = null;
             }
-        }
-        public function layThongTinBenhNhanQuaEmail($email) {
-            $p = new connectdatabase();
-            $pdo = $p->connect();
-            if (!$pdo) return false;
-    
-            $query = $pdo->prepare("SELECT * FROM benhnhan WHERE email = :email");
-            $query->bindParam(":email", $email);
-            $query->execute();
-            return $query->fetch(PDO::FETCH_ASSOC);
         }
         public function capNhatMatKhau($maBenhNhan, $matKhauMoi) {
             $p = new connectdatabase();
@@ -100,6 +89,21 @@
             } else {
                 return ["error" => "Không thể kết nối database"];
             }
-        }      
+        }    
+        public function layDanhSachBenhNhan(){
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if ($pdo) {
+                try {
+                    $query = $pdo->query("SELECT * FROM benhnhan ORDER BY maBenhNhan DESC;");
+                    $data = $query->fetchAll(PDO::FETCH_ASSOC);
+                    return $data;
+                } catch (PDOException $e) {
+                    return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+                }
+            } else {
+                return ["error" => "Không thể kết nối database"];
+            }
+        }  
     }
 ?>

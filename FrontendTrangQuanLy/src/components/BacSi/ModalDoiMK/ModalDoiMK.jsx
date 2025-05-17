@@ -13,9 +13,9 @@ import { FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import bcrypt from "bcryptjs-react";
-import { fetchBacSiByMaBS } from "../../services/apiDoctor";
-import { doiThongTinDoctor } from "../../services/loginAPI";
-import { doLogoutAction } from "../../redux/account/accountSlice";
+import { fetchBacSiByMaBS } from "../../../services/apiDoctor";
+import { doiThongTinDoctor } from "../../../services/loginAPI";
+import { doLogoutAction } from "../../../redux/account/accountSlice";
 
 const ModalDoiMK = () => {
   const dispatch = useDispatch();
