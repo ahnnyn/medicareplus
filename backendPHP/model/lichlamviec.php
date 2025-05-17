@@ -9,8 +9,8 @@ class mLichLamViec {
         $this->pdo = $p->connect(); // Kết nối database
     }
 
-    // Lấy lịch làm việc theo ngày của bác sĩ
-    public function layLichLamViecTheoNgay($maBacSi)
+    // Lấy lịch làm việc của bác sĩ
+    public function layLichLamViec($maBacSi)
     {
         if (!$this->pdo) {
             return ["error" => "Không thể kết nối database"];
@@ -149,11 +149,11 @@ class mLichLamViec {
     // }
 
     public function themLichLamViecBacSi($maBacSi, $ngayLam, $khungGioList, $hinhThucKham) {
-        if (!$this->pdo) return ["error" => "Không thể kết nối database"];
-        if (!is_numeric($maBacSi) || !is_array($khungGioList)) return ["error" => "Dữ liệu đầu vào không hợp lệ"];
+        if (!$this->pdo) return ["status" => false, "error" => "Không thể kết nối database"];
+        if (!is_numeric($maBacSi) || !is_array($khungGioList)) return ["status" => false, "error" => "Dữ liệu đầu vào không hợp lệ"];
     
         $date = DateTime::createFromFormat('Y-m-d', $ngayLam);
-        if (!$date || $date->format('Y-m-d') !== $ngayLam) return ["error" => "Ngày làm việc không hợp lệ"];
+        if (!$date || $date->format('Y-m-d') !== $ngayLam) return ["status" => false, "error" => "Ngày làm việc không hợp lệ"];
     
         try {
             // Kiểm tra xem ngày làm việc đã có trong bảng lichlamviec hay chưa
@@ -177,7 +177,6 @@ class mLichLamViec {
                 $oldKhungGioList = $stmtOld->fetchAll(PDO::FETCH_COLUMN);
 
                 // Xử lý xóa và thêm khung giờ
-                // Đảm bảo xử lý tham số đúng cách
                 $toDelete = array_diff($oldKhungGioList, $khungGioList);
                 $toAdd = array_diff($khungGioList, $oldKhungGioList);
                 if (!empty($toDelete)) {
@@ -204,7 +203,7 @@ class mLichLamViec {
                     }
                 }
 
-                return ["success" => "Cập nhật lịch làm việc thành công"];
+                return ["status" => true, "message" => "Cập nhật lịch làm việc thành công"];
             } else {
                 // Nếu chưa có lịch làm việc cho ngày đó, tạo mới lịch làm việc và thêm khung giờ
                 $this->pdo->beginTransaction();
@@ -238,11 +237,11 @@ class mLichLamViec {
                 }
     
                 $this->pdo->commit();
-                return ["success" => "Thêm lịch làm việc thành công"];
+                return ["status" => true, "message" => "Thêm lịch làm việc thành công"];
             }
         } catch (PDOException $e) {
             if ($this->pdo->inTransaction()) $this->pdo->rollBack();
-            return ["error" => "Lỗi: " . $e->getMessage()];
+            return ["status" => false, "error" => "Lỗi PDO: " . $e->getMessage()];
         }
     }
       

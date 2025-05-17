@@ -21,7 +21,7 @@ $p = new cChuyenKhoa();
 if (isset($_GET["action"])) {
     switch ($_GET["action"]) {
         case "getAllChuyenKhoa":
-            $p->layDanhSachChuyenKhoa();
+            $p->getDanhSachChuyenKhoa();
             break;
         case "getChuyenKhoaById":
             if (isset($_GET["maKhoa"])) {

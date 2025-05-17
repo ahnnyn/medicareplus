@@ -25,7 +25,7 @@ if (isset($_GET["action"])) {
             if (isset($_GET["maBacSi"]) && !empty($_GET["maBacSi"])) {
                 $p->getLichLamViec($_GET["maBacSi"]);
             } else {
-                echo json_encode(["error" => "Thiếu hoặc sai mã bác sĩ hoặc ngày làm việc"]);
+                echo json_encode(["error" => "Thiếu hoặc sai mã bác sĩ"]);
             }
             break;
             case "getLichLamViecTheoNgay":
@@ -48,8 +48,7 @@ if (isset($_GET["action"])) {
                 $maKhungGio = $data["maKhungGio"]; // PHẢI LÀ MẢNG
                 $hinhThucKham = isset($data["hinhThucKham"]) ? $data["hinhThucKham"] : null; // Có thể không có
             
-                $p = new mLichLamViec();
-                $result = $p->themLichLamViecBacSi($maBacSi, $ngayLamViec, $maKhungGio, $hinhThucKham);
+                $result = $p->themLichLamViec($maBacSi, $ngayLamViec, $maKhungGio, $hinhThucKham);
             
                 echo json_encode($result);
                 break;            

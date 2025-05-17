@@ -128,92 +128,90 @@
         }
 
         public function capNhatThongTinPhieuKhamBenh($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham, $donThuoc) {
-    $p = new connectdatabase();
-    $pdo = $p->connect();
-    if (!$pdo) {
-        return [
-            "status" => false,
-            "message" => "Không thể kết nối cơ sở dữ liệu."
-        ];
-    }
-
-    try {
-        // Bắt đầu transaction
-        $pdo->beginTransaction();
-
-        // Cập nhật thông tin phiếu khám bệnh
-        $query = $pdo->prepare("UPDATE phieukhambenh SET tienSu = :tienSu, chanDoan = :chuanDoan, lyDoKham = :lyDoKham WHERE maPhieu = :maPhieuKham");
-        $query->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
-        $query->bindParam(":tienSu", $tienSu);
-        $query->bindParam(":chuanDoan", $chuanDoan);
-        $query->bindParam(":lyDoKham", $lyDoKham);
-        $isUpdated = $query->execute();
-
-        if (!$isUpdated) {
-            throw new Exception("Cập nhật phiếu khám thất bại.");
-        }
-
-        if (empty($donThuoc)) {
-            // Nếu không có đơn thuốc thì xóa đơn thuốc cũ và chi tiết
-            $queryDeleteCT = $pdo->prepare("DELETE FROM chitiet_donthuoc WHERE maDonThuoc IN (SELECT maDonThuoc FROM donthuoc WHERE maPhieuKhamBenh = :maPhieuKham)");
-            $queryDeleteCT->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
-            $queryDeleteCT->execute();
-
-            $queryDeleteDT = $pdo->prepare("DELETE FROM donthuoc WHERE maPhieuKhamBenh = :maPhieuKham");
-            $queryDeleteDT->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
-            $queryDeleteDT->execute();
-        } else {
-            // Nếu có đơn thuốc
-            // Kiểm tra xem đã có đơn thuốc chưa
-            $queryCheck = $pdo->prepare("SELECT maDonThuoc FROM donthuoc WHERE maPhieuKhamBenh = :maPhieuKham");
-            $queryCheck->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
-            $queryCheck->execute();
-            $maDonThuoc = $queryCheck->fetchColumn();
-
-            if (!$maDonThuoc) {
-                // Nếu chưa có thì tạo mới
-                $queryInsertDonThuoc = $pdo->prepare("INSERT INTO donthuoc (maPhieuKhamBenh, ngayTao) VALUES (:maPhieuKham, NOW())");
-                $queryInsertDonThuoc->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
-                $queryInsertDonThuoc->execute();
-                $maDonThuoc = $pdo->lastInsertId();
-            } else {
-                // Nếu có rồi thì xóa chi tiết đơn thuốc cũ để cập nhật lại
-                $queryDeleteChiTiet = $pdo->prepare("DELETE FROM chitiet_donthuoc WHERE maDonThuoc = :maDonThuoc");
-                $queryDeleteChiTiet->bindParam(":maDonThuoc", $maDonThuoc, PDO::PARAM_INT);
-                $queryDeleteChiTiet->execute();
+            $p = new connectdatabase();
+            $pdo = $p->connect();
+            if (!$pdo) {
+                return [
+                    "status" => false,
+                    "message" => "Không thể kết nối cơ sở dữ liệu."
+                ];
             }
 
-            // Thêm lại các chi tiết đơn thuốc
-            foreach ($donThuoc as $thuoc) {
-                $queryChiTiet = $pdo->prepare("INSERT INTO chitiet_donthuoc (maDonThuoc, tenThuoc, lieuDung, soLanDungTrongNgay, soNgay, ghiChu) 
-                    VALUES (:maDonThuoc, :tenThuoc, :lieuDung, :soLanDung, :soNgay, :ghiChu)");
-                $queryChiTiet->bindParam(":maDonThuoc", $maDonThuoc, PDO::PARAM_INT);
-                $queryChiTiet->bindParam(":tenThuoc", $thuoc['tenThuoc']);
-                $queryChiTiet->bindParam(":lieuDung", $thuoc['lieuLuong']);
-                $queryChiTiet->bindParam(":soLanDung", $thuoc['soLanDungTrongNgay']);
-                $queryChiTiet->bindParam(":soNgay", $thuoc['soNgayDung'], PDO::PARAM_INT);
-                $queryChiTiet->bindParam(":ghiChu", $thuoc['ghiChu']);
-                $queryChiTiet->execute();
+            try {
+                // Bắt đầu transaction
+                $pdo->beginTransaction();
+
+                // Cập nhật thông tin phiếu khám bệnh
+                $query = $pdo->prepare("UPDATE phieukhambenh SET tienSu = :tienSu, chanDoan = :chuanDoan, lyDoKham = :lyDoKham WHERE maPhieu = :maPhieuKham");
+                $query->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
+                $query->bindParam(":tienSu", $tienSu);
+                $query->bindParam(":chuanDoan", $chuanDoan);
+                $query->bindParam(":lyDoKham", $lyDoKham);
+                $isUpdated = $query->execute();
+
+                if (!$isUpdated) {
+                    throw new Exception("Cập nhật phiếu khám thất bại.");
+                }
+
+                if (empty($donThuoc)) {
+                    // Nếu không có đơn thuốc thì xóa đơn thuốc cũ và chi tiết
+                    $queryDeleteCT = $pdo->prepare("DELETE FROM chitiet_donthuoc WHERE maDonThuoc IN (SELECT maDonThuoc FROM donthuoc WHERE maPhieuKhamBenh = :maPhieuKham)");
+                    $queryDeleteCT->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
+                    $queryDeleteCT->execute();
+
+                    $queryDeleteDT = $pdo->prepare("DELETE FROM donthuoc WHERE maPhieuKhamBenh = :maPhieuKham");
+                    $queryDeleteDT->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
+                    $queryDeleteDT->execute();
+                } else {
+                    // Nếu có đơn thuốc
+                    // Kiểm tra xem đã có đơn thuốc chưa
+                    $queryCheck = $pdo->prepare("SELECT maDonThuoc FROM donthuoc WHERE maPhieuKhamBenh = :maPhieuKham");
+                    $queryCheck->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
+                    $queryCheck->execute();
+                    $maDonThuoc = $queryCheck->fetchColumn();
+
+                    if (!$maDonThuoc) {
+                        // Nếu chưa có thì tạo mới
+                        $queryInsertDonThuoc = $pdo->prepare("INSERT INTO donthuoc (maPhieuKhamBenh, ngayTao) VALUES (:maPhieuKham, NOW())");
+                        $queryInsertDonThuoc->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
+                        $queryInsertDonThuoc->execute();
+                        $maDonThuoc = $pdo->lastInsertId();
+                    } else {
+                        // Nếu có rồi thì xóa chi tiết đơn thuốc cũ để cập nhật lại
+                        $queryDeleteChiTiet = $pdo->prepare("DELETE FROM chitiet_donthuoc WHERE maDonThuoc = :maDonThuoc");
+                        $queryDeleteChiTiet->bindParam(":maDonThuoc", $maDonThuoc, PDO::PARAM_INT);
+                        $queryDeleteChiTiet->execute();
+                    }
+
+                    // Thêm lại các chi tiết đơn thuốc
+                    foreach ($donThuoc as $thuoc) {
+                        $queryChiTiet = $pdo->prepare("INSERT INTO chitiet_donthuoc (maDonThuoc, tenThuoc, lieuDung, soLanDungTrongNgay, soNgay, ghiChu) 
+                            VALUES (:maDonThuoc, :tenThuoc, :lieuDung, :soLanDung, :soNgay, :ghiChu)");
+                        $queryChiTiet->bindParam(":maDonThuoc", $maDonThuoc, PDO::PARAM_INT);
+                        $queryChiTiet->bindParam(":tenThuoc", $thuoc['tenThuoc']);
+                        $queryChiTiet->bindParam(":lieuDung", $thuoc['lieuLuong']);
+                        $queryChiTiet->bindParam(":soLanDung", $thuoc['soLanDungTrongNgay']);
+                        $queryChiTiet->bindParam(":soNgay", $thuoc['soNgayDung'], PDO::PARAM_INT);
+                        $queryChiTiet->bindParam(":ghiChu", $thuoc['ghiChu']);
+                        $queryChiTiet->execute();
+                    }
+                }
+
+                // Commit mọi thay đổi
+                $pdo->commit();
+
+                return [
+                    "status" => true,
+                    "message" => "Cập nhật phiếu khám bệnh thành công."
+                ];
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                return [
+                    "status" => false,
+                    "message" => "Lỗi: " . $e->getMessage()
+                ];
             }
         }
-
-        // Commit mọi thay đổi
-        $pdo->commit();
-
-        return [
-            "status" => true,
-            "message" => "Cập nhật phiếu khám bệnh thành công."
-        ];
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        return [
-            "status" => false,
-            "message" => "Lỗi: " . $e->getMessage()
-        ];
-    }
-}
-
-
 
         public function layAllPhieuKhamBenh($maHoSo) {
             $p = new connectdatabase();

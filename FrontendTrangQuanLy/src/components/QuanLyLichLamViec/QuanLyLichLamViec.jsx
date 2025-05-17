@@ -2,7 +2,7 @@ import { Badge, Button, Calendar, Checkbox, Col, DatePicker, Divider, Form, mess
 import { useEffect, useState } from "react"
 import moment from "moment"
 import './css.scss'
-import { dangKyKhungGioKham, fetchBacSiByMaBS, fetchCaLamViec, fetchKhungGioByCaLamViec, fetchKhungGio, getTimeSlotsByDoctorAndDate } from "../../services/apiDoctor"
+import { dangKyKhungGioKham, fetchBacSiByMaBS, fetchKhungGio, getTimeSlotsByDoctor } from "../../services/apiDoctor"
 import { useSelector } from "react-redux"
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
@@ -26,20 +26,24 @@ const QuanLyLichLamViec = () => {
         'Chuyên khoa': []
       });
       
+    const selectedDoctor = Form.useWatch('maBacSi', form);
 
     const user = useSelector(state => state.accountDoctor.user)
 
     useEffect(() => {
-        fetchAllDoctors()
+      if (selectedDoctor) {
+        fetchDoctorTimes();
+      }
+    }, [selectedDoctor]);
+
+    useEffect(() => {
+        fetchDoctors()
     }, [user])
 
     useEffect(() => {
         fetchAllTimes()
     }, [])
 
-    useEffect(() => {
-        fetchKhungGioOfCa()
-    }, [])
 
     useEffect(() => {
         if (dataDoctor && dataDoctor.maBacSi) {
@@ -53,8 +57,6 @@ const QuanLyLichLamViec = () => {
     useEffect(() => {
         fetchDoctorTimes();
     }, [hinhThucKham, form.getFieldValue('date')]);
-    
-
     
     useEffect(() => {
         const doctorId = form.getFieldValue('maBacSi');
@@ -74,20 +76,9 @@ const QuanLyLichLamViec = () => {
         console.log("dataLichLamViec updated: ", dataLichLamViec);
       }, [dataLichLamViec]);
 
-    const fetchKhungGioOfCa = async () => {
-        try {
-            const res = await fetchKhungGioByCaLamViec(); // Lấy dữ liệu khung giờ từ API
-            console.log("Khung giờ trong ca làm: ", res);
-            if (res && res.length > 0) {
-                setDataKGTheoCa(res);  // Cập nhật state với dữ liệu có thêm ca làm
-                console.log("Khung giờ theo ca làm: ", dataKGTheoCa);
-            }
-        } catch (error) {
-            console.error("Error fetching ca lam viec data:", error);
-        }
-    };
+
     
-    const fetchAllDoctors = async () => {
+    const fetchDoctors = async () => {
         try {
             const res = await fetchBacSiByMaBS(user.maBacSi);
             console.log("res doctor by id: ", res);
@@ -119,58 +110,89 @@ const QuanLyLichLamViec = () => {
     console.log("dataTime: ", dataTime);
 
     const fetchDoctorTimes = async () => {
-        const doctorId = form.getFieldValue('maBacSi');
-        const appointmentDate = form.getFieldValue('date');
-      
-        if (doctorId && appointmentDate) {
-          try {
-            const formattedDate = appointmentDate.format('YYYY-MM-DD');
-            const res = await getTimeSlotsByDoctorAndDate(doctorId, formattedDate);
-      
-            if (res && Array.isArray(res)) {
-              setDataLichLamViec(res); // render bảng
-      
-              const oppositeType = hinhThucKham === 'Trực tuyến' ? 'Chuyên khoa' : 'Trực tuyến';
-      
-              const matchedCurrent = res.filter(
-                item => item.hinhThucKham === hinhThucKham && item.ngayLamViec === formattedDate
-              );
-      
-              const matchedOpposite = res.filter(
-                item => item.hinhThucKham === oppositeType && item.ngayLamViec === formattedDate
-              );
-      
-              const selected = matchedCurrent.map(item => item.maKhungGio);
-              const disabled = matchedOpposite.map(item => item.maKhungGio);
-      
-              const allTimeRes = await fetchKhungGio();
-      
-              const finalTimeList = allTimeRes.map(time => ({
-                ...time,
-                disabled: disabled.includes(time.maKhungGio),
-              }));
-      
-              setDataTime(finalTimeList);
-      
-              // Luôn cập nhật selectedTimesByType cho hình thức hiện tại
-              setSelectedTimesByType(prev => ({
-                ...prev,
-                [hinhThucKham]: selected,
-              }));
-      
-              // Đặt selectedTimes & giá trị form từ dữ liệu mới cập nhật
-              setSelectedTimes(selected);
-              form.setFieldsValue({
-                time: selected,
-              });
-            }
-          } catch (error) {
-            console.error("Error fetching doctor times:", error);
+      // Lấy giá trị form
+      let doctorId = form.getFieldValue('maBacSi') || dataDoctor.maBacSi || ''; // fallback sang dataDoctor.maBacSi nếu form rỗng
+      const appointmentDate = form.getFieldValue('date'); // moment object hoặc undefined/null
+      const formattedDate = appointmentDate ? appointmentDate.format('YYYY-MM-DD') : null;
+
+      if (!doctorId) {
+        // Nếu không có bác sĩ thì không gọi API
+        setDataLichLamViec([]);
+        setDataTime([]);
+        return;
+      }
+
+      try {
+        const res = await getTimeSlotsByDoctor(doctorId);
+
+        if (res && Array.isArray(res)) {
+          let filteredRes = res;
+
+          // Lọc theo ngày nếu có ngày
+          if (formattedDate) {
+            filteredRes = filteredRes.filter(item => item.ngayLamViec === formattedDate);
+          }
+
+          // Lọc theo hình thức khám nếu có
+          if (hinhThucKham) {
+            filteredRes = filteredRes.filter(item => item.hinhThucKham === hinhThucKham);
+          }
+
+          setDataLichLamViec(filteredRes); // render bảng
+
+          // Xử lý disabled time cho các hình thức khác (nếu có ngày)
+          if (formattedDate && hinhThucKham) {
+            const oppositeType = hinhThucKham === 'Trực tuyến' ? 'Chuyên khoa' : 'Trực tuyến';
+            const matchedCurrent = res.filter(
+              item => item.hinhThucKham === hinhThucKham && item.ngayLamViec === formattedDate
+            );
+            const matchedOpposite = res.filter(
+              item => item.hinhThucKham === oppositeType && item.ngayLamViec === formattedDate
+            );
+
+            const selected = matchedCurrent.map(item => item.maKhungGio);
+            const disabled = matchedOpposite.map(item => item.maKhungGio);
+
+            const allTimeRes = await fetchKhungGio();
+
+            const finalTimeList = allTimeRes.map(time => ({
+              ...time,
+              disabled: disabled.includes(time.maKhungGio),
+            }));
+
+            setDataTime(finalTimeList);
+
+            // Cập nhật selectedTimesByType cho hình thức hiện tại
+            setSelectedTimesByType(prev => ({
+              ...prev,
+              [hinhThucKham]: selected,
+            }));
+
+            setSelectedTimes(selected);
+            form.setFieldsValue({ time: selected });
+          } else {
+            // Nếu không có ngày thì không disable gì hết, set toàn bộ thời gian
+            const allTimeRes = await fetchKhungGio();
+            setDataTime(allTimeRes);
+
+            // reset selected times
             setSelectedTimes([]);
+            form.setFieldsValue({ time: [] });
           }
         }
-      };
-      
+      } catch (error) {
+        console.error("Error fetching doctor times:", error);
+        setSelectedTimes([]);
+        setDataLichLamViec([]);
+        setDataTime([]);
+      }
+    };
+      // Hàm xử lý khi chọn khung giờ
+      useEffect(() => {
+    fetchDoctorTimes();
+  }, [form.getFieldValue('date'), hinhThucKham]);
+
+
     const handleTimeSelect = (timeId) => {
         const currentSelected = selectedTimesByType[hinhThucKham] || [];
       
@@ -226,9 +248,10 @@ const QuanLyLichLamViec = () => {
         try {
             // Gửi danh sách KHUNG GIỜ ĐÃ CẬP NHẬT CHO HÌNH THỨC ĐANG CHỌN
             const res = await dangKyKhungGioKham(maBacSi, appointmentDate, selectedTimes, hinhThucKham);
+            console.log("res dang ky khung gio: ", res);
     
-            if (res && res.success) {
-                message.success(res.success);
+            if (res && res.status) {
+                message.success(res.message);
                 // Sau khi cập nhật thành công, có thể gọi lại fetchDoctorTimes() để refresh lại
                 fetchDoctorTimes();
             } else {
@@ -284,6 +307,8 @@ const QuanLyLichLamViec = () => {
               ) : null,
           })),
         ];
+
+
       
         const allTimeSlots = Array.from(new Set(dataLichLamViec.map(item => item.khungGio))).sort();
       
@@ -349,7 +374,6 @@ const QuanLyLichLamViec = () => {
                     >
                         <Form.Item name="maLichLamViec" style={{ display: 'none' }}>
                             <Select
-                                placeholder="Chọn mã lịch làm việc"
                                 options={dataLichLamViec.map(item => ({ value: item.maLichLamViec, label: item.tenLichLamViec }))}
                                 onChange={value => form.setFieldsValue({ maLichLamViec: value })}
                             />

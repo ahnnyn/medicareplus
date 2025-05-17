@@ -58,6 +58,10 @@ const HoSoBenhNhan = () => {
         findAllOrder();
     }, [user]);
 
+    useEffect(() => {
+    console.log("dataView", dataView);
+    }, [dataView]);
+
     const handleViewDetails = (record) => {
         setDataView(record.lichKham);
         setOpenView(true);
@@ -108,7 +112,7 @@ const HoSoBenhNhan = () => {
             key: "action",
             render: (_, record) => (
                 <Space size="middle">
-                    <Tooltip title="Xem chi tiết lịch khám" color="green">
+                    <Tooltip title="Xem chi tiết hồ sơ bệnh nhân" color="green">
                         <FaEye
                             size={23}
                             style={{ color: "green", cursor: "pointer", fontSize: "18px" }}
@@ -142,6 +146,7 @@ const HoSoBenhNhan = () => {
                     columns={columns}
                     dataSource={dataOrder}
                     rowKey={(record) => record.maBenhNhan}
+                    locale={dataOrder.length === 0 ? { emptyText: "Không có hồ sơ bệnh nhân phù hợp" } : {}}
                 />
             </Col>
             <ModalHoSoBenhNhan

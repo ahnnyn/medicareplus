@@ -6,7 +6,7 @@ class cLichLamViec {
     {
         header('Content-Type: application/json; charset=utf-8');
         $p = new mLichLamViec();
-        $result = $p->layLichLamViecTheoNgay($maBacSi);
+        $result = $p->layLichLamViec($maBacSi);
 
         if (isset($result['error'])) {
             http_response_code(500); // Lỗi truy vấn
@@ -57,10 +57,10 @@ class cLichLamViec {
         // Trả về phản hồi JSON
         if (isset($result["error"])) {
             http_response_code(500); // Lỗi server
-            echo json_encode($result);
+            return $result;
         } else {
             http_response_code(201); // Thành công (tạo dữ liệu)
-            echo json_encode($result);
+            return $result;
         }
     }
     

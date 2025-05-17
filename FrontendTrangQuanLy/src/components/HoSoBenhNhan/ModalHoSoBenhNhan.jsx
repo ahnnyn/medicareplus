@@ -7,6 +7,8 @@ import html2canvas from 'html2canvas';
 const ModalHoSoBenhNhan = ({ openView, setOpenView, dataView, setDataView }) => {
     const [dataPhieuKham, setDataPhieuKham] = useState({});
     const dataArray = Array.isArray(dataView) ? dataView : [];
+    console.log("dataArray", dataArray);
+    const dataPhieuKhamArray = Array.isArray(dataPhieuKham) ? dataPhieuKham : [];
 
     const onClose = () => {
         setOpenView(false);
@@ -47,6 +49,7 @@ const ModalHoSoBenhNhan = ({ openView, setOpenView, dataView, setDataView }) => 
             : <Tag color="red">Chưa thanh toán</Tag>;
     };
 
+    // Columns phiếu khám
     const columnsPhieuKham = [
         {
             title: 'Lý do khám',
@@ -67,31 +70,31 @@ const ModalHoSoBenhNhan = ({ openView, setOpenView, dataView, setDataView }) => 
 
     // Columns danh sách thuốc
     const columnsDonThuoc = [
-    {
-        title: 'Tên thuốc',
-        dataIndex: 'tenThuoc',
-        key: 'tenThuoc',
-    },
-    {
-        title: 'Liều lượng',
-        dataIndex: 'lieuLuong',
-        key: 'lieuLuong',
-    },
-    {
-        title: 'Số lần dùng/ngày',
-        dataIndex: 'soLanDungTrongNgay',
-        key: 'soLanDungTrongNgay',
-    },
-    {
-        title: 'Số ngày dùng',
-        dataIndex: 'soNgayDung',
-        key: 'soNgayDung',
-    },
-    {
-        title: 'Ghi chú',
-        dataIndex: 'ghiChu',
-        key: 'ghiChu',
-    },
+        {
+            title: 'Tên thuốc',
+            dataIndex: 'tenThuoc',
+            key: 'tenThuoc',
+        },
+        {
+            title: 'Liều lượng',
+            dataIndex: 'lieuLuong',
+            key: 'lieuLuong',
+        },
+        {
+            title: 'Số lần dùng/ngày',
+            dataIndex: 'soLanDungTrongNgay',
+            key: 'soLanDungTrongNgay',
+        },
+        {
+            title: 'Số ngày dùng',
+            dataIndex: 'soNgayDung',
+            key: 'soNgayDung',
+        },
+        {
+            title: 'Ghi chú',
+            dataIndex: 'ghiChu',
+            key: 'ghiChu',
+        },
     ];
 
     const handleDownloadPDF = async (id) => {

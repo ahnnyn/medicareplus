@@ -2,7 +2,7 @@
     include("../model/chuyenkhoa.php");
     
     class cChuyenKhoa {
-        public function layDanhSachChuyenKhoa() {
+        public function getDanhSachChuyenKhoa() {
             $p = new mChuyenKhoa();
             $result = $p->layDanhSachChuyenKhoa();
             

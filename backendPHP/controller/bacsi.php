@@ -28,7 +28,7 @@
             echo json_encode(["data" => $bacSiList]);
         }
 
-        public function layThongTinBacSiByKhoa($maKhoa) {
+        public function getThongTinBacSiByKhoa($maKhoa) {
             if (!$maKhoa) {
                 echo json_encode(["error" => "Thiếu mã khoa"]);
                 return;

@@ -150,6 +150,24 @@ export const fetchCaLamViec = async () => {
   }
 };
 
+export const getTimeSlotsByDoctor = async (maBacSi) => {
+  const URL_BACKEND = `/api/lichlamviec.php?action=getLichLamViec&maBacSi=${maBacSi}`;
+
+  try {
+    const response = await axios.get(URL_BACKEND);
+
+    console.log("Dữ liệu lịch làm việc từ API:", response);
+
+    return response; // Trả về response.data thay vì response
+  } catch (error) {
+    console.error(
+      "Lỗi khi gọi lịch làm việc API:",
+      error.response ? error.response : error.message
+    );
+    return [];
+  }
+};
+
 export const getTimeSlotsByDoctorAndDate = async (maBacSi, ngayLamViec) => {
   const URL_BACKEND = `/api/lichlamviec.php?action=getLichLamViecTheoNgay&maBacSi=${maBacSi}&ngayLamViec=${ngayLamViec}`;
 

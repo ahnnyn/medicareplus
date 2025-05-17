@@ -28,7 +28,7 @@ if (isset($_GET["action"])) {
             break;
         case "getBacSiByChuyenKhoa":
             if (isset($_GET["maKhoa"])) {
-                $p->layThongTinBacSiByKhoa($_GET["maKhoa"]);
+                $p->getThongTinBacSiByKhoa($_GET["maKhoa"]);
             } else {
                 echo json_encode(["error" => "Thiếu mã khoa"]);
             }
