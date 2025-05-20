@@ -26,24 +26,25 @@ const BacSiNoiBat = () => {
       let res = await fetchAllBacSi(""); // Luôn lấy tất cả để lọc frontend
 
       console.log("res", res);
-  
+
       if (res && res.data && Array.isArray(res.data)) {
         let filteredData = res.data;
-  
+
         // 1. Kiểm tra điều kiện lọc theo hình thức khám chỉ khi không chọn "Tất cả"
         if (status !== "tatca") {
           filteredData = filteredData.filter((item) => {
-            const hinhThucArr = item?.hinhThucKham?.toLowerCase().split(",") || [];
-  
+            const hinhThucArr =
+              item?.hinhThucKham?.toLowerCase().split(",") || [];
+
             if (status === "chuyenkhoa") {
               return hinhThucArr.includes("chuyên khoa");
             } else if (status === "tructuyen") {
               return hinhThucArr.includes("trực tuyến");
             }
-            return true;  // Điều này sẽ bảo đảm giữ lại những bác sĩ có hình thức khác nếu cần
+            return true; // Điều này sẽ bảo đảm giữ lại những bác sĩ có hình thức khác nếu cần
           });
         }
-  
+
         // 2. Lọc theo từ khóa tìm kiếm (nếu có)
         if (search) {
           const keyword = search.toLowerCase();
@@ -51,10 +52,10 @@ const BacSiNoiBat = () => {
             item?.hoTen?.toLowerCase().includes(keyword)
           );
         }
-  
+
         // Nếu không có bác sĩ nào sau khi lọc, xử lý trường hợp này
         if (filteredData.length === 0) {
-          setDataAllDoctor([]);  // Hoặc thông báo không có bác sĩ
+          setDataAllDoctor([]); // Hoặc thông báo không có bác sĩ
         } else {
           setDataAllDoctor(filteredData); // Cập nhật danh sách bác sĩ
         }
@@ -66,12 +67,11 @@ const BacSiNoiBat = () => {
       setDataAllDoctor([]); // Xử lý khi có lỗi
     }
   };
-  
-  
-  
 
   const handleRedirectDoctor = (maBacSi, hinhThucKham) => {
-    navigate(`/view-doctor?maBacSi=${maBacSi}&hinhThucKham=${hinhThucKham}`);
+    navigate(
+      `/chi-tiet-bac-si?maBacSi=${maBacSi}&hinhThucKham=${hinhThucKham}`
+    );
   };
 
   const onSearch = (value) => {
@@ -88,7 +88,10 @@ const BacSiNoiBat = () => {
       <Row style={{ marginTop: "120px" }}></Row>
       <div
         className=""
-        style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
+        style={{
+          backgroundImage: `url('../../public/Banner_2.jpg')`,
+          height: "450px",
+        }}
       >
         <Row justify="space-between" align="middle" gutter={16}>
           <Col xs={24} md={12} className="">
@@ -115,12 +118,26 @@ const BacSiNoiBat = () => {
               </h2>
               <ul
                 className=""
-                style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}
+                style={{
+                  listStyleType: "none",
+                  paddingLeft: "0",
+                  lineHeight: "1.8",
+                  color: "#333",
+                }}
               >
-                <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
-                <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
+                <li>
+                  ✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ
+                  hội có số thứ tự thấp nhất, tránh hết số
+                </li>
+                <li>
+                  ✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh
+                  toán (đối với cơ sở mở thanh toán online)
+                </li>
                 <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
-                <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
+                <li>
+                  ✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro
+                  (đối với các cơ sở tư có áp dụng)
+                </li>
               </ul>
             </div>
           </Col>
@@ -168,7 +185,10 @@ const BacSiNoiBat = () => {
               />
             </Col>
             <Col span={18}>
-              <SearchComponent placeholder="Tìm kiếm tên bác sĩ" onSearch={onSearch} />
+              <SearchComponent
+                placeholder="Tìm kiếm tên bác sĩ"
+                onSearch={onSearch}
+              />
             </Col>
 
             {dataAllDoctor?.length > 0 ? (
@@ -177,13 +197,17 @@ const BacSiNoiBat = () => {
                   key={index}
                   span={24}
                   style={{ padding: "10px 15px 0", cursor: "pointer" }}
-                  onClick={() => handleRedirectDoctor(item.maBacSi, selectedStatus)}
+                  onClick={() =>
+                    handleRedirectDoctor(item.maBacSi, selectedStatus)
+                  }
                 >
                   <Row>
                     <Col span={3}>
                       <Avatar
                         style={{ border: "1px solid green" }}
-                        src={`${import.meta.env.VITE_BACKEND_URL}/public/bacsi/${item?.hinhAnh}`}
+                        src={`${
+                          import.meta.env.VITE_BACKEND_URL
+                        }/public/bacsi/${item?.hinhAnh}`}
                         shape="square"
                         size={120}
                         icon={<UserOutlined />}

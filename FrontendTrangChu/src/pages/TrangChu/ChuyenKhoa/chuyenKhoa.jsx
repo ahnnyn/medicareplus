@@ -10,147 +10,201 @@ import { fetchAllChuyenKhoa } from "../../../services/apiChuyenKhoaBacSi"; // Đ
 import { useNavigate } from "react-router-dom";
 import SearchComponent from "../../../components/TrangChu/SearchComponent/SearchComponent";
 
-
-
 const ChuyenKhoa = () => {
+  const [dataAllDoctor, setDataAllDoctor] = useState([]);
+  const navigate = useNavigate();
+  const [dataSearch, setDataSearch] = useState("");
 
-    const [dataAllDoctor, setDataAllDoctor] = useState([])
-    const navigate = useNavigate()
-    const [dataSearch, setDataSearch] = useState('')
-    
-    useEffect(() => {
-        fetchListDoctor(dataSearch)
-    }, [dataSearch])
+  useEffect(() => {
+    fetchListDoctor(dataSearch);
+  }, [dataSearch]);
 
-    const fetchListDoctor = async (searchQuery = "") => {
-        try {
-            let res;
-            if (searchQuery) {
-                // Nếu có tìm kiếm, tìm chuyên khoa theo tên
-                res = await findChuyenKhoaByTen(`tenkhoa=${encodeURIComponent(searchQuery)}`);
-            } else {
-                // Nếu không có tìm kiếm, lấy tất cả chuyên khoa
-                res = await fetchAllChuyenKhoa(""); // Truyền chuỗi rỗng để lấy tất cả chuyên khoa
-            }
+  const fetchListDoctor = async (searchQuery = "") => {
+    try {
+      let res;
+      if (searchQuery) {
+        // Nếu có tìm kiếm, tìm chuyên khoa theo tên
+        res = await findChuyenKhoaByTen(
+          `tenkhoa=${encodeURIComponent(searchQuery)}`
+        );
+      } else {
+        // Nếu không có tìm kiếm, lấy tất cả chuyên khoa
+        res = await fetchAllChuyenKhoa(""); // Truyền chuỗi rỗng để lấy tất cả chuyên khoa
+      }
 
-            console.log("res all doctor: ", res);
-            if (res && res.data) {
-                setDataAllDoctor(res.data); // Cập nhật dữ liệu chuyên khoa
-            } else {
-                setDataAllDoctor([]); // Nếu không có dữ liệu, gán mảng rỗng
-            }
-        } catch (error) {
-            console.error("Lỗi khi gọi API:", error);
-            setDataAllDoctor([]); // Nếu có lỗi, gán mảng rỗng
-        }
-    };
-
-    const handleRedirectChuyenKhoa = (item) => {
-        navigate(`/user/view-chuyen-khoa-kham?maKhoa=${item}`)
+      console.log("res all doctor: ", res);
+      if (res && res.data) {
+        setDataAllDoctor(res.data); // Cập nhật dữ liệu chuyên khoa
+      } else {
+        setDataAllDoctor([]); // Nếu không có dữ liệu, gán mảng rỗng
+      }
+    } catch (error) {
+      console.error("Lỗi khi gọi API:", error);
+      setDataAllDoctor([]); // Nếu có lỗi, gán mảng rỗng
     }
+  };
 
-    const onSearch = (value) => {
-        console.log("Giá trị tìm kiếm:", value); // Thêm log này
-    
-        setDataSearch(value || '');
-    };
+  const handleRedirectChuyenKhoa = (item) => {
+    navigate(`/chi-tiet-chuyen-khoa?maKhoa=${item}`);
+  };
 
-    return (
-        <>
-        <HeaderViewDoctor />
-        <Row style={{marginBottom: "120px"}}></Row>
+  const onSearch = (value) => {
+    console.log("Giá trị tìm kiếm:", value); // Thêm log này
+
+    setDataSearch(value || "");
+  };
+
+  return (
+    <>
+      <HeaderViewDoctor />
+      <Row style={{ marginBottom: "120px" }}></Row>
+      <div
+        className=""
+        style={{
+          backgroundImage: `url('../../public/Banner_2.jpg')`,
+          height: "450px",
+        }}
+      >
+        <Row justify="space-between" align="middle" gutter={16}>
+          <Col xs={24} md={12} className="">
             <div
+              className=""
+              style={{
+                marginLeft: "70px",
+                padding: "10px 20px",
+                borderRadius: "40px",
+                backgroundColor: "white",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                marginTop: "50px",
+              }}
+            >
+              <h2
                 className=""
-                style={{ backgroundImage: `url('../../public/Banner_2.jpg')`, height: "450px" }}
-                >
-                <Row justify="space-between" align="middle" gutter={16}>
-                    <Col xs={24} md={12} className="">
-                    <div className="" style={{ marginLeft: "70px", padding: "10px 20px", borderRadius: "40px", backgroundColor: "white", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", marginTop: "50px" }}>
-                        <h2 className="" style={{ fontSize: "clamp(20px, 5vw, 30px)", fontWeight: "bold", color: "#00B0F0" }}>
-                        ĐẶT KHÁM THEO BÁC SĨ
-                        </h2>
-                        <ul className="" style={{ listStyleType: "none", paddingLeft: "0", lineHeight: "1.8", color: "#333" }}>
-                        <li>✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ hội có số thứ tự thấp nhất, tránh hết số</li>
-                        <li>✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh toán (đối với cơ sở mở thanh toán online)</li>
-                        <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
-                        <li>✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro (đối với các cơ sở tư có áp dụng)</li>
-                        </ul>
-                    </div>
-                    </Col>
-
-                    <Col xs={4} md={12} className="z-0 flex justify-end">
-                    <img
-                        src="../../public/banner_1-removebg-preview.png"
-                        alt="Doctors illustration"
-                        className=""
-                        style={{ maxHeight: "350px", float: "right", marginTop: "100px", marginRight: "50px" }}
-                    />
-                    </Col>
-                </Row>
+                style={{
+                  fontSize: "clamp(20px, 5vw, 30px)",
+                  fontWeight: "bold",
+                  color: "#00B0F0",
+                }}
+              >
+                ĐẶT KHÁM THEO BÁC SĨ
+              </h2>
+              <ul
+                className=""
+                style={{
+                  listStyleType: "none",
+                  paddingLeft: "0",
+                  lineHeight: "1.8",
+                  color: "#333",
+                }}
+              >
+                <li>
+                  ✅ Chủ động chọn bác sĩ tin tưởng, đặt càng sớm, càng có cơ
+                  hội có số thứ tự thấp nhất, tránh hết số
+                </li>
+                <li>
+                  ✅ Đặt khám theo giờ, không cần chờ lấy số thứ tự, chờ thanh
+                  toán (đối với cơ sở mở thanh toán online)
+                </li>
+                <li>✅ Được hoàn phí khám nếu hủy phiếu</li>
+                <li>
+                  ✅ Được hưởng chính sách hoàn tiền khi đặt lịch trên Medpro
+                  (đối với các cơ sở tư có áp dụng)
+                </li>
+              </ul>
             </div>
-    <Row style={{ marginTop: "20px" }}></Row>
+          </Col>
 
-        <Row>
-            <Col span={18} className="col-body">
-                <Row>
-                    <Col span={24}>
-                        <p className="txt-title"><IoHomeSharp /> / Chuyên khoa khám</p>
-                        {/* <Divider/> */}
-                        {/* <hr style={{border: "1px solid rgb(243, 243, 243)"}} /> */}
-                    </Col>
-                    <Col span={24}>
-                        <p className="title-lichhen"> Chuyên khoa khám</p>
-                    </Col>   
-                    <Col span={24} style={{marginBottom: "20px"}}>
-                        <div style={{ display: "flex", justifyContent: "center" }}>
-                            <div style={{ width: "800px" }}>
-                            <SearchComponent
-                                placeholder="Tìm kiếm Chuyên khoa"
-                                onSearch={onSearch}
-                            />
-                            </div>
-                        </div>
-                    </Col>  
-
-                    {dataAllDoctor?.length > 0 ? (
-                        dataAllDoctor.map((item, index) => (
-                            <Col key={index} span={24} style={{ padding: "10px 15px 0", cursor: "pointer" }} onClick={() => handleRedirectChuyenKhoa(item.maKhoa)}>
-                                <Row>
-                                    <Col xs={6} sm={5} md={3}>
-                                        <Avatar  
-                                        style={{
-                                            width: "clamp(60px, 10vw, 110px)",
-                                            height: "clamp(60px, 10vw, 110px)",
-                                            border: "1px solid green"
-                                        }}
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/public/chuyenkhoa/${item?.hinhAnh}`} 
-                                        shape="square" 
-                                        icon={<UserOutlined />} />
-                                    </Col>
-                                    <Col xs={18}
-                                        sm={19}
-                                        md={21} className="box-title-doctor">
-                                        <span className="txt-Title-doctor-noi-bat" style={{ fontSize: "clamp(16px, 5vw, 22px)" }}>
-                                            {item.tenKhoa}
-                                        </span> <br />                                       
-                                    </Col>
-                                </Row>
-                                <hr style={{ border: "1px solid rgb(243, 243, 243)" }} />
-                            </Col>
-                        ))
-                    ) : (
-                        <Col span={24} style={{ textAlign: "center", padding: "20px" }}>
-                            <p style={{ color: "gray", fontSize: "18px" }}>Chưa có chuyên khoa khám nào.</p>
-                        </Col>
-                    )}                    
-                    
-                </Row>
-            </Col>
+          <Col xs={4} md={12} className="z-0 flex justify-end">
+            <img
+              src="../../public/banner_1-removebg-preview.png"
+              alt="Doctors illustration"
+              className=""
+              style={{
+                maxHeight: "350px",
+                float: "right",
+                marginTop: "100px",
+                marginRight: "50px",
+              }}
+            />
+          </Col>
         </Row>
-        <Row style={{marginBottom: "150px"}}></Row>
-        
-        <Footer/>
-        </>
-    )
-}
-export default ChuyenKhoa
+      </div>
+      <Row style={{ marginTop: "20px" }}></Row>
+
+      <Row>
+        <Col span={18} className="col-body">
+          <Row>
+            <Col span={24}>
+              <p className="txt-title">
+                <IoHomeSharp /> / Chuyên khoa khám
+              </p>
+              {/* <Divider/> */}
+              {/* <hr style={{border: "1px solid rgb(243, 243, 243)"}} /> */}
+            </Col>
+            <Col span={24}>
+              <p className="title-lichhen"> Chuyên khoa khám</p>
+            </Col>
+            <Col span={24} style={{ marginBottom: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <div style={{ width: "800px" }}>
+                  <SearchComponent
+                    placeholder="Tìm kiếm Chuyên khoa"
+                    onSearch={onSearch}
+                  />
+                </div>
+              </div>
+            </Col>
+
+            {dataAllDoctor?.length > 0 ? (
+              dataAllDoctor.map((item, index) => (
+                <Col
+                  key={index}
+                  span={24}
+                  style={{ padding: "10px 15px 0", cursor: "pointer" }}
+                  onClick={() => handleRedirectChuyenKhoa(item.maKhoa)}
+                >
+                  <Row>
+                    <Col xs={6} sm={5} md={3}>
+                      <Avatar
+                        style={{
+                          width: "clamp(60px, 10vw, 110px)",
+                          height: "clamp(60px, 10vw, 110px)",
+                          border: "1px solid green",
+                        }}
+                        src={`${
+                          import.meta.env.VITE_BACKEND_URL
+                        }/public/chuyenkhoa/${item?.hinhAnh}`}
+                        shape="square"
+                        icon={<UserOutlined />}
+                      />
+                    </Col>
+                    <Col xs={18} sm={19} md={21} className="box-title-doctor">
+                      <span
+                        className="txt-Title-doctor-noi-bat"
+                        style={{ fontSize: "clamp(16px, 5vw, 22px)" }}
+                      >
+                        {item.tenKhoa}
+                      </span>{" "}
+                      <br />
+                    </Col>
+                  </Row>
+                  <hr style={{ border: "1px solid rgb(243, 243, 243)" }} />
+                </Col>
+              ))
+            ) : (
+              <Col span={24} style={{ textAlign: "center", padding: "20px" }}>
+                <p style={{ color: "gray", fontSize: "18px" }}>
+                  Chưa có chuyên khoa khám nào.
+                </p>
+              </Col>
+            )}
+          </Row>
+        </Col>
+      </Row>
+      <Row style={{ marginBottom: "150px" }}></Row>
+
+      <Footer />
+    </>
+  );
+};
+export default ChuyenKhoa;

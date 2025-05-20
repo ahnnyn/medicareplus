@@ -221,12 +221,16 @@ export const xoaLichCu = (_id) => {
   return axios.post("/api/doctor/delete-old-time-slots", { _id: _id });
 };
 export const callUploadDoctorImg = (file) => {
-    const bodyFormData = new FormData();
-    bodyFormData.append('file', file);
+  const bodyFormData = new FormData();
+  bodyFormData.append("file", file);
 
-    return axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/upload.php`, bodyFormData, {
-        headers: { "Content-Type": "multipart/form-data" }
-    });
+  return axios.post(
+    `${import.meta.env.VITE_BACKEND_URL}/api/upload.php`,
+    bodyFormData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
 };
 
 // lấy bác sĩ thông qua id
@@ -237,7 +241,7 @@ export const fetchBacSiByMaBS = (maBacSi) => {
 
 // tim ra doctor thong qua id
 export const fetchDoctorById = (id) => {
-  const URL_BACKEND = `/api/doctor/view-doctor?id=${id}`;
+  const URL_BACKEND = `/api/doctor/chi-tiet-bac-si?id=${id}`;
   return axios.get(URL_BACKEND);
 };
 
@@ -302,10 +306,10 @@ export const handleHuyOrder = (query) => {
   return axios.post(URL_BACKEND);
 };
 
-export const findAllLichKhamByBacSi = (maBacSi) => {
-  const URL_BACKEND = `/api/lichkham.php?action=getLichKhamByBacSi`;
-  return axios.get(URL_BACKEND);
-};
+// export const findAllLichKhamByBacSi = (maBacSi) => {
+//   const URL_BACKEND = `/api/lichkham.php?action=getLichKhamByBacSi`;
+//   return axios.get(URL_BACKEND);
+// };
 
 // // -----------------------
 // export const xacNhanLich = (maBacSi, trangThaiXacNhan) => {
@@ -314,90 +318,134 @@ export const findAllLichKhamByBacSi = (maBacSi) => {
 //     })
 // }
 export const updateThongTinlichKham = (maBacSi, maLichKham, trangThai) => {
-  return axios.put(`/api/lichkham.php?action=update-trang-thai-lich-kham&maBacSi=${maBacSi}&maLichKham=${maLichKham}&trangThai=${trangThai}`);
+  return axios.put(
+    `/api/lichkham.php?action=update-trang-thai-lich-kham&maBacSi=${maBacSi}&maLichKham=${maLichKham}&trangThai=${trangThai}`
+  );
 };
 
-export const taoPhieuKhamBenh = (idHoSo, idBS, idLK, hoTen, ngayKham, khungGio, tienSu, chuanDoan, lyDoKham, danhSachDonThuoc) => {
-  console.log('danhSachDonThuoc', danhSachDonThuoc);
-  return axios.post('/api/phieukhambenh.php?action=tao-phieu-kham', {
-    idHoSo,
-    idBS,
-    idLK,
-    hoTen,
-    ngayKham,
-    khungGio,
-    tienSu,
-    chuanDoan,
-    lyDoKham,
-    danhSachDonThuoc
-  }, {
-    headers: {
-      'Content-Type': 'application/json' // Đảm bảo gửi với Content-Type là application/json
-    }
-  });
-};
-
-export const fetchLayTTPhieuKhamBenh = (idLK,ngayKham, khungGio) => {
+export const taoPhieuKhamBenh = (
+  idHoSo,
+  idBS,
+  idLK,
+  hoTen,
+  ngayKham,
+  khungGio,
+  tienSu,
+  chuanDoan,
+  lyDoKham,
+  danhSachDonThuoc
+) => {
+  console.log("danhSachDonThuoc", danhSachDonThuoc);
   return axios.post(
-    '/api/phieukhambenh.php?action=lay-thong-tin-phieu-kham',
+    "/api/phieukhambenh.php?action=tao-phieu-kham",
     {
+      idHoSo,
+      idBS,
       idLK,
+      hoTen,
       ngayKham,
-      khungGio
+      khungGio,
+      tienSu,
+      chuanDoan,
+      lyDoKham,
+      danhSachDonThuoc,
     },
     {
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json", // Đảm bảo gửi với Content-Type là application/json
+      },
     }
   );
 };
 
-export const updateTTPhieuKhamBenh = (idPhieuKham, tienSu, chuanDoan, lyDoKham, danhSachDonThuoc) => {
+export const fetchLayTTPhieuKhamBenh = (idLK, ngayKham, khungGio) => {
   return axios.post(
-    '/api/phieukhambenh.php?action=cap-nhat-thong-tin-phieu-kham',
+    "/api/phieukhambenh.php?action=lay-thong-tin-phieu-kham",
+    {
+      idLK,
+      ngayKham,
+      khungGio,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+};
+
+export const updateTTPhieuKhamBenh = (
+  idPhieuKham,
+  tienSu,
+  chuanDoan,
+  lyDoKham,
+  danhSachDonThuoc
+) => {
+  return axios.post(
+    "/api/phieukhambenh.php?action=cap-nhat-thong-tin-phieu-kham",
     {
       idPhieuKham,
       tienSu,
       chuanDoan,
       lyDoKham,
-      danhSachDonThuoc
+      danhSachDonThuoc,
     },
     {
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     }
   );
 };
 
-export const  createConsultationRoom = async (doctorInfo, patientInfo) => {
-  try {
-      const res = await axios.post('/api/message.php?action=tao-phong-tu-van', {
-          doctorInfo,
-          patientInfo
-      });
-      return res;  // Đảm bảo trả về res.data (chứ không phải res)
-  } catch (error) {
-      throw new Error('Không thể tạo phòng tư vấn hoặc gửi email.');
-  }
-};
 
 export const deleteBacSi = async (maBacSi) => {
-  return axios.delete(`/api/bacsi.php?action=xoaBacSi&maBacSi=${ maBacSi }`);
+  return axios.delete(`/api/bacsi.php?action=xoaBacSi&maBacSi=${maBacSi}`);
 };
 export const fetchAllBenhNhan = async () => {
-    const URL_BACKEND = `/api/benhnhan.php?action=getAllBenhNhan`;
-    return axios.get(URL_BACKEND)
+  const URL_BACKEND = `/api/benhnhan.php?action=getAllBenhNhan`;
+  return axios.get(URL_BACKEND);
 };
 export const fetchOneAccKH = (maBenhNhan) => {
-    const URL_BACKEND = `/api/benhnhan.php?action=getThongTinBenhNhan&maBenhNhan=${maBenhNhan}`;
-    return axios.get(URL_BACKEND);
+  const URL_BACKEND = `/api/benhnhan.php?action=getThongTinBenhNhan&maBenhNhan=${maBenhNhan}`;
+  return axios.get(URL_BACKEND);
 };
-export const themBacSi = (hoTen, gioiTinh, ngaySinh, soDienThoai, email, diaChi, giaKham, hinhAnh, moTa, maKhoa, username, matKhau, maVaiTro) => {
-    const URL_BACKEND = '/api/bacsi.php?action=themBacSi'
-    const data = {
-        hoTen, gioiTinh, ngaySinh, soDienThoai, email, diaChi, giaKham, hinhAnh, moTa, maKhoa, username, matKhau, maVaiTro
-    }
-    return axios.post(URL_BACKEND, data)
+export const themBacSi = (
+  hoTen,
+  gioiTinh,
+  ngaySinh,
+  soDienThoai,
+  email,
+  diaChi,
+  giaKham,
+  hinhAnh,
+  moTa,
+  maKhoa,
+  username,
+  matKhau,
+  maVaiTro
+) => {
+  const URL_BACKEND = "/api/bacsi.php?action=themBacSi";
+  const data = {
+    hoTen,
+    gioiTinh,
+    ngaySinh,
+    soDienThoai,
+    email,
+    diaChi,
+    giaKham,
+    hinhAnh,
+    moTa,
+    maKhoa,
+    username,
+    matKhau,
+    maVaiTro,
+  };
+  return axios.post(URL_BACKEND, data);
+};
+
+
+export const findAllLichKhamByBacSi = (maBacSi) => {
+    const URL_BACKEND = `/api/lichkham.php?action=lich-kham-by-bac-si&maBacSi=${maBacSi}`    
+    return axios.get(URL_BACKEND)
 }

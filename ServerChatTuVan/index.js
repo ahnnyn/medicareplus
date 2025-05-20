@@ -10,7 +10,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3003"], // Thay đổi nếu frontend chạy ở port khác
+    origin: ["http://localhost:3003"],
     methods: ["GET", "POST"]
   }
 });

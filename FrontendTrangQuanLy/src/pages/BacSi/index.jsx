@@ -68,7 +68,7 @@ const Home = () => {
                   alt="avatar bác sĩ"
                   className="avatar"
                 />
-                <div className="user-name">{user.hoTen}</div>
+                <div className="user-name">{user?.hoTen}</div>
                 <div className="user-role">Chào mừng bạn trở lại!</div>
               </div>
 
@@ -154,7 +154,7 @@ const Home = () => {
                   >
                     LỊCH HẸN CỦA BÁC SĨ{" "}
                     <span style={{ color: "blue" }}>
-                      {user.hoTen.toUpperCase()}
+                      {user?.hoTen?.toUpperCase()}
                     </span>
                   </span>
                   <div style={{ marginTop: "30px" }}>

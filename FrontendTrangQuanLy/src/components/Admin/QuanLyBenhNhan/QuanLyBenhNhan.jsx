@@ -72,8 +72,8 @@ const QuanLyBenhNhan = () => {
       title: "Giới tính",
       dataIndex: "gioiTinh",
       render: (value) => {
-        if (value === 0) return "Nam";
-        if (value === 1) return "Nữ";
+        if (value === "0") return "Nam";
+        if (value === "1") return "Nữ";
         return "Khác";
       },
     },

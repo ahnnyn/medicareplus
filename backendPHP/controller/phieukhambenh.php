@@ -3,7 +3,7 @@ include("../model/phieukhambenh.php");
 class cPhieuKhamBenh {
     public function taoPhieuKhamMoi($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham, $donThuoc) {
         // Kiểm tra các tham số
-        if (empty($maHoSo) || empty($maBacSi) || empty($tenBN) || empty($ngayKham) || empty($tienSu) || empty($chuanDoan) || empty($lyDoKham) || empty($donThuoc)) {
+        if (empty($maHoSo) || empty($maBacSi) || empty($tenBN) || empty($ngayKham) || empty($tienSu) || empty($chuanDoan) || empty($lyDoKham)) {
             echo json_encode(["status" => false, "message" => "Dữ liệu không hợp lệ!"]);
             return;
         }

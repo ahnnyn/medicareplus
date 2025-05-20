@@ -532,7 +532,7 @@ const PageDatLichKham = () => {
                   <Form.Item
                     name="patientName"
                     rules={[
-                      { required: true, message: "Vui lòng nhập thông tin." },
+                      { required: true, message: "Vui lòng nhập họ tên." },
                       {
                         pattern: new RegExp(/^(?=.{6,})(^[\p{L} ]+$)/u),
                         message:
@@ -566,7 +566,7 @@ const PageDatLichKham = () => {
                   <Form.Item
                     name="phone"
                     rules={[
-                      { required: true, message: "Vui lòng nhập thông tin." },
+                      { required: true, message: "Vui lòng nhập số điện thoại." },
                       {
                         pattern: /^0\d{9}$/,
                         message:
@@ -587,7 +587,7 @@ const PageDatLichKham = () => {
                   <Form.Item
                     name="email"
                     rules={[
-                      { required: true, message: "Vui lòng nhập thông tin." },
+                      { required: true, message: "Vui lòng nhập thông tin email." },
                       {
                         type: "email",
                         message: "Vui lòng nhập đúng định dạng địa chỉ email",
@@ -631,7 +631,7 @@ const PageDatLichKham = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng nhập địa chỉ chi tiết của bạn",
+                        message: "Vui lòng nhập địa chỉ của bạn.",
                       },
                     ]}
                     hasFeedback
@@ -648,7 +648,7 @@ const PageDatLichKham = () => {
                   <Form.Item
                     name="lyDoKham"
                     rules={[
-                      { required: true, message: "Vui lòng nhập lí do khám" },
+                      { required: true, message: "Vui lòng nhập lý do khám." },
                     ]}
                     hasFeedback
                   >

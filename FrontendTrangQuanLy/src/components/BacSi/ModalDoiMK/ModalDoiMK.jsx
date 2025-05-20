@@ -40,15 +40,15 @@ const ModalDoiMK = () => {
   }, [user]);
 
   const onFinishDoiMK = async (values) => {
-    console.log("🔄 Gửi request đổi mật khẩu đến API...", values);
+    console.log("Gửi request đổi mật khẩu đến API...", values);
 
     try {
         const res = await doiThongTinDoctor(values.idAcc, values.idBS, values.username, values.password, values.passwordMoi);
         
-        console.log("📥 API Full Response:", res); // Kiểm tra phản hồi API
+        console.log("API Full Response:", res); // Kiểm tra phản hồi API
 
         if (!res) {
-            console.error("❌ API không trả về dữ liệu!");
+            console.error(" API không trả về dữ liệu!");
             notification.error({
                 message: "Lỗi hệ thống",
                 description: "API không phản hồi hoặc bị lỗi.",
@@ -57,18 +57,18 @@ const ModalDoiMK = () => {
         }
 
         if (res.success) {
-            message.success("✅ Đổi mật khẩu thành công!");
+            message.success("Đổi mật khẩu thành công!");
             dispatch(doLogoutAction());
             navigate("/login-doctor");
         } else {
-            console.error("❌ API không trả về success:", res);
+            console.error("API không trả về success:", res);
             notification.error({
-                message: "❌ Đổi mật khẩu thất bại!",
+                message: " Đổi mật khẩu thất bại!",
                 description: res?.message || "Có lỗi xảy ra, vui lòng thử lại!",
             });
         }
     } catch (error) {
-        console.error("❌ Lỗi khi gọi API:", error);
+        console.error(" Lỗi khi gọi API:", error);
 
         notification.error({
             message: "Lỗi hệ thống",

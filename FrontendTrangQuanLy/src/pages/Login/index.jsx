@@ -25,28 +25,40 @@ const Login = () => {
   const dispatch = useDispatch();
 
   const isAuthenticated = useSelector((state) => state.accountDoctor.isAuthenticated);
-  const { maVaiTro } = useSelector((state) => state.accountDoctor.user);
+  const maVaiTro = useSelector((state) => state.accountDoctor.user.maVaiTro);
 
-  // Lấy thông tin đăng nhập từ localStorage nếu có
-  useEffect(() => {
-    const rememberedDoctor = localStorage.getItem("rememberedDoctor");
-    if (rememberedDoctor) {
-      const account = JSON.parse(rememberedDoctor);
-      form.setFieldsValue({
-        username: account.username,
-        password: account.password,
-        remember: true,
-      });
-      setRemember(true);
-    }
-  }, [form]);
+useEffect(() => {
+  const rememberedDoctor = localStorage.getItem("rememberedDoctor");
+  if (rememberedDoctor) {
+    const account = JSON.parse(rememberedDoctor);
+    form.setFieldsValue({
+      username: account.username,
+      password: account.password,
+      remember: true,
+    });
+    setRemember(true);
+
+    // Thêm Enter key listener để đăng nhập bằng tài khoản đã lưu
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+        form.submit(); // Gửi form tự động
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }
+}, [form]);
+
 
   // Điều hướng sau khi đăng nhập thành công
   useEffect(() => {
     if (isAuthenticated) {
-      if (maVaiTro === 2) {
+      if (maVaiTro === "2") {
         navigate("/doctor");
-      } else if (maVaiTro === 1) {
+      } else if (maVaiTro === "1") {
         navigate("/admin");
       } else {
         notification.warning({
@@ -57,58 +69,61 @@ const Login = () => {
     }
   }, [isAuthenticated, maVaiTro, navigate]);
 
-  const onFinish = async (values) => {
-    setIsLoading(true);
-    try {
-      const res = await handleLoginDoctor(values.username, values.password);
-      if (res.success && res.token) {
-        dispatch(doLoginAction({ user: res.user, token: res.token }));
+ const onFinish = async (values) => {
+  setIsLoading(true);
+  try {
+    const res = await handleLoginDoctor(values.username, values.password);
+    console.log("Login Response:", res);
+    if (res.success && res.token) {
+      const { user, token } = res;
+      const role = Number(user.maVaiTro);
 
-        if (remember) {
-          localStorage.setItem(
-            "rememberedDoctor",
-            JSON.stringify({ username: values.username, password: values.password })
-          );
-        } else {
-          localStorage.removeItem("rememberedDoctor");
-        }
+      if (remember) {
+        localStorage.setItem(
+          "rememberedDoctor",
+          JSON.stringify({ username: values.username, password: values.password })
+        );
+      } else {
+        localStorage.removeItem("rememberedDoctor");
+      }
 
-        form.resetFields();
+      form.resetFields();
+
+      // Chỉ dispatch nếu role hợp lệ
+      if (role === 2 || role === 1) {
+        dispatch(doLoginAction({ user, token }));
 
         notification.success({
           message: "Đăng nhập thành công!",
-          description: `Chào mừng ${res.user.fullName || "người dùng"} quay lại.`,
+          description: `Chào mừng ${user.hoTen || "người dùng"} quay lại.`,
           duration: 3,
         });
 
-        // ✅ Điều hướng dựa vào maVaiTro
-        const { maVaiTro } = res.user;
-        if (maVaiTro === 2) {
-          navigate("/doctor");
-        } else if (maVaiTro === 1) {
-          navigate("/admin");
-        } else {
-          notification.warning({
-            message: "Không xác định vai trò!",
-            description: "Vui lòng liên hệ quản trị viên.",
-          });
-        }
+        if (role === 2) navigate("/doctor");
+        if (role === 1) navigate("/admin");
       } else {
-        notification.error({
-          message: "Đăng nhập không thành công!",
-          description: res.message || "Thông tin đăng nhập không đúng.",
-          duration: 5,
+        notification.warning({
+          message: "Không xác định vai trò!",
+          description: "Vui lòng liên hệ quản trị viên.",
         });
       }
-    } catch (error) {
+    } else {
       notification.error({
-        message: "Lỗi hệ thống",
-        description: error.message,
+        message: "Đăng nhập không thành công!",
+        description: res.message || "Thông tin đăng nhập không đúng.",
+        duration: 5,
       });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (error) {
+    notification.error({
+      message: "Lỗi hệ thống",
+      description: error.message,
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleLayMK = async (values) => {
     const email = values.email;
@@ -160,7 +175,16 @@ const Login = () => {
               ĐĂNG NHẬP HỆ THỐNG
             </h2>
 
-            <Form form={form} layout="vertical" onFinish={onFinish}>
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  form.submit(); // gọi submit toàn form
+                }
+              }}
+            >
               <Form.Item
                 label="Tên đăng nhập"
                 name="username"
@@ -225,16 +249,17 @@ const Login = () => {
                   loading={isLoading}
                   type="primary"
                   size="large"
+                  htmlType="submit"
                   style={{
                     width: "100%",
                     height: "45px",
                     background: "#2A95BF",
                     border: "none",
                   }}
-                  onClick={() => form.submit()}
                 >
                   ĐĂNG NHẬP
                 </Button>
+
               </Form.Item>
             </Form>
           </div>

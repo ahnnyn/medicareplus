@@ -92,9 +92,9 @@ const PatientViewModal = ({ open, patientId, onCancel }) => {
               <Col span={24}>
                 <Form.Item label="Giới tính" name="gender">
                   <Radio.Group disabled style={{ color: "#000" }}>
-                    <Radio value={0}>Nam</Radio>
-                    <Radio value={1}>Nữ</Radio>
-                    <Radio value={2}>Khác</Radio>
+                    <Radio value={"0"}>Nam</Radio>
+                    <Radio value={"1"}>Nữ</Radio>
+                    <Radio value={"2"}>Khác</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>

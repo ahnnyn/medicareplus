@@ -99,7 +99,7 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
   }
 
   // Nếu đã có dataPhieuKham, thì update lại các giá trị trong form
-  if (dataPhieuKham && typeof dataPhieuKham === 'object' && dataPhieuKham?.maPhieu && dataPhieuKham?.maDonThuoc) {
+  if (dataPhieuKham && typeof dataPhieuKham === 'object' && dataPhieuKham?.maPhieu || dataPhieuKham?.maDonThuoc) {
     const donThuoc = dataPhieuKham?.maDonThuoc ? dataPhieuKham?.danhSachDonThuoc : [];
 
     formPhieuKham.setFieldsValue({
@@ -302,7 +302,17 @@ return (
           <Col span={24} style={{ padding: "0 0 20px", fontSize: "18px", textAlign: "center" }}>
             <span style={{ fontWeight: "500", color: "navy" }}>ĐƠN THUỐC</span>
           </Col>
-          <Form.List name="donThuoc">
+          <Form.List 
+            name="donThuoc"
+            rules={[
+          {
+            validator: async (_, donThuoc) => {
+              // Cho phép bỏ trống (không nhập thuốc nào)
+              // => KHÔNG cần làm gì nếu mảng rỗng
+              return Promise.resolve();
+            }
+          }
+        ]}>
             {(fields, { add, remove }) => (
               <>
                 <Row gutter={[16, 16]}>

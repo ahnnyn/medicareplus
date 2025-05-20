@@ -3,78 +3,74 @@
 
     class mPhieuKhamBenh {
         public function taoPhieuKhamBenh($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham, $donThuoc) {
-            // Kiểm tra các tham số đầu vào
-            if (!is_numeric($maHoSo) || !is_numeric($maBacSi) || !is_numeric($maLichKham) || empty($tenBN) || empty($ngayKham) || empty($khungGio) || empty($tienSu) || empty($chuanDoan) || empty($lyDoKham)) {
-                echo json_encode(["status" => false, "message" => "Vui lòng nhập đầy đủ thông tin!"]);
-                exit;
-            }
-        
-            $maHoSo = (int)$maHoSo;
-            $maBacSi = (int)$maBacSi;
-            $maLichKham = (int)$maLichKham;
-            
-        
-            // Kết nối và xử lý database
-            $p = new connectdatabase();
-            $pdo = $p->connect();
-            if ($pdo) {
-                try {
-                    $pdo->beginTransaction();
-                    $query = $pdo->prepare("INSERT INTO phieukhambenh (maHoSo, maBacSi, maLichKham, hoTenBenhNhan, ngayKham, khungGioKham, tienSu, chanDoan, lyDoKham) 
-                                            VALUES (:maHoSo, :maBacSi, :maLichKham, :tenBN, :ngayKham, :khungGio, :tienSu, :chuanDoan, :lyDoKham)");
-                    $query->bindParam(":maHoSo", $maHoSo, PDO::PARAM_INT);
-                    $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
-                    $query->bindParam(":maLichKham", $maLichKham, PDO::PARAM_INT);
-                    $query->bindParam(":tenBN", $tenBN);
-                    $query->bindParam(":ngayKham", $ngayKham);
-                    $query->bindParam(":khungGio", $khungGio);
-                    $query->bindParam(":tienSu", $tienSu);
-                    $query->bindParam(":chuanDoan", $chuanDoan);
-                    $query->bindParam(":lyDoKham", $lyDoKham);
-                    $success = $query->execute();
-                    
-                    if ($success) {
-                        // Lấy ID của phiếu khám vừa tạo
-                        $maPhieuKham = $pdo->lastInsertId();
-                        // Tạo đơn thuốc và lưu vào bảng donthuoc
-                        $queryDonThuoc = $pdo->prepare("INSERT INTO donthuoc (maPhieuKhamBenh, ngayTao) 
-                                                        VALUES (:maPhieuKham, :ngayTao)");
-                        $queryDonThuoc->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
-                        $queryDonThuoc->bindParam(":ngayTao", $ngayKham); // Sử dụng ngày khám làm ngày tạo đơn thuốc
-                        $queryDonThuoc->execute();
+    if (!is_numeric($maHoSo) || !is_numeric($maBacSi) || !is_numeric($maLichKham) || empty($tenBN) || empty($ngayKham) || empty($khungGio) || empty($tienSu) || empty($chuanDoan) || empty($lyDoKham)) {
+        echo json_encode(["status" => false, "message" => "Vui lòng nhập đầy đủ thông tin!"]);
+        exit;
+    }
 
-                        // Lấy maDonThuoc mới tạo
-                        $maDonThuoc = $pdo->lastInsertId();
-                        
-                        // Lưu chi tiết đơn thuốc vào bảng chitiet_donthuoc
-                        foreach ($donThuoc as $thuoc) {
-                            error_log(print_r($donThuoc, true)); // Log dữ liệu
-                            $queryChiTiet = $pdo->prepare("INSERT INTO chitiet_donthuoc (maDonThuoc, tenThuoc, lieuDung, soLanDungTrongNgay, soNgay, ghiChu) 
-                                    VALUES (:maDonThuoc, :tenThuoc, :lieuDung, :soLanDung, :soNgay, :ghiChu)");
-                                    $queryChiTiet->bindParam(":ghiChu", $thuoc['ghiChu']);
-                                    $queryChiTiet->bindParam(":maDonThuoc", $maDonThuoc, PDO::PARAM_INT);
-                                    $queryChiTiet->bindParam(":tenThuoc", $thuoc['tenThuoc']);
-                                    $queryChiTiet->bindParam(":lieuDung", $thuoc['lieuLuong']);
-                                    $queryChiTiet->bindParam(":soLanDung", $thuoc['soLanDungTrongNgay']);
-                                    $queryChiTiet->bindParam(":soNgay", $thuoc['soNgayDung'], PDO::PARAM_INT);
-                                    $queryChiTiet->execute();
-                        }
+    $maHoSo = (int)$maHoSo;
+    $maBacSi = (int)$maBacSi;
+    $maLichKham = (int)$maLichKham;
 
-                        // Nếu tất cả các bước thành công, commit transaction
-                        $pdo->commit();
+    $p = new connectdatabase();
+    $pdo = $p->connect();
+    if ($pdo) {
+        try {
+            $pdo->beginTransaction();
 
-                        return (["status" => true, "message" => "Tạo phiếu khám bệnh thành công"]);
-                    } else {
-                        return (["status" => false, "message" => "Tạo phiếu khám bệnh thất bại"]);
+            $query = $pdo->prepare("INSERT INTO phieukhambenh (maHoSo, maBacSi, maLichKham, hoTenBenhNhan, ngayKham, khungGioKham, tienSu, chanDoan, lyDoKham) 
+                                    VALUES (:maHoSo, :maBacSi, :maLichKham, :tenBN, :ngayKham, :khungGio, :tienSu, :chuanDoan, :lyDoKham)");
+            $query->bindParam(":maHoSo", $maHoSo, PDO::PARAM_INT);
+            $query->bindParam(":maBacSi", $maBacSi, PDO::PARAM_INT);
+            $query->bindParam(":maLichKham", $maLichKham, PDO::PARAM_INT);
+            $query->bindParam(":tenBN", $tenBN);
+            $query->bindParam(":ngayKham", $ngayKham);
+            $query->bindParam(":khungGio", $khungGio);
+            $query->bindParam(":tienSu", $tienSu);
+            $query->bindParam(":chuanDoan", $chuanDoan);
+            $query->bindParam(":lyDoKham", $lyDoKham);
+            $success = $query->execute();
+
+            if ($success) {
+                $maPhieuKham = $pdo->lastInsertId();
+
+                // Chỉ tạo đơn thuốc nếu có đơn thuốc
+                if (is_array($donThuoc) && count($donThuoc) > 0) {
+                    $queryDonThuoc = $pdo->prepare("INSERT INTO donthuoc (maPhieuKhamBenh, ngayTao) 
+                                                    VALUES (:maPhieuKham, :ngayTao)");
+                    $queryDonThuoc->bindParam(":maPhieuKham", $maPhieuKham, PDO::PARAM_INT);
+                    $queryDonThuoc->bindParam(":ngayTao", $ngayKham);
+                    $queryDonThuoc->execute();
+
+                    $maDonThuoc = $pdo->lastInsertId();
+
+                    foreach ($donThuoc as $thuoc) {
+                        $queryChiTiet = $pdo->prepare("INSERT INTO chitiet_donthuoc (maDonThuoc, tenThuoc, lieuDung, soLanDungTrongNgay, soNgay, ghiChu) 
+                            VALUES (:maDonThuoc, :tenThuoc, :lieuDung, :soLanDung, :soNgay, :ghiChu)");
+                        $queryChiTiet->bindParam(":maDonThuoc", $maDonThuoc, PDO::PARAM_INT);
+                        $queryChiTiet->bindParam(":tenThuoc", $thuoc['tenThuoc']);
+                        $queryChiTiet->bindParam(":lieuDung", $thuoc['lieuLuong']);
+                        $queryChiTiet->bindParam(":soLanDung", $thuoc['soLanDungTrongNgay']);
+                        $queryChiTiet->bindParam(":soNgay", $thuoc['soNgayDung'], PDO::PARAM_INT);
+                        $queryChiTiet->bindParam(":ghiChu", $thuoc['ghiChu']);
+                        $queryChiTiet->execute();
                     }
-                } catch (PDOException $e) {
-                    $pdo->rollBack(); // thêm dòng này
-                    return (["status" => false, "error" => "Lỗi truy vấn: " . $e->getMessage()]);
                 }
+
+                $pdo->commit();
+                return (["status" => true, "message" => "Tạo phiếu khám bệnh thành công"]);
             } else {
-                return (["status" => false, "error" => "Không thể kết nối database"]);
+                return (["status" => false, "message" => "Tạo phiếu khám bệnh thất bại"]);
             }
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            return (["status" => false, "error" => "Lỗi truy vấn: " . $e->getMessage()]);
         }
+    } else {
+        return (["status" => false, "error" => "Không thể kết nối database"]);
+    }
+}
+
             
         public function layThongTinPhieuKham($maLichKham, $ngayKham, $khungGio) {
             $p = new connectdatabase();

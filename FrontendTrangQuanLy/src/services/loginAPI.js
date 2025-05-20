@@ -17,10 +17,10 @@ export const doiThongTinDoctor = async (idAcc, idBS, username, password, passwor
             idAcc, idBS, username, password, passwordMoi
         });
 
-        console.log("📥 API Full Response:", response);
+        console.log("API Full Response:", response);
         return response;
     } catch (error) {
-        console.error("❌ Lỗi khi gửi request:", error);
+        console.error("Lỗi khi gửi request:", error);
         return {
             success: false,
             message: error.response?.message || "Không thể kết nối API"

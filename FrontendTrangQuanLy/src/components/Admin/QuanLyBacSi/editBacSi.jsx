@@ -206,9 +206,9 @@ const DoctorEditModal = ({ open, doctorId, onCancel, onUpdateSuccess }) => {
               <Col span={24}>
                 <Form.Item label="Giới tính" name="gender">
                   <Radio.Group>
-                    <Radio value={0}>Nam</Radio>
-                    <Radio value={1}>Nữ</Radio>
-                    <Radio value={2}>Khác</Radio>
+                    <Radio value={"0"}>Nam</Radio>
+                    <Radio value={"1"}>Nữ</Radio>
+                    <Radio value={"2"}>Khác</Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>

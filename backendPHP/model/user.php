@@ -58,28 +58,28 @@ class mUser {
 
             unset($user['matKhau']);
 
-// Lấy thông tin chi tiết theo vai trò
-if ($user['maVaiTro'] == 2) {
-    // Bác sĩ
-    $stmt = $pdo->prepare("SELECT * FROM bacsi WHERE maTaiKhoan = :maTaiKhoan");
-    $stmt->bindParam(':maTaiKhoan', $user['maTaiKhoan']);
-    $stmt->execute();
-    $detail = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Lấy thông tin chi tiết theo vai trò
+            if ($user['maVaiTro'] == 2) {
+                // Bác sĩ
+                $stmt = $pdo->prepare("SELECT * FROM bacsi WHERE maTaiKhoan = :maTaiKhoan");
+                $stmt->bindParam(':maTaiKhoan', $user['maTaiKhoan']);
+                $stmt->execute();
+                $detail = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($detail) {
-        $user = array_merge($user, $detail);
-    }
-} elseif ($user['maVaiTro'] == 1) {
-    // Quản trị viên
-    $stmt = $pdo->prepare("SELECT * FROM quantrivien WHERE maTaiKhoan = :maTaiKhoan");
-    $stmt->bindParam(':maTaiKhoan', $user['maTaiKhoan']);
-    $stmt->execute();
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($detail) {
+                    $user = array_merge($user, $detail);
+                }
+            } elseif ($user['maVaiTro'] == 1) {
+                // Quản trị viên
+                $stmt = $pdo->prepare("SELECT * FROM taikhoan WHERE maTaiKhoan = :maTaiKhoan");
+                $stmt->bindParam(':maTaiKhoan', $user['maTaiKhoan']);
+                $stmt->execute();
+                $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($admin) {
-        $user = array_merge($user, $admin);
-    }
-}
+                if ($admin) {
+                    $user = array_merge($user, $admin);
+                }
+            }
 
             $payload = [
                 "iat" => time(),
