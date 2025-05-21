@@ -55,8 +55,8 @@ const LichHenCard = () => {
         // Sắp xếp: Hủy xuống cuối, mới nhất lên đầu
         const sorted = res
         .sort((a, b) => {
-          if (a.trangThai === "Đã hủy" && b.trangThai !== "Đã hủy") return 1;
-          if (a.trangThai !== "Đã hủy" && b.trangThai === "Đã hủy") return -1;
+          if (a.trangThai === "Hủy" && b.trangThai !== "Hủy") return 1;
+          if (a.trangThai !== "Hủy" && b.trangThai === "Hủy") return -1;
           // Nếu cùng trạng thái thì so sánh ngày (mới -> cũ)
           return new Date(b.ngayKham) - new Date(a.ngayKham);
         });
@@ -145,7 +145,7 @@ const LichHenCard = () => {
         return "processing";
       case "Đã khám":
         return "green";
-      case "Đã hủy":
+      case "Hủy":
         return "red";
       default:
         return "default";
@@ -294,27 +294,40 @@ const LichHenCard = () => {
     />
   </Tooltip>
 
-  <Tooltip title="Chỉnh sửa lịch hẹn">
-    <RiEdit2Fill
-      style={{
-        color: "orange",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => handleEditClick(item)}
-    />
-  </Tooltip>
+<Tooltip title="Chỉnh sửa lịch hẹn">
+  <RiEdit2Fill
+    style={{
+      color: "orange",
+      cursor: (item.trangThai === "Hủy" || item.trangThai === "Đã khám") ? "not-allowed" : "pointer",
+      fontSize: 18,
+      opacity: (item.trangThai === "Hủy" || item.trangThai === "Đã khám") ? 0.4 : 1,
+    }}
+    onClick={() => {
+      if (item.trangThai !== "Hủy" && item.trangThai !== "Đã khám") {
+        handleEditClick(item);
+      }
+    }}
+  />
+</Tooltip>
 
-  <Tooltip title="Xóa lịch hẹn">
-    <RiDeleteBin5Line
-      style={{
-        color: "red",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => handleDeleteClick(item)}
-    />
-  </Tooltip>
+
+<Tooltip title="Xóa lịch hẹn">
+  <RiDeleteBin5Line
+    style={{
+      color: "red",
+      cursor: (item.trangThai === "Hủy" || item.trangThai === "Đã khám") ? "not-allowed" : "pointer",
+      fontSize: 18,
+      opacity: (item.trangThai === "Hủy" || item.trangThai === "Đã khám") ? 0.4 : 1,
+    }}
+    onClick={() => {
+      if (item.trangThai !== "Hủy" && item.trangThai !== "Đã khám") {
+        handleDeleteClick(item);
+      }
+    }}
+  />
+</Tooltip>
+
+
 
   {/* Nút gọi video */}
   <Tooltip title="Gọi video">

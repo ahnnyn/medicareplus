@@ -43,12 +43,6 @@ const HoSoCuaToi = () => {
                             >
                                 <i className="fa-solid fa-file-medical-alt"></i> Phiếu khám bệnh
                             </button>
-                            <button
-                                className={`sidebar-item ${activeTab === "thongBao" ? "active" : ""}`}
-                                onClick={() => setActiveTab("thongBao")}
-                            >
-                                <i className="fa-solid fa-bell"></i> Thông báo <span className="badge">99+</span>
-                            </button>
                         </div>
                     </div>
 

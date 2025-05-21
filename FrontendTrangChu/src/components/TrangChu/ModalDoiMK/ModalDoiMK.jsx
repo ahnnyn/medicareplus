@@ -80,6 +80,13 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
             });
         }
 
+        if (matKhauMoi === matKhau) {
+            return notification.error({
+                message: "Mật khẩu mới trùng với mật khẩu cũ",
+                description: "Vui lòng nhập mật khẩu mới khác mật khẩu cũ.",
+            });
+        }
+
         const isMatch = await bcrypt.compare(matKhau, dataAccKH.matKhau);
         if (!isMatch) {
             return notification.error({
@@ -153,12 +160,21 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
                         <Form.Item
                             label="Mật khẩu mới"
                             name="matKhauMoi"
+                            dependencies={['matKhau']}
                             rules={[
                                 { required: true, message: "Vui lòng nhập mật khẩu mới!" },
                                 {
                                     pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/,
                                     message: 'Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt!',
                                 },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('matKhau') !== value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error("Mật khẩu mới không được trùng với mật khẩu cũ!"));
+                                    },
+                                }),
                             
                             ]}
                             hasFeedback

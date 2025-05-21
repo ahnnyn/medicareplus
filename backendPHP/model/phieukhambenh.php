@@ -212,25 +212,65 @@
         public function layAllPhieuKhamBenh($maHoSo) {
             $p = new connectdatabase();
             $pdo = $p->connect();
-            if ($pdo){
+            
+            if ($pdo) {
                 try {
                     $query = $pdo->prepare("
-                    SELECT pkb.*, bs.hoTen, hs.gioiTinh, hs.ngaySinh, hs.ngheNghiep, hs.CCCD, hs.diaChi, lk.giaKham, bn.soDienThoai
-                        FROM phieukhambenh pkb 
+                        SELECT 
+                            pkb.*, 
+                            bs.hoTen, 
+                            hs.gioiTinh, 
+                            hs.ngaySinh, 
+                            hs.ngheNghiep, 
+                            hs.CCCD, 
+                            hs.diaChi, 
+                            lk.giaKham, 
+                            bn.soDienThoai,
+                            GROUP_CONCAT(
+                                CONCAT(
+                                    '{',
+                                    '\"maThuoc\":\"', IFNULL(ctdt.maThuoc, ''), '\",',
+                                    '\"tenThuoc\":\"', IFNULL(ctdt.tenThuoc, ''), '\",',
+                                    '\"lieuDung\":\"', IFNULL(ctdt.lieuDung, ''), '\",',
+                                    '\"soLanDungTrongNgay\":\"', IFNULL(ctdt.soLanDungTrongNgay, ''), '\",',
+                                    '\"soNgay\":\"', IFNULL(ctdt.soNgay, ''), '\",',
+                                    '\"ghiChu\":\"', IFNULL(ctdt.ghiChu, ''), '\"',
+                                    '}'
+                                )
+                                SEPARATOR ','
+                            ) AS donThuoc
+                        FROM phieukhambenh pkb
                         JOIN hosobenhnhan hs ON hs.maHoSo = pkb.maHoSo
                         JOIN bacsi bs ON bs.maBacSi = pkb.maBacSi
                         JOIN lichkham lk ON lk.maLich = pkb.maLichKham
                         JOIN benhnhan bn ON bn.maBenhNhan = hs.maBenhNhan
+                        LEFT JOIN donthuoc dt ON dt.maPhieuKhamBenh = pkb.maPhieu
+                        LEFT JOIN chitiet_donthuoc ctdt ON ctdt.maDonThuoc = dt.maDonThuoc
                         WHERE hs.maHoSo = :maHoSo
+                        GROUP BY pkb.maPhieu
                     ");
+                    
                     $query->bindParam(":maHoSo", $maHoSo, PDO::PARAM_INT);
                     $query->execute();
-                    $result = $query->fetchAll(PDO::FETCH_ASSOC);
-                    if (!$result) {
+                    $results = $query->fetchAll(PDO::FETCH_ASSOC);
+
+                    if (!$results) {
                         return ["error" => "Không có phiếu khám nào"];
                     }
-                    return $result;
-                }catch(PDOException $e) {
+
+                    // Chuyển chuỗi JSON đơn thuốc thành mảng
+                    foreach ($results as &$row) {
+                        if (!empty($row['donThuoc'])) {
+                            $jsonString = '[' . $row['donThuoc'] . ']';
+                            $decoded = json_decode($jsonString, true);
+                            $row['donThuoc'] = is_array($decoded) ? $decoded : [];
+                        } else {
+                            $row['donThuoc'] = [];
+                        }
+                    }
+
+                    return $results;
+                } catch (PDOException $e) {
                     return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
                 }
             } else {

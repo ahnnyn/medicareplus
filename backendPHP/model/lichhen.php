@@ -129,7 +129,7 @@
             try {
                 $query = $pdo->prepare("
                     UPDATE lichkham 
-                    SET trangThai = 'Đã hủy' where maLich = :maLich
+                    SET trangThai = 'Hủy' where maLich = :maLich
                 ");
                 $query->bindParam(":maLich", $maLich, PDO::PARAM_INT);
                 $query->execute();

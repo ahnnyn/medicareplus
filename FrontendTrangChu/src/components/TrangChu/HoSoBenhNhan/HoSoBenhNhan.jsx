@@ -199,7 +199,12 @@ const HoSoBenhNhan = () => {
             <p><UserOutlined /> <b>Họ và tên:</b> {profile?.hoTenBenhNhan}</p>
           </Col>
           <Col span={24}>
-            <p><CalendarOutlined /> <b>Ngày sinh:</b> {profile?.ngaySinh || "Chưa cập nhật"}</p>
+            <p>
+              <CalendarOutlined /> <b>Ngày sinh:</b>{" "}
+              {profile?.ngaySinh && profile?.ngaySinh !== "0000-00-00"
+                ? dayjs(profile.ngaySinh).format("DD/MM/YYYY")
+                : "Chưa cập nhật"}
+            </p>
           </Col>
           <Col span={24}>
             <p><PhoneOutlined /> <b>SĐT:</b> {profile?.soDienThoai || "Chưa cập nhật"}</p>
@@ -223,7 +228,14 @@ const HoSoBenhNhan = () => {
       <Modal title="Chi tiết hồ sơ" open={isModalVisible} onCancel={closeChiTiet} footer={null}>
         <Row gutter={[16, 12]}>
           <Col span={24}><p><UserOutlined /> <b>Họ và tên:</b> {profile.hoTenBenhNhan}</p></Col>
-          <Col span={24}><p><CalendarOutlined /> <b>Ngày sinh:</b> {profile.ngaySinh || "Chưa cập nhật"}</p></Col>
+          <Col span={24}>
+            <p>
+              <CalendarOutlined /> <b>Ngày sinh:</b>{" "}
+              {profile?.ngaySinh && profile?.ngaySinh !== "0000-00-00"
+                ? dayjs(profile.ngaySinh).format("DD/MM/YYYY")
+                : "Chưa cập nhật"}
+            </p>
+          </Col>
           <Col span={24}><p><PhoneOutlined /> <b>SĐT:</b> {profile.soDienThoai || "Chưa cập nhật"}</p></Col>
           <Col span={24}><p><ManOutlined /> <b>Giới tính:</b> {getGioiTinhText(profile.gioiTinh)}</p></Col>
           <Col span={24}><p><TeamOutlined /> <b>CCCD:</b> {profile.CCCD || "Chưa cập nhật"}</p></Col>
@@ -244,7 +256,19 @@ const HoSoBenhNhan = () => {
           <Form.Item name="maBenhNhan" hidden>
             <Input />
           </Form.Item>
-          <Form.Item label="Họ và tên" name="hoTenBenhNhan" rules={[{ required: true }]}>
+          <Form.Item 
+            label="Họ và tên" 
+            name="hoTenBenhNhan" 
+            rules={[
+              {
+                required: true,
+                message: 'Vui lòng nhập họ tên!',
+              },
+              {
+                pattern: /^[A-Za-zÀ-ỹ\s]+$/,
+                message: 'Không được nhập số, ký tự đặc biệt!',
+              },
+            ]}>
             <Input />
           </Form.Item>
           <Form.Item
@@ -252,7 +276,12 @@ const HoSoBenhNhan = () => {
             name="ngaySinh"
             rules={[{ required: true, message: 'Vui lòng chọn ngày sinh' }]}
           >
-            <DatePicker format="YYYY-MM-DD" style={{ width: '100%' }} />
+          <DatePicker
+            format="DD/MM/YYYY"
+            style={{ width: "100%" }}
+            placeholder="Chọn ngày sinh"
+            disabledDate={(current) => current && current > dayjs().endOf('day')}
+          />
           </Form.Item>
           <Form.Item label="Giới tính" name="gioiTinh" rules={[{ required: true }]}>
             <Select>
@@ -262,7 +291,7 @@ const HoSoBenhNhan = () => {
             </Select>
           </Form.Item>
           <Form.Item label="CCCD" name="CCCD">
-            <Input />
+            <Input readOnly />
           </Form.Item>
           <Form.Item label="Nghề nghiệp" name="ngheNghiep">
             <Input />

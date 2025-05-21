@@ -147,14 +147,15 @@ const PhieuKhamTable = ({ editingRecord }) => {
   )}
 
   <Modal
-    title="Chi tiết phiếu khám"
-    visible={modalVisible}
-    onCancel={handleCloseModal}
-    footer={null}
-    width={750}
-  >
-    {selectedRecord && (
-      <Row gutter={[32, 32]}>
+  title="Chi tiết phiếu khám"
+  open={modalVisible}
+  onCancel={handleCloseModal}
+  footer={null}
+  width={750}
+>
+  {selectedRecord && (
+    <>
+      <Row gutter={[16, 16]}>
         <Col span={12}>
           <Card title="Thông tin bệnh nhân" bordered={false}>
             <Text strong style={{ fontSize: "16px" }}>Tên bệnh nhân: </Text>
@@ -167,7 +168,7 @@ const PhieuKhamTable = ({ editingRecord }) => {
             <Text>{formatGender(selectedRecord.gioiTinh)}</Text>
             <br />
             <Text strong style={{ fontSize: "16px" }}>Ngày sinh: </Text>
-            <Text>{moment(selectedRecord.ngaySinh).format("DD/MM/YYYY")}</Text>
+            <Text>{selectedRecord.ngaySinh ? moment(selectedRecord.ngaySinh).format("DD/MM/YYYY") : "Không rõ"}</Text>
             <br />
             <Text strong style={{ fontSize: "16px" }}>Nghề nghiệp: </Text>
             <Text>{selectedRecord.ngheNghiep}</Text>
@@ -179,6 +180,7 @@ const PhieuKhamTable = ({ editingRecord }) => {
             <Text>{selectedRecord.diaChi}</Text>
           </Card>
         </Col>
+
         <Col span={12}>
           <Card title="Thông tin khám" bordered={false}>
             <Text strong style={{ fontSize: "16px" }}>Bác sĩ khám: </Text>
@@ -194,18 +196,81 @@ const PhieuKhamTable = ({ editingRecord }) => {
             <Text>{selectedRecord.chanDoan || "Không ghi"}</Text>
             <br />
             <Text strong style={{ fontSize: "16px" }}>Ngày khám: </Text>
-            <Text>{moment(selectedRecord.ngayKham).format("DD/MM/YYYY")}</Text>
+            <Text>{selectedRecord.ngayKham ? moment(selectedRecord.ngayKham).format("DD/MM/YYYY") : "Không rõ"}</Text>
             <br />
             <Text strong style={{ fontSize: "16px" }}>Giờ khám: </Text>
             <Text>{selectedRecord.khungGioKham}</Text>
             <br />
             <Text strong style={{ fontSize: "16px" }}>Giá khám: </Text>
-            <Text>{selectedRecord.giaKham}</Text>
+            <Text>
+              {selectedRecord.giaKham !== undefined && selectedRecord.giaKham !== null
+                ? `${Number(selectedRecord.giaKham).toLocaleString('vi-VN', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })} VND`
+                : "Chưa có"}
+            </Text>
           </Card>
         </Col>
       </Row>
-    )}
-  </Modal>
+
+      <Row style={{ marginTop: 20 }}>
+        <Col span={24}>
+          <Card title="Thông tin đơn thuốc" bordered={false}>
+            {Array.isArray(selectedRecord.donThuoc) && selectedRecord.donThuoc.length > 0 ? (
+              <Table
+                dataSource={selectedRecord.donThuoc}
+                pagination={false}
+                rowKey={(item, index) => index}
+                size="small"
+                bordered
+                columns={[
+                  {
+                    title: "Tên thuốc",
+                    dataIndex: "tenThuoc",
+                    key: "tenThuoc",
+                    align: "center",
+                    width: 150,
+                  },
+                  {
+                    title: "Liều dùng",
+                    dataIndex: "lieuDung",
+                    key: "lieuDung",
+                    align: "center",
+                    width: 100,
+                  },
+                  {
+                    title: "Số lần/ngày",
+                    dataIndex: "soLanDungTrongNgay",
+                    key: "soLanDungTrongNgay",
+                    align: "center",
+                    width: 100,
+                  },
+                  {
+                    title: "Số ngày",
+                    dataIndex: "soNgay",
+                    key: "soNgay",
+                    align: "center",
+                    width: 100,
+                  },
+                  {
+                    title: "Ghi chú",
+                    dataIndex: "ghiChu",
+                    align: "center",
+                    key: "ghiChu",
+                  },
+                ]}
+                scroll={{ x: 600 }}
+              />
+            ) : (
+              <Empty description="Không có đơn thuốc" />
+            )}
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )}
+</Modal>
 </Row>
 
   );

@@ -11,6 +11,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import "./style.css";
+import dayjs from "dayjs";
 
 const CreateDoctor = ({ openCreateDoctor, setOpenCreateDoctor, fetchListDoctor }) => {
   const [form] = Form.useForm();
@@ -203,7 +204,7 @@ console.log("API Response: ", res);
               <Col span={12}>
                 <Form.Item label="Họ tên" name="hoTen" rules={[
                                 { required: true, message: "Vui lòng nhập họ tên!" },
-                                { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số!" },
+                                { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số, ký tự đặc biệt!" },
                             ]}>
                   <Input placeholder="Nhập họ tên" />
                 </Form.Item>
@@ -250,9 +251,18 @@ console.log("API Response: ", res);
               </Col>
 
               <Col span={12}>
-                <Form.Item label="Ngày sinh" name="ngaySinh">
-                  <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
-                </Form.Item>
+                        <Form.Item
+                        label="Ngày sinh"
+                        name="ngaySinh"
+                        rules={[{ required: true, message: "Vui lòng chọn ngày sinh!" }]}
+                        >
+                        <DatePicker
+                            format="DD/MM/YYYY"
+                            style={{ width: "100%" }}
+                            placeholder="Chọn ngày sinh"
+                            disabledDate={(current) => current && current > dayjs().endOf('day')}
+                        />
+                        </Form.Item>
               </Col>
 
               <Col span={12}>
