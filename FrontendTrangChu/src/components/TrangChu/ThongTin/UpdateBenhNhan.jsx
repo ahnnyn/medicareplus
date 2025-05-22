@@ -252,7 +252,7 @@ useEffect(() => {
                             name="hoTen"
                             rules={[
                                 { required: true, message: "Vui lòng nhập họ tên!" },
-                                { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số!" },
+                                { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số, ký tự đặc biệt!" },
                             ]}
                         >
                             <Input />
@@ -316,7 +316,7 @@ useEffect(() => {
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                    <Form.Item
+                        <Form.Item
                         label="Ngày sinh"
                         name="ngaySinh"
                         rules={[{ required: true, message: "Vui lòng chọn ngày sinh!" }]}
@@ -325,6 +325,7 @@ useEffect(() => {
                             format="DD/MM/YYYY"
                             style={{ width: "100%" }}
                             placeholder="Chọn ngày sinh"
+                            disabledDate={(current) => current && current > dayjs().endOf('day')}
                         />
                         </Form.Item>
                     </Col>

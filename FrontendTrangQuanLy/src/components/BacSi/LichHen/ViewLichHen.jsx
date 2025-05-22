@@ -130,8 +130,8 @@ const ViewLichHen = ({ openViewDH, dataViewDH, setOpenViewDH, setDataViewDH }) =
                 </p>
             }
             open={openViewDH}
-            onCancel={cancel}           // ✅ sửa từ onClose => onCancel
-            footer={null}               // ✅ không hiển thị nút footer mặc định
+            onCancel={cancel}           // sửa từ onClose => onCancel
+            footer={null}               // không hiển thị nút footer mặc định
             width={850}
             destroyOnClose
         >

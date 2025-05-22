@@ -15,6 +15,7 @@ import {
   import { taoHoSoBenhNhan } from "../../../services/apiChuyenKhoaBacSi";
   import React from 'react';
   import { useSelector } from "react-redux";
+  import moment from 'moment';
   import './taoHoSo.css';
   
   
@@ -102,11 +103,27 @@ import {
   
                 <Col span={12}>
                   <Form.Item
-                    label="Ngày sinh (năm/tháng/ngày)"
+                    label="Ngày sinh (ngày/tháng/năm)"
                     name="ngaySinh"
-                    rules={[{ required: true, message: "Vui lòng chọn ngày sinh!" }]}
+                    rules={[
+                      { required: true, message: "Vui lòng chọn ngày sinh!" },
+                      {
+                        validator: (_, value) => {
+                          if (!value) return Promise.resolve();
+                          // so sánh ngày sinh < ngày hiện tại
+                          const today = moment().startOf('day');
+                          if (value.isBefore(today, 'day')) return Promise.resolve();
+                          return Promise.reject(new Error("Ngày sinh phải trước ngày hiện tại!"));
+                        },
+                      },
+                    ]}
                   >
-                    <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+                    <DatePicker
+                      format="DD/MM/YYYY"
+                      style={{ width: "100%" }}
+                      // có thể thêm props sau nếu muốn disable chọn ngày tương lai
+                      disabledDate={current => current && current >= moment().endOf('day')}
+                    />
                   </Form.Item>
                 </Col>
   
@@ -139,10 +156,16 @@ import {
                   <Form.Item
                     label="Mã CCCD"
                     name="CCCD"
-                    rules={[{ required: true, message: 'Vui lòng nhập mã CCCD!' }, { pattern: /^[0-9]{9,12}$/, message: 'CCCD không hợp lệ!' }]}
+                    rules={[
+                      { required: true, message: 'Vui lòng nhập mã CCCD!' },
+                      {
+                        pattern: /^\d{12}$/,
+                        message: 'CCCD phải gồm đúng 12 chữ số.',
+                      },
+                    ]}
                     hasFeedback
                   >
-                    <Input placeholder="Nhập mã định danh..." />
+                    <Input placeholder="Nhập 12 số CCCD..." maxLength={12} />
                   </Form.Item>
                 </Col>
   
@@ -167,7 +190,7 @@ import {
                   >
                     Tạo mới
                   </Button>
-                  <Button onClick={() => form.resetFields()} className="btn-reset">Nhập lại</Button>
+                  <Button onClick={() => form.resetFields()} style={{ width: "200px", height: "40px"}} className="btn-reset">Nhập lại</Button>
                 </Col>
               </Row>
             </Form>

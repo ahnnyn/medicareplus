@@ -141,7 +141,7 @@ const ModalHoSoBenhNhan = ({ openView, setOpenView, dataView, setDataView }) => 
             footer={null}
             width={800}
             centered
-            bodyStyle={{ maxHeight: '80vh', overflowY: 'auto', padding: '10px' }}
+            bodyStyle={{ maxHeight: '80vh', overflowY: 'auto', overflowX: 'auto', padding: '10px' }}
 
         >
             {dataArray.length > 0 ? (

@@ -50,7 +50,7 @@ const Userinfor = () => {
           alt="avatar"
           className="avatar"
         />
-        <h2>{userData?.hoTen || "Người dùng"}</h2>
+        <h3>{userData?.hoTen || "Người dùng"}</h3>
       </div>
       <div className="icons">
         <img src="./more.png" alt="more" />

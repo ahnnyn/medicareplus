@@ -245,61 +245,72 @@ const QuanLyLichHen = () => {
             }
         },
         {
-            title: "Chức năng", render: (_, record) => (
+            title: "Chức năng",
+            render: (_, record) => {
+                const isDisabled = record.trangThai === "Đã hủy";
+
+                return (
                 <div style={{ display: "flex", gap: "10px" }}>
-                    <Tooltip title="Xem chi tiết" style={{ marginRight: 10 }}>
-                        <FaEye
-                            style={{ color: "green", cursor: "pointer", fontSize: "18px" }}
-                            onClick={() => {
-                                if (!record) {
-                                    console.error("⚠️ Không tìm thấy dữ liệu bệnh nhân!");
-                                    return;
-                                }
-                                setDataViewDH(record);
-                                setOpenViewDH(true);
-                            }}
-                        />
+                    <Tooltip title="Xem chi tiết">
+                    <FaEye
+                        style={{ color: "green", cursor: "pointer", fontSize: "18px" }}
+                        onClick={() => {
+                        if (!record) {
+                            console.error("⚠️ Không tìm thấy dữ liệu bệnh nhân!");
+                            return;
+                        }
+                        setDataViewDH(record);
+                        setOpenViewDH(true);
+                        }}
+                    />
                     </Tooltip>
-        
+
                     <Tooltip title="Chỉnh sửa phiếu khám">
-                        <RiEdit2Fill
-                            style={{ color: "orange", cursor: "pointer", fontSize: "18px" }}
-                            onClick={() => handleEditClick(record)} // Mở modal khi bấm vào bút
-                        />
+                    <RiEdit2Fill
+                        style={{ color: "orange", cursor: "pointer", fontSize: "18px" }}
+                        onClick={() => handleEditClick(record)}
+                    />
                     </Tooltip>
 
                     {/* Nút gọi video */}
-                    <Tooltip title="Gọi video">
-                        <BsCameraVideoFill
+                    <Tooltip title={isDisabled ? "Đã hủy - không thể gọi" : "Gọi video"}>
+                    <BsCameraVideoFill
                         style={{
-                            color: "#1890ff",
-                            cursor: "pointer",
-                            fontSize: 18,
+                        color: isDisabled ? "#ccc" : "#1890ff",
+                        cursor: isDisabled ? "not-allowed" : "pointer",
+                        fontSize: 18,
+                        pointerEvents: isDisabled ? "none" : "auto",
                         }}
                         onClick={() => {
-                            const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${record.maLich}&patientId=${record.maBenhNhan}&doctorId=${record.maBacSi}&currentUserID=${user?.maBacSi}&currentRole=${user?.tenVaiTro}`;
-                            window.open(videoCallUrl, "_blank"); // Mở ở tab mới
+                        if (isDisabled) return;
+                        const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${record.maLich}&patientId=${record.maBenhNhan}&doctorId=${record.maBacSi}&currentUserID=${user?.maBacSi}&currentRole=${user?.tenVaiTro}`;
+                        window.open(videoCallUrl, "_blank");
                         }}
-                        />
+                    />
                     </Tooltip>
 
                     {/* Nút nhắn tin */}
-                    <Tooltip title="Nhắn tin">
-                        <IoChatbubbleEllipsesSharp
+                    <Tooltip title={isDisabled ? "Đã hủy - không thể nhắn tin" : "Nhắn tin"}>
+                    <IoChatbubbleEllipsesSharp
                         style={{
-                            color: "#52c41a",
-                            cursor: "pointer",
-                            fontSize: 18,
+                        color: isDisabled ? "#ccc" : "#52c41a",
+                        cursor: isDisabled ? "not-allowed" : "pointer",
+                        fontSize: 18,
+                        pointerEvents: isDisabled ? "none" : "auto",
                         }}
                         onClick={() => {
-                            const chatUrl = `http://localhost:3003/chat?appointmentId=${record.maLich}&patientId=${record.maBenhNhan}&doctorId=${record.maBacSi}&currentUserID=${user?.maBacSi}&currentRole=${user?.tenVaiTro}`;
-                            window.open(chatUrl, "_blank"); // Mở ở tab mới
+                        if (isDisabled) return;
+                        const chatUrl = `http://localhost:3003/chat?appointmentId=${record.maLich}&patientId=${record.maBenhNhan}&doctorId=${record.maBacSi}&currentUserID=${user?.maBacSi}&currentRole=${user?.tenVaiTro}`;
+                        window.open(chatUrl, "_blank");
                         }}
-                        />
+                    />
                     </Tooltip>
                 </div>
-            )
-        }
+                );
+            },
+            }
+
+        
     ];
 
     return (

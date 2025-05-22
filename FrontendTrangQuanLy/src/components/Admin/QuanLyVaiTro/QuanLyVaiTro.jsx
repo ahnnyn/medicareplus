@@ -87,20 +87,34 @@ const loadRoles = async () => {
   };
 
   const onFinish = async (values) => {
-    try {
-      if (editingRole) {
-        await updateVaiTro(editingRole.maVaiTro, values.tenVaiTro);
-        message.success("Cập nhật vai trò thành công");
-      } else {
-        await createVaiTro(values.tenVaiTro);
-        message.success("Thêm vai trò thành công");
-      }
-      closeModal();
-      loadRoles();
-    } catch (error) {
-      message.error("Lỗi khi lưu vai trò");
+  try {
+    const tenMoi = values.tenVaiTro.trim().toLowerCase();
+    const existed = roles.some(
+      (r) =>
+        r.tenVaiTro.trim().toLowerCase() === tenMoi &&
+        (!editingRole || r.maVaiTro !== editingRole.maVaiTro)
+    );
+
+    if (existed) {
+      message.error("Tên vai trò đã tồn tại!");
+      return;
     }
-  };
+
+    if (editingRole) {
+      await updateVaiTro(editingRole.maVaiTro, values.tenVaiTro);
+      message.success("Cập nhật vai trò thành công");
+    } else {
+      await createVaiTro(values.tenVaiTro);
+      message.success("Thêm vai trò thành công");
+    }
+
+    closeModal();
+    loadRoles();
+  } catch (error) {
+    message.error("Lỗi khi lưu vai trò");
+  }
+};
+
 
   const confirmDeleteRole = (role) => {
     setSelectedRole(role);
@@ -227,9 +241,9 @@ console.log("selectedRole:", selectedRole);
             name="tenVaiTro"
             label="Tên vai trò"
            rules={[
-                                { required: true, message: "Vui lòng nhập tên vai trò!" },
-                                { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số!" },
-                            ]}
+            { required: true, message: "Vui lòng nhập tên vai trò!" },
+            { pattern: /^[A-Za-zÀ-ỹ\s]+$/, message: "Không được nhập số!" },
+          ]}
           >
             <Input 
               placeholder="Nhập tên vai trò"

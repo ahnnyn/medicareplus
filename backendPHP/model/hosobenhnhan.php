@@ -15,7 +15,8 @@ class mHoSoBenhNhan {
 
         try {
             $query = $pdo->prepare("
-                SELECT * FROM hosobenhnhan hs 
+                SELECT hs.*, bn.email, bn.soDienThoai 
+                FROM hosobenhnhan hs 
                 JOIN benhnhan bn ON bn.maBenhNhan = hs.maBenhNhan 
                 WHERE hs.maBenhNhan = :id
             ");

@@ -28,7 +28,6 @@ import Footer from "../../../components/TrangChu/Footer/Footer";
 import { RiEdit2Fill, RiDeleteBin5Line } from "react-icons/ri";
 import { fetchLichKham, deleteLichHen, taoVnPayUrl} from "../../../services/apiChuyenKhoaBacSi";
 
-// ✅ Thêm import 2 modal riêng biệt
 import ModalXemChiTietLichHen from "./ModalXemChiTietLichHen";
 import ModalCapNhatLichHen from "./ModalCapNhatLichHen";
 
@@ -250,7 +249,9 @@ const LichHenCard = () => {
                           </Tag>
                         </div>
 
-                        {item.trangThai === "Chờ khám" && item.trangThaiThanhToan === "Chưa thanh toán" && (
+                        {( (item.trangThai === "Chờ khám" || item.trangThai === "Đã khám") &&
+                          item.trangThaiThanhToan === "Chưa thanh toán" &&
+                          item.phuongthucthanhtoan === "VnPay") && (
                           <Tooltip title="Thanh toán ngay">
                             <a
                               style={{
@@ -267,6 +268,7 @@ const LichHenCard = () => {
                             </a>
                           </Tooltip>
                         )}
+
                       </Col>
                     </Row>
 
@@ -295,61 +297,76 @@ const LichHenCard = () => {
                         />
                       </Tooltip>
 
-                      <Tooltip title="Chỉnh sửa lịch hẹn">
-                        <RiEdit2Fill
-                          style={{
-                            color: "orange",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => handleEditClick(item)}
-                        />
-                      </Tooltip>
+                        <Tooltip title="Chỉnh sửa lịch hẹn">
+                          <RiEdit2Fill
+                            style={{
+                              color: "orange",
+                              cursor: (item.trangThai === "Đã hủy" || item.trangThai === "Đã khám") ? "not-allowed" : "pointer",
+                              fontSize: 18,
+                              opacity: (item.trangThai === "Đã hủy" || item.trangThai === "Đã khám") ? 0.4 : 1,
+                            }}
+                            onClick={() => {
+                              if (item.trangThai !== "Đã hủy" && item.trangThai !== "Đã khám") {
+                                handleEditClick(item);
+                              }
+                            }}
+                          />
+                        </Tooltip>
+                        <Tooltip title="Xóa lịch hẹn">
+                          <RiDeleteBin5Line
+                            style={{
+                              color: "red",
+                              cursor: (item.trangThai === "Đã hủy" || item.trangThai === "Đã khám") ? "not-allowed" : "pointer",
+                              fontSize: 18,
+                              opacity: (item.trangThai === "Đã hủy" || item.trangThai === "Đã khám") ? 0.4 : 1,
+                            }}
+                            onClick={() => {
+                              if (item.trangThai !== "Đã hủy" || item.trangThai !== "Đã khám") {
+                                handleDeleteClick(item);
+                              }
+                            }}
+                          />
+                        </Tooltip>
 
-                      <Tooltip title="Xóa lịch hẹn">
-                        <RiDeleteBin5Line
-                          style={{
-                            color: "red",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => handleDeleteClick(item)}
-                        />
-                      </Tooltip>
 
                       {/* Nút gọi video */}
-                      <Tooltip title="Gọi video">
-                        <BsCameraVideoFill
-                          style={{
-                            color: "#1890ff",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => {
-                            const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
-                            window.open(videoCallUrl, "_blank"); // Mở ở tab mới
-                          }}
-                        />
-                      </Tooltip>
+                      
+                      {/* Nút gọi video */}
+                        <Tooltip title={item.trangThai === "Đã hủy" ? "Đã hủy - không thể gọi" : "Gọi video"}>
+                          <BsCameraVideoFill
+                            style={{
+                              color: item.trangThai === "Đã hủy" ? "#ccc" : "#1890ff",
+                              cursor: item.trangThai === "Đã hủy" ? "not-allowed" : "pointer",
+                              fontSize: 18,
+                              pointerEvents: item.trangThai === "Đã hủy" ? "none" : "auto",
+                            }}
+                            onClick={() => {
+                              if (item.trangThai === "Đã hủy") return;
+                              const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+                              window.open(videoCallUrl, "_blank");
+                            }}
+                          />
+                        </Tooltip>
 
-                      {/* Nút nhắn tin */}
-                      <Tooltip title="Nhắn tin">
-                        <IoChatbubbleEllipsesSharp
-                          style={{
-                            color: "#52c41a",
-                            cursor: "pointer",
-                            fontSize: 18,
-                          }}
-                          onClick={() => {
-                            const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
-                            window.open(chatUrl, "_blank"); // Mở ở tab mới
-                          }}
-                        />
-                      </Tooltip>
+                        {/* Nút nhắn tin */}
+                        <Tooltip title={item.trangThai === "Đã hủy" ? "Đã hủy - không thể nhắn tin" : "Nhắn tin"}>
+                          <IoChatbubbleEllipsesSharp
+                            style={{
+                              color: item.trangThai === "Đã hủy" ? "#ccc" : "#52c41a",
+                              cursor: item.trangThai === "Đã hủy" ? "not-allowed" : "pointer",
+                              fontSize: 18,
+                              pointerEvents: item.trangThai === "Đã hủy" ? "none" : "auto",
+                            }}
+                            onClick={() => {
+                              if (item.trangThai === "Đã hủy") return;
+                              const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+                              window.open(chatUrl, "_blank");
+                            }}
+                          />
+                        </Tooltip>
+                      </div>
                     </div>
-
                   </div>
-                </div>
               </Col>
             ))}
           </Row>
@@ -365,14 +382,14 @@ const LichHenCard = () => {
       <Row style={{ marginBottom: "50px" }}></Row>
       <Footer />
 
-      {/* ✅ Modal xem chi tiết */}
+      {/* Modal xem chi tiết */}
       <ModalXemChiTietLichHen
         open={openViewDH}
         onCancel={() => setOpenViewDH(false)}
         data={dataViewDH}
       />
 
-      {/* ✅ Modal cập nhật lịch hẹn */}
+      {/* Modal cập nhật lịch hẹn */}
       <ModalCapNhatLichHen
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}

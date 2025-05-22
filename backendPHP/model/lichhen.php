@@ -138,7 +138,7 @@
 
                 // Kiểm tra xem có bản ghi nào được cập nhật không
                 if ($query->rowCount() > 0) {
-                    return ["success" => true, "message" => "Xóa lịch hẹn thành công"];
+                    return ["success" => true, "message" => "Hủy lịch hẹn thành công"];
                 } else {
                     return ["success" => false, "message" => "Không tìm thấy lịch hẹn hoặc lịch hẹn đã bị hủy trước đó"];
                 }

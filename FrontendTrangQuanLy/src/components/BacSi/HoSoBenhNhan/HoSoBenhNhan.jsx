@@ -1,9 +1,8 @@
-// HoSoBenhNhan.js
 import { Col, Row, Space, Table, Tooltip } from "antd";
 import { useEffect, useState } from "react";
 import { FaEye } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { findAllLichKhamByBacSi } from "../../../services/doctorAPI";
+import { findAllLichKhamByBacSi } from "../../../services/apiDoctor";
 import ModalHoSoBenhNhan from "./ModalHoSoBenhNhan";
 import SearchComponent from "../Search/SearchComponent";
 

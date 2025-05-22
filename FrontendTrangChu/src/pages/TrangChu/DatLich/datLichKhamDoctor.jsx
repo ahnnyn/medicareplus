@@ -197,7 +197,7 @@ const PageDatLichKham = () => {
     const dateBN =
       values.dateBenhNhan?.format?.("YYYY-MM-DD") || values.dateBenhNhan;
 
-    console.log("📋 Toàn bộ values:", values);
+    console.log("Toàn bộ values:", values);
 
     setLoadingSubmit(true);
 
@@ -691,26 +691,24 @@ const PageDatLichKham = () => {
                         },
                       ]}
                     >
-                      <Radio.Group
-                        onChange={handlePaymentChange}
-                        value="TienMat"
-                      >
+                      <Radio.Group onChange={handlePaymentChange}>
                         {hinhThucKham === "chuyenkhoa" ? (
-              <>
-                        <Radio style={{ fontSize: "16px" }} value="TienMat">
-                          Thanh toán sau tại cơ sở y tế
-                        </Radio>
-                        <Radio style={{ fontSize: "16px" }} value="VnPay">
-                          Thanh toán Online
-                        </Radio>
-                      </>
-                    ) : hinhThucKham === "tructuyen" ? (
-                      <Radio style={{ fontSize: "16px" }} value="VnPay">
-                        Thanh toán Online
-                      </Radio>
-                    ) : null}
+                          <>
+                            <Radio style={{ fontSize: "16px" }} value="TienMat">
+                              Thanh toán sau tại cơ sở y tế
+                            </Radio>
+                            <Radio style={{ fontSize: "16px" }} value="VnPay">
+                              Thanh toán bằng VNPay
+                            </Radio>
+                          </>
+                        ) : hinhThucKham === "tructuyen" ? (
+                          <Radio style={{ fontSize: "16px" }} value="VnPay">
+                            Thanh toán bằng VNPay
+                          </Radio>
+                        ) : null}
                       </Radio.Group>
                     </Form.Item>
+
                   </Col>
                 </Row>
 
