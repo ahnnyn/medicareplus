@@ -333,7 +333,9 @@ export const taoPhieuKhamBenh = (
   tienSu,
   chuanDoan,
   lyDoKham,
-  danhSachDonThuoc
+  danhSachDonThuoc,
+  emailBenhNhan,
+  tenBacSi
 ) => {
   console.log("danhSachDonThuoc", danhSachDonThuoc);
   return axios.post(
@@ -349,6 +351,8 @@ export const taoPhieuKhamBenh = (
       chuanDoan,
       lyDoKham,
       danhSachDonThuoc,
+      emailBenhNhan,
+      tenBacSi,
     },
     {
       headers: {
@@ -379,7 +383,12 @@ export const updateTTPhieuKhamBenh = (
   tienSu,
   chuanDoan,
   lyDoKham,
-  danhSachDonThuoc
+  danhSachDonThuoc,
+  maLichKham,
+  ngayKham,
+  khungGio,
+  emailBenhNhan, 
+  tenBacSi
 ) => {
   return axios.post(
     "/api/phieukhambenh.php?action=cap-nhat-thong-tin-phieu-kham",
@@ -389,6 +398,11 @@ export const updateTTPhieuKhamBenh = (
       chuanDoan,
       lyDoKham,
       danhSachDonThuoc,
+      maLichKham,
+      ngayKham,
+      khungGio,
+      emailBenhNhan, 
+      tenBacSi
     },
     {
       headers: {

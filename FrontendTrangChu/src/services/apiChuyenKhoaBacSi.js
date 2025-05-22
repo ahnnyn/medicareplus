@@ -148,14 +148,17 @@ export const updateBenhNhan = (_id, email, password, firstName, lastName, phone,
 // dat lich kham
 // Đặt lịch khám thông thường
 export const datLichKhamBenh = (
-    maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan, hinhThucKham
+    maBenhNhan, maBacSi, khungGioKham, tenBenhNhan,email, soDienThoai, giaKham, gioKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan, hinhThucKham
 ) => {
     return axios.post('/api/lichkham.php?action=dat-lich-kham-moi', {
         maBenhNhan,
         maBacSi,
         khungGioKham,
         tenBenhNhan,
+        email,
+        soDienThoai,
         giaKham,
+        gioKham,
         ngayKhamBenh,
         lyDoKham,
         hinhThucThanhToan,
@@ -163,14 +166,17 @@ export const datLichKhamBenh = (
     })
 }
 
-export const datLichKhamBenhVnPay = (maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, giaKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan, hinhThucKham
+export const datLichKhamBenhVnPay = (maBenhNhan, maBacSi, khungGioKham, tenBenhNhan, email, soDienThoai, giaKham, gioKham, ngayKhamBenh, lyDoKham, hinhThucThanhToan, hinhThucKham
 ) => {
     return axios.post('/api/lichkham.php?action=dat-lich-kham-moi', {
         maBenhNhan,
         maBacSi,
         khungGioKham,
         tenBenhNhan,
+        email,
+        soDienThoai,
         giaKham,
+        gioKham,
         ngayKhamBenh,
         lyDoKham,
         hinhThucThanhToan,

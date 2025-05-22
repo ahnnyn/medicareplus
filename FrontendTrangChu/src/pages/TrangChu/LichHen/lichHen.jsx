@@ -92,6 +92,7 @@ const LichHenCard = () => {
       onOk: async () => {
         try {
           const res = await deleteLichHen(record.maLich);
+          console.log(res); // Log dữ liệu trả về từ API
           if (res?.success) {
             notification.success({
               message: res.message || "Hủy lịch hẹn thành công",
@@ -270,82 +271,82 @@ const LichHenCard = () => {
                     </Row>
 
                     <div
-  style={{
-    position: "absolute",
-    top: 0,
-    right: 0,
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 12,
-    padding: 8,
-  }}
->
-  <Tooltip title="Xem chi tiết">
-    <FaEye
-      style={{
-        color: "green",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => {
-        setDataViewDH(item);
-        setOpenViewDH(true);
-      }}
-    />
-  </Tooltip>
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 12,
+                        padding: 8,
+                      }}
+                    >
+                      <Tooltip title="Xem chi tiết">
+                        <FaEye
+                          style={{
+                            color: "green",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => {
+                            setDataViewDH(item);
+                            setOpenViewDH(true);
+                          }}
+                        />
+                      </Tooltip>
 
-  <Tooltip title="Chỉnh sửa lịch hẹn">
-    <RiEdit2Fill
-      style={{
-        color: "orange",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => handleEditClick(item)}
-    />
-  </Tooltip>
+                      <Tooltip title="Chỉnh sửa lịch hẹn">
+                        <RiEdit2Fill
+                          style={{
+                            color: "orange",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => handleEditClick(item)}
+                        />
+                      </Tooltip>
 
-  <Tooltip title="Xóa lịch hẹn">
-    <RiDeleteBin5Line
-      style={{
-        color: "red",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => handleDeleteClick(item)}
-    />
-  </Tooltip>
+                      <Tooltip title="Xóa lịch hẹn">
+                        <RiDeleteBin5Line
+                          style={{
+                            color: "red",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => handleDeleteClick(item)}
+                        />
+                      </Tooltip>
 
-  {/* Nút gọi video */}
-  <Tooltip title="Gọi video">
-    <BsCameraVideoFill
-      style={{
-        color: "#1890ff",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => {
-        const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
-        window.open(videoCallUrl, "_blank"); // Mở ở tab mới
-      }}
-    />
-  </Tooltip>
+                      {/* Nút gọi video */}
+                      <Tooltip title="Gọi video">
+                        <BsCameraVideoFill
+                          style={{
+                            color: "#1890ff",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => {
+                            const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+                            window.open(videoCallUrl, "_blank"); // Mở ở tab mới
+                          }}
+                        />
+                      </Tooltip>
 
-  {/* Nút nhắn tin */}
-  <Tooltip title="Nhắn tin">
-    <IoChatbubbleEllipsesSharp
-      style={{
-        color: "#52c41a",
-        cursor: "pointer",
-        fontSize: 18,
-      }}
-      onClick={() => {
-        const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
-        window.open(chatUrl, "_blank"); // Mở ở tab mới
-      }}
-    />
-  </Tooltip>
-</div>
+                      {/* Nút nhắn tin */}
+                      <Tooltip title="Nhắn tin">
+                        <IoChatbubbleEllipsesSharp
+                          style={{
+                            color: "#52c41a",
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                          onClick={() => {
+                            const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+                            window.open(chatUrl, "_blank"); // Mở ở tab mới
+                          }}
+                        />
+                      </Tooltip>
+                    </div>
 
                   </div>
                 </div>

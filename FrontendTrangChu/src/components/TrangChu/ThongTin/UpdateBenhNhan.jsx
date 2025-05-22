@@ -121,7 +121,7 @@ useEffect(() => {
                 // const fileName = res.url.split("/").pop();
                 const imageUrl = `${import.meta.env.VITE_BACKEND_URL}${res.url}`;
                 // const fileName = res.url.split("/").pop();
-                setImageUrl(imageUrl);  // ✅ Đúng tên biến ở đây
+                setImageUrl(imageUrl);  //Đúng tên biến ở đây
                 // form.setFieldsValue({ hinhAnh: fileName }); 
                 setFileList([{ 
                     uid: "-1", 
@@ -164,7 +164,7 @@ useEffect(() => {
         }
         const hinhAnh = imageUrl.split("/").pop(); // Extract filename from the image URL
         
-         // ⚠️ Kiểm tra kỹ mã bệnh nhân
+         // Kiểm tra kỹ mã bệnh nhân
     if (!values.maBenhNhan) {
         notification.error({
             message: "Thiếu thông tin!",
@@ -198,7 +198,7 @@ useEffect(() => {
                 values.maBenhNhan,
                 values.hoTen,
                 values.gioiTinh,
-                formattedNgaySinh,  // 👈 Format chuẩn để tránh lệch múi giờ
+                formattedNgaySinh,  // Format chuẩn để tránh lệch múi giờ
                 values.soDienThoai,
                 values.email,
                 values.diaChi,
@@ -309,9 +309,9 @@ useEffect(() => {
                                 <Radio value={"2"}>Khác</Radio>
                             </Radio.Group> */}
                             <Radio.Group>
-                                <Radio value={0}>Nam</Radio>
-                                <Radio value={1}>Nữ</Radio>
-                                <Radio value={2}>Khác</Radio>
+                                <Radio value={"0"}>Nam</Radio>
+                                <Radio value={"1"}>Nữ</Radio>
+                                <Radio value={"2"}>Khác</Radio>
                                 </Radio.Group>
                         </Form.Item>
                     </Col>

@@ -56,7 +56,10 @@ if (isset($_GET["action"])) {
                     isset($data["maBacSi"]) && !empty($data["maBacSi"]) &&
                     isset($data["khungGioKham"]) && !empty($data["khungGioKham"]) &&
                     isset($data["tenBenhNhan"]) && !empty($data["tenBenhNhan"]) &&
+                    isset($data["email"]) && !empty($data["email"]) &&
+                    isset($data["soDienThoai"]) && !empty($data["soDienThoai"]) &&
                     isset($data["giaKham"]) && !empty($data["giaKham"]) &&
+                    isset($data["gioKham"]) && !empty($data["gioKham"]) &&
                     isset($data["ngayKhamBenh"]) && !empty($data["ngayKhamBenh"]) &&
                     isset($data["lyDoKham"]) && !empty($data["lyDoKham"]) &&
                     !empty($hinhThucThanhToan) &&
@@ -67,7 +70,10 @@ if (isset($_GET["action"])) {
                         $data["maBacSi"],
                         $data["khungGioKham"],
                         $data["tenBenhNhan"],
+                        $data["email"],
+                        $data["soDienThoai"],
                         $data["giaKham"],
+                        $data["gioKham"],
                         $data["ngayKhamBenh"],
                         $data["lyDoKham"],
                         $hinhThucThanhToan,

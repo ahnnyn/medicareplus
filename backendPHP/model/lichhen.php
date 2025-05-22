@@ -120,24 +120,32 @@
             }
         }
 
-        public function xoaLichHen($maLich) {
+       public function xoaLichHen($maLich) {
             $p = new connectdatabase();
             $pdo = $p->connect();
             if (!$pdo) {
                 return ["success" => false, "message" => "Không thể kết nối database"];
             }
+
             try {
                 $query = $pdo->prepare("
-                    UPDATE lichkham 
-                    SET trangThai = 'Đã hủy' where maLich = :maLich
+                    UPDATE lichkham
+                    SET trangThai = 'Đã hủy'
+                    WHERE maLich = :maLich
                 ");
                 $query->bindParam(":maLich", $maLich, PDO::PARAM_INT);
                 $query->execute();
-    
-                return ["success" => true, "message" => "Xóa lịch hẹn thành công"];
+
+                // Kiểm tra xem có bản ghi nào được cập nhật không
+                if ($query->rowCount() > 0) {
+                    return ["success" => true, "message" => "Xóa lịch hẹn thành công"];
+                } else {
+                    return ["success" => false, "message" => "Không tìm thấy lịch hẹn hoặc lịch hẹn đã bị hủy trước đó"];
+                }
             } catch (PDOException $e) {
                 return ["success" => false, "message" => "Lỗi truy vấn: " . $e->getMessage()];
             }
         }
+
     }
 ?>

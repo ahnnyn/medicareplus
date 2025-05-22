@@ -89,7 +89,7 @@
             }
         }
 
-        public function taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan, $giaKham, $ngayKham, $lyDoKham, $hinhThucThanhToan, $hinhThucKham) {
+        public function taoLichKhamMoi($maBenhNhan, $maBacSi, $maKhungGio, $tenBenhNhan,$email, $soDienThoai, $giaKham, $gioKham, $ngayKham, $lyDoKham, $hinhThucThanhToan, $hinhThucKham) {
             $p = new connectdatabase();
             $pdo = $p->connect();
         
@@ -151,9 +151,8 @@
                         if ($updateSuccess) {
                             return [
                                 "status" => true,
-                                "message" => "Tạo lịch khám và cập nhật trạng thái thành công",
-                                "maLichKham" => $maLichKham,
-                                "roomID" => $roomID
+                                "message" => "Đặt lịch khám thành công!",
+                                "maLichKham" => $maLichKham
                             ];
                         } else {
                             return ["status" => false, "error" => "Không thể cập nhật trạng thái đặt lịch"];

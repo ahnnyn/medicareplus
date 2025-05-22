@@ -157,7 +157,8 @@
             if ($result === true) {
                 // Gửi email thông báo
                 require '../helpers/sendemail.php'; // Đường dẫn đến file gửi mail
-                $sendMailResult = guiEmailThongBao($email, $hoTen, $username, $matKhau);
+                $p = new EmailService();
+                $sendMailResult = $p->guiEmailThongBao($email, $hoTen, $username, $matKhau);
 
                 if ($sendMailResult === true) {
                     return ['success' => true, 'message' => 'Thêm bác sĩ thành công và gửi mail thành công'];

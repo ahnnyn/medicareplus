@@ -33,9 +33,11 @@ if (isset($_GET["action"])) {
             $chuanDoan = $data['chuanDoan'] ?? null;
             $lyDoKham = $data['lyDoKham'] ?? null;
             $donThuoc = $data['danhSachDonThuoc'] ?? null;
+            $emailBenhNhan = $data['emailBenhNhan'] ?? null;
+            $tenBacSi = $data['tenBacSi'] ?? null;
 
         
-            $result = $p->taoPhieuKhamMoi($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham, $donThuoc);
+            $result = $p->taoPhieuKhamMoi($maHoSo, $maBacSi, $maLichKham, $tenBN, $ngayKham, $khungGio, $tienSu, $chuanDoan, $lyDoKham, $donThuoc, $emailBenhNhan, $tenBacSi);
             echo json_encode($result);
             exit;
             break;
@@ -58,9 +60,14 @@ if (isset($_GET["action"])) {
             $chuanDoan = $data['chuanDoan'];
             $lyDoKham = $data['lyDoKham'];
             $donThuoc = $data['danhSachDonThuoc'] ?? null;
+            $ngayKham = $data['ngayKham'];
+            $khungGio = $data['khungGio'];
+            $emailBenhNhan = $data['emailBenhNhan'] ?? null;
+            $tenBacSi = $data['tenBacSi'] ?? null;
+            $maLichKham = $data['maLichKham'] ?? null;
 
         
-            $result = $p->updateThongTinPhieuKham($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham, $donThuoc);
+            $result = $p->updateThongTinPhieuKham($maPhieuKham, $tienSu, $chuanDoan, $lyDoKham, $donThuoc, $maLichKham, $ngayKham, $khungGio, $emailBenhNhan, $tenBacSi);
             echo json_encode($result);
             break;
         case "lay-phieu-kham-benh":

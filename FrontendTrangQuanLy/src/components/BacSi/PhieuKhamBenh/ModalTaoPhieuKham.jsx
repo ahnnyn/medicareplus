@@ -166,7 +166,12 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
           values.tienSu,
           values.chuanDoan,
           values.lyDoKham,
-          danhSachDonThuoc
+          danhSachDonThuoc,
+          maLichKham,
+          values.ngayKham,
+          values.khungGio,
+          editingRecord?.email,
+          editingRecord?.tenBacSi
         );
       } else {
         // Nếu phiếu khám chưa tồn tại, tạo mới
@@ -180,7 +185,9 @@ const fetchPhieuKhamBenh = async (maLichKham, ngayKham, khungGio) => {
           values.tienSu,
           values.chuanDoan,
           values.lyDoKham,
-          danhSachDonThuoc
+          danhSachDonThuoc,
+          editingRecord?.email,
+          editingRecord?.tenBacSi
         );
       }
   

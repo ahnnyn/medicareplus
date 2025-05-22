@@ -109,9 +109,9 @@ const QuanLyLichLamViec = () => {
     console.log("dataDoctor: ", dataDoctor);
     console.log("dataTime: ", dataTime);
 
-    const fetchDoctorTimes = async () => {
+    const fetchDoctorTimes = async (externalDoctorId = null) => {
       // Lấy giá trị form
-      let doctorId = form.getFieldValue('maBacSi') || dataDoctor.maBacSi || ''; // fallback sang dataDoctor.maBacSi nếu form rỗng
+      let doctorId = externalDoctorId || form.getFieldValue('maBacSi') || dataDoctor.maBacSi ||user?.maBacSi || ''; // fallback sang dataDoctor.maBacSi nếu form rỗng
       const appointmentDate = form.getFieldValue('date'); // moment object hoặc undefined/null
       const formattedDate = appointmentDate ? appointmentDate.format('YYYY-MM-DD') : null;
 

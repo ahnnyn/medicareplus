@@ -29,11 +29,7 @@ class cLichHen {
         $p = new mLichHen();
         $result = $p->xoaLichHen($maLich);
 
-        if (isset($result['success'])) {
-            return ['success' => true];
-        } else {
-            return ['success' => false, 'error' => $result['error'] ?? 'Lỗi không xác định'];
-        }
+        return $result;
     }
     
 }
