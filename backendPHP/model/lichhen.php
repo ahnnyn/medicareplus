@@ -32,7 +32,8 @@
                             lk.trangThaiThanhToan,
                             lk.phuongthucthanhtoan,
                             lk.hinhThucKham,
-                            kh.tenKhoa
+                            kh.tenKhoa,
+                            kh.maKhoa
                         FROM lichkham lk 
                         JOIN bacsi bs ON lk.maBacSi = bs.maBacSi 
                         JOIN khunggio kg ON lk.maKhungGio = kg.maKhungGio
