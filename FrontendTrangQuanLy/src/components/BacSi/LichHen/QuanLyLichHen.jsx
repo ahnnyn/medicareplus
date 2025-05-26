@@ -256,7 +256,7 @@ const QuanLyLichHen = () => {
                         style={{ color: "green", cursor: "pointer", fontSize: "18px" }}
                         onClick={() => {
                         if (!record) {
-                            console.error("⚠️ Không tìm thấy dữ liệu bệnh nhân!");
+                            console.error("Không tìm thấy dữ liệu bệnh nhân!");
                             return;
                         }
                         setDataViewDH(record);
@@ -265,11 +265,20 @@ const QuanLyLichHen = () => {
                     />
                     </Tooltip>
 
-                    <Tooltip title="Chỉnh sửa phiếu khám">
-                    <RiEdit2Fill
-                        style={{ color: "orange", cursor: "pointer", fontSize: "18px" }}
-                        onClick={() => handleEditClick(record)}
-                    />
+                    {/* Nút chỉnh sửa phiếu khám */}
+                    <Tooltip title={isDisabled ? "Đã hủy - không thể chỉnh sửa" : "Chỉnh sửa phiếu khám"}>
+                        <RiEdit2Fill
+                            style={{
+                            color: isDisabled ? "#ccc" : "orange",
+                            cursor: isDisabled ? "not-allowed" : "pointer",
+                            fontSize: "18px",
+                            pointerEvents: isDisabled ? "none" : "auto",
+                            }}
+                            onClick={() => {
+                            if (isDisabled) return;
+                            handleEditClick(record);
+                            }}
+                        />
                     </Tooltip>
 
                     {/* Nút gọi video */}

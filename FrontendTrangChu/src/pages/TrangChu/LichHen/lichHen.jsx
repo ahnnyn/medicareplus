@@ -241,6 +241,10 @@ const LichHenCard = () => {
                           {item.trangThai}
                         </Tag>
                       </Col>
+                      <Col span={12}>
+                        <b>Phương thức thanh toán:</b> {item.phuongthucthanhtoan || "Chưa rõ"}
+                        
+                      </Col>
                       <Col span={12} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div>
                           <b>Trạng thái thanh toán:</b>{" "}
@@ -312,7 +316,7 @@ const LichHenCard = () => {
                             }}
                           />
                         </Tooltip>
-                        <Tooltip title="Xóa lịch hẹn">
+                        <Tooltip title="Hủy lịch hẹn">
                           <RiDeleteBin5Line
                             style={{
                               color: "red",
@@ -321,15 +325,12 @@ const LichHenCard = () => {
                               opacity: (item.trangThai === "Đã hủy" || item.trangThai === "Đã khám") ? 0.4 : 1,
                             }}
                             onClick={() => {
-                              if (item.trangThai !== "Đã hủy" || item.trangThai !== "Đã khám") {
+                              if (item.trangThai !== "Đã hủy" && item.trangThai !== "Đã khám") {
                                 handleDeleteClick(item);
                               }
                             }}
                           />
                         </Tooltip>
-
-
-                      {/* Nút gọi video */}
                       
                       {/* Nút gọi video */}
                         <Tooltip title={item.trangThai === "Đã hủy" ? "Đã hủy - không thể gọi" : "Gọi video"}>

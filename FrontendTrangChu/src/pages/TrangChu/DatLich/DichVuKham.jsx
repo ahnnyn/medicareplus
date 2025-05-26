@@ -22,12 +22,12 @@ const DichVuKham = () => {
     {
       icon: <FaClinicMedical size={40} color="blue" />,
       txtP: "Đặt khám tại bệnh viện",
-      redirect: "/chuyen-khoa-kham",
+      redirect: "/chuyen-khoa-kham?hinhThucKham=chuyenkhoa",
     },
     {
       icon: <FiVideo size={40} color="blue" />,
       txtP: "Tư vấn sức khỏe trực tuyến",
-      redirect: "/chuyen-khoa-kham",
+      redirect: "/chuyen-khoa-kham?hinhThucKham=tructuyen",
     },
     {
       icon: <FaBrain size={40} color="blue" />,

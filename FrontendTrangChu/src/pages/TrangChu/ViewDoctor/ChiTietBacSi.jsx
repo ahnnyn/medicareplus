@@ -195,8 +195,59 @@ const ChiTietBacSi = () => {
     <>
       <div className="layout-app">
         <HeaderViewDoctor />
+        <Row style={{ marginBottom: "120px" }}></Row>
+        <div
+          className=""
+          style={{
+            backgroundImage: `url('../../public/Banner_2.jpg')`,
+            height: "300px",
+          }}
+        >
+        <Row justify="space-between" align="middle" gutter={16}>
+          <Col xs={24} md={12} className="">
+            <div
+              style={{
+                marginLeft: "90px",
+                padding: "20px 30px",
+                borderRadius: "40px",
+                backgroundColor: "white",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",   // căn giữa theo trục ngang
+                justifyContent: "center", // căn giữa theo trục dọc (nếu có thêm chiều cao cố định)
+                textAlign: "center",
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: "clamp(20px, 5vw, 30px)",
+                  fontWeight: "bold",
+                  color: "#00B0F0",
+                  margin: 0,
+                }}
+              >
+                ĐẶT KHÁM THEO BÁC SĨ
+              </h3>
+            </div>
 
-        <Row style={{ marginBottom: "150px" }}></Row>
+          </Col>
+
+          <Col xs={24} md={12} className="z-0 flex justify-end">
+            <img
+              src="../../public/540_phan_loai_dieu_kien_sx_trang_thiet_bi_y_te-removebg-preview.png"
+              alt="Doctors illustration"
+              className=""
+              style={{
+                maxHeight: "350px",
+                float: "right",
+                marginRight: "100px",
+              }}
+            />
+          </Col>
+        </Row>
+      </div>
+      <Row style={{ marginTop: "20px" }}></Row>
 
         <Row>
           <Col span={18} className="body-view-doctocc">

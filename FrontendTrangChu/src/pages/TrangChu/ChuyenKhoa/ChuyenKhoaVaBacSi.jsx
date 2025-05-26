@@ -8,16 +8,18 @@ import {
   Form,
   DatePicker,
   Radio,
+  Alert,
+  Card,
 } from "antd";
 import Footer from "../../../components/TrangChu/Footer/Footer";
 import HeaderViewDoctor from "../../../components/TrangChu/Header/HeaderViewDoctor";
 import "../LichHen/lichhen.scss";
 import { IoHomeSharp } from "react-icons/io5";
 import { DownOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FaLocationDot } from "react-icons/fa6";
-import { CaretRightOutlined } from "@ant-design/icons";
+import { CaretRightOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
   FaRegCalendarAlt,
   FaRegHandPointRight,
@@ -72,16 +74,26 @@ const ChuyenKhoaVaBacSi = () => {
   const [hienThiTime, setHienThiTime] = useState("Chọn ngày khám!");
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [khungGio, setkhungGio] = useState([]);
+  const queryParams = new URLSearchParams(location.search);
+  const hinhThucKhamFromUrl = queryParams.get("hinhThucKham"); 
   const [selectedHinhThucKham, setSelectedHinhThucKham] =
     useState("chuyenkhoa");
 
-  const fetchChuyenKhoaByMaKhoa = async (maKhoa) => {
-    const res = await fetchChuyenKhoaByID(maKhoa);
-    console.log("res chuyên khoa: ", res);
-    if (res && res.data) {
-      setDataChuyenKhoaByID(res.data);
-    }
+  const hienThiHinhThuc = {
+    chuyenkhoa: "Chuyên khoa",
+    tructuyen: "Trực tuyến",
   };
+
+  const hinhThucKhamListFromUrl = hinhThucKhamFromUrl
+    ? hinhThucKhamFromUrl.split(",").map(s => s.trim())
+    : [];
+    const fetchChuyenKhoaByMaKhoa = async (maKhoa) => {
+      const res = await fetchChuyenKhoaByID(maKhoa);
+      console.log("res chuyên khoa: ", res);
+      if (res && res.data) {
+        setDataChuyenKhoaByID(res.data);
+      }
+    };
 
   console.log("dataChuyenKhoaByID: ", dataChuyenKhoaByID);
 
@@ -92,6 +104,28 @@ const ChuyenKhoaVaBacSi = () => {
       setDataBacSiByChuyenKhoa([...res.bacSiList]); // Spread operator để cập nhật state đúng cách
     }
   };
+
+// Hàm loại bỏ dấu và chuẩn hóa chuỗi
+const normalize = (str) =>
+  str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, ""); // bỏ khoảng trắng
+
+const bacSiFilter = useMemo(() => {
+  if (hinhThucKhamFromUrl) {
+    return dataBacSiByChuyenKhoa.filter((bs) => {
+      const hinhThucList = bs.hinhThucKhamList
+        ?.split(",")
+        .map((s) => normalize(s.trim()));
+      return hinhThucList?.includes(normalize(hinhThucKhamFromUrl));
+    });
+  }
+  return dataBacSiByChuyenKhoa || [];
+}, [dataBacSiByChuyenKhoa, hinhThucKhamFromUrl]);
+
+
 
   const fetchBacSiByID = async (maBacSi) => {
     const res = await fetchBacSiByMaBS(maBacSi);
@@ -171,6 +205,17 @@ const ChuyenKhoaVaBacSi = () => {
     setOpen(false);
   };
 
+  useEffect(() => {
+  if (hinhThucKhamFromUrl && (hinhThucKhamFromUrl === "tructuyen" || hinhThucKhamFromUrl === "chuyenkhoa")) {
+    const newSelected = {};
+    dataBacSiByChuyenKhoa?.forEach((item) => {
+      if (!selectedHinhThucKham[item.maBacSi]) {
+        newSelected[item.maBacSi] = hinhThucKhamFromUrl;
+      }
+    });
+    setSelectedHinhThucKham(prev => ({ ...prev, ...newSelected }));
+  }
+}, [dataBacSiByChuyenKhoa]);
   const englishToVietnameseDays = {
     Sunday: "Chủ nhật",
     Monday: "Thứ 2",
@@ -339,16 +384,59 @@ const ChuyenKhoaVaBacSi = () => {
               </span>
             </Col>
             <Col span={24}>
-              <span style={{ marginLeft: "15px" }}>
-                <div
+              <Card
+                title={
+                  <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "22px",
+                    fontWeight: "bold",
+                    color: "#33c7d8",
+                    gap: "8px",
+                  }}>
+                    <InfoCircleOutlined />
+                    Mô tả chuyên khoa
+                  </div>
+                }
+                bordered={false}
+                style={{
+                  margin: "20px",
+                  borderRadius: "10px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                }}
+                bodyStyle={{
+                  fontSize: "16px",
+                  lineHeight: "1.8",
+                  color: "#333",
+                  padding: "20px",
+                  backgroundColor: "#fdfdfd",
+                }}
+              >
+                <div dangerouslySetInnerHTML={{ __html: dataChuyenKhoaByID?.moTa }} />
+              </Card>
+
+
+             {hinhThucKhamListFromUrl.length > 0 && (
+                <Card
                   style={{
-                    marginTop: "15px",
-                    marginLeft: "10px",
-                    fontSize: "17px",
+                    margin: "20px 15px",
+                    background: "#f0f9ff",
+                    borderLeft: "5px solid #33c7d8",
+                    borderRadius: "10px",
                   }}
-                  dangerouslySetInnerHTML={{ __html: dataChuyenKhoaByID?.moTa }}
-                />
-              </span>
+                  bodyStyle={{ padding: "12px 20px" }}
+                >
+                  <div style={{ fontSize: "17px", fontWeight: 500}}>
+                    Danh sách các bác sĩ có lịch khám {" "} 
+                    <span style={{ color: "#33c7d8" }}>
+                      {hinhThucKhamListFromUrl
+                        .map(ht => hienThiHinhThuc[ht] || ht)
+                        .join(", ")}
+                    </span>
+                  </div>
+                </Card>
+              )}
+
             </Col>
           </Row>
         </Col>
@@ -365,8 +453,8 @@ const ChuyenKhoaVaBacSi = () => {
                 padding: "20px 10px",
               }}
             >
-              {dataBacSiByChuyenKhoa?.length > 0 ? (
-                dataBacSiByChuyenKhoa.map((item, index) => (
+              {bacSiFilter?.length > 0 ? (
+                bacSiFilter.map((item, index) => (
                   <Col
                     key={item.maBacSi}
                     span={24}
@@ -441,8 +529,10 @@ const ChuyenKhoaVaBacSi = () => {
                           <Col span={24}>
                             <Radio.Group
                               value={
-                                selectedHinhThucKham[item.maBacSi] ||
-                                "Chuyên khoa"
+                                selectedHinhThucKham[item.maBacSi] ??
+                                (hinhThucKhamFromUrl === "tructuyen" || hinhThucKhamFromUrl === "chuyenkhoa"
+                                  ? hinhThucKhamFromUrl
+                                  : "chuyenkhoa")
                               }
                               onChange={(e) => {
                                 const newValue = e.target.value;
@@ -815,6 +905,22 @@ const ChuyenKhoaVaBacSi = () => {
                     </Row>
                   </Col>
                 ))
+              )  :hinhThucKhamFromUrl ? (
+                <Col
+                  span={24}
+                  className="box-lich-kham"
+                  style={{ backgroundColor: "white" }}
+                >
+                  <p
+                    style={{
+                      color: "red",
+                      fontSize: "22px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Không có bác sĩ phù hợp với hình thức khám này.
+                  </p>
+                </Col>
               ) : (
                 <Col
                   span={24}

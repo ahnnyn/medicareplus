@@ -13,40 +13,8 @@ class mUser {
     
         if ($pdo) {
             try {
-                // Use Prepared Statement to prevent SQL Injection
-                // $stmt = $pdo->prepare("SELECT tk.*, bs.* FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan WHERE tk.username = :username and tk.maVaiTro = 2");
-                // $stmt->bindParam(':username', $username);
-                // $stmt->execute();
-                
-                // $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                // if ($user && password_verify($matKhau, $user['matKhau'])) {
-                //     // Remove the password from the user data before returning
-                //     unset($user['matKhau']);
-    
-                //     // Create payload for JWT
-                //     $payload = [
-                //         "iat" => time(),
-                //         "exp" => time() + 3600, // Token expires after 1 hour
-                //         "data" => [
-                //             "maTaiKhoan" => $user['maTaiKhoan'],
-                //             "username" => $user['username'],
-                //         ]
-                //     ];
-    
-                //     // Generate JWT token
-                //     $jwt = JWT::encode($payload, $this->secret_key, 'HS256');
-    
-                //     return [
-                //         "success" => true,
-                //         "message" => "Đăng nhập thành công",
-                //         "user" => $user,
-                //         "token" => $jwt
-                //     ];
-                // } else {
-                //     return ["success" => false, "message" => "Sai tài khoản hoặc mật khẩu"];
-                // }
-            $stmt = $pdo->prepare("SELECT * FROM taikhoan WHERE username = :username");
+ 
+            $stmt = $pdo->prepare("SELECT tk.*, bs.*, vt.tenVaiTro FROM taikhoan tk JOIN bacsi bs ON tk.maTaiKhoan = bs.maTaiKhoan JOIN vaitro vt ON vt.maVaiTro = tk.maVaiTro WHERE tk.username = :username");
             $stmt->bindParam(':username', $username);
             $stmt->execute();
 

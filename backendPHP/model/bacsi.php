@@ -43,34 +43,42 @@
         }
 
         public function layThongTinBacSiByKhoa($maKhoa) {
-            if (!$maKhoa) {
-                return ["error" => "Thiếu mã khoa"];
-            }
-        
-            $p = new connectdatabase();
-            $pdo = $p->connect();
-        
-            if (!$pdo) {
-                return ["error" => "Không thể kết nối database"];
-            }
-        
-            try {
-                $query = $pdo->prepare("
-                    SELECT bs.* FROM bacsi bs 
-                    JOIN khoa k ON bs.maKhoa = k.maKhoa 
-                    WHERE k.maKhoa = :maKhoa
-                ");
-                $query->bindParam(":maKhoa", $maKhoa, PDO::PARAM_INT);
-                $query->execute();
-                
-                $result = $query->fetchAll(PDO::FETCH_ASSOC);  // Lấy tất cả bác sĩ
-                return $result ?: ["error" => "Không có bác sĩ nào thuộc chuyên khoa này"];
-            } catch (PDOException $e) {
-                return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
-            } finally {
-                $pdo = null;  // Đóng kết nối
-            }
-        }
+    $maKhoa = (int)$maKhoa;  // ép kiểu cho chắc
+
+    if (!$maKhoa) {
+        return ["error" => "Thiếu hoặc không hợp lệ mã khoa"];
+    }
+
+    $p = new connectdatabase();
+    $pdo = $p->connect();
+
+    if (!$pdo) {
+        return ["error" => "Không thể kết nối database"];
+    }
+
+    try {
+        $query = $pdo->prepare("
+            SELECT 
+                bs.*, 
+                GROUP_CONCAT(DISTINCT llv.hinhThucKham ORDER BY llv.hinhThucKham SEPARATOR ', ') AS danhSachHinhThucKham
+            FROM bacsi bs
+            JOIN khoa k ON bs.maKhoa = k.maKhoa
+            LEFT JOIN lichLamViec llv ON bs.maBacSi = llv.maBacSi
+            WHERE k.maKhoa = :maKhoa
+            GROUP BY bs.maBacSi
+        ");
+        $query->bindValue(":maKhoa", $maKhoa, PDO::PARAM_INT);  // hoặc PDO::PARAM_STR cũng ok
+        $query->execute();
+
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result ?: ["error" => "Không có bác sĩ nào thuộc chuyên khoa này"];
+    } catch (PDOException $e) {
+        return ["error" => "Lỗi truy vấn: " . $e->getMessage()];
+    } finally {
+        $pdo = null;
+    }
+}
+
 
         public function layThongTinBacSiById($id) {
             if (!$id) {

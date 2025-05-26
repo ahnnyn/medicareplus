@@ -13,12 +13,12 @@ class EmailService {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'tuyenduyen24112002@gmail.com';   // Gmail thật của bạn
-        $mail->Password = 'mulceystderrhzgj';  
+            $mail->Username = 'medicareplus.vn@gmail.com';
+            $mail->Password = 'cmlu wkcy vgob pmce'; 
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom('tuyenduyen24112002@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
+        $mail->setFrom('medicareplus.vn@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
         $mail->addAddress($email, $hoTen);
 
         $mail->isHTML(true);
@@ -47,12 +47,12 @@ class EmailService {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tuyenduyen24112002@gmail.com';
-            $mail->Password = 'mulceystderrhzgj';
+            $mail->Username = 'medicareplus.vn@gmail.com';
+            $mail->Password = 'cmlu wkcy vgob pmce';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
-            $mail->setFrom('tuyenduyen24112002@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
+            $mail->setFrom('medicareplus.vn@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
             $mail->addAddress($email, $hoTen);
 
             $mail->isHTML(true);
@@ -82,12 +82,12 @@ class EmailService {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tuyenduyen24112002@gmail.com';
-            $mail->Password = 'mulceystderrhzgj';
+            $mail->Username = 'medicareplus.vn@gmail.com';
+            $mail->Password = 'cmlu wkcy vgob pmce';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
-            $mail->setFrom('tuyenduyen24112002@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
+            $mail->setFrom('medicareplus.vn@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
             $mail->addAddress($email, $hoTen);
 
             $mail->isHTML(true);
@@ -119,12 +119,12 @@ class EmailService {
             $mail->isSMTP();
             $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'tuyenduyen24112002@gmail.com';
-            $mail->Password = 'mulceystderrhzgj';
+            $mail->Username = 'medicareplus.vn@gmail.com';
+            $mail->Password = 'cmlu wkcy vgob pmce';
             $mail->SMTPSecure = 'tls';
             $mail->Port = 587;
 
-            $mail->setFrom('tuyenduyen24112002@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
+            $mail->setFrom('medicareplus.vn@gmail.com', 'Hệ thống chăm sóc sức khỏe Medicareplus');
             $mail->addAddress($email, $hoTenBN);
 
             $mail->isHTML(true);

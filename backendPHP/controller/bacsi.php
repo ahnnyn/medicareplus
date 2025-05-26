@@ -55,7 +55,8 @@
                         "maKhoa" => $row["maKhoa"],
                         "giaKham" => $row["giaKham"],
                         "soDT"=>$row["soDienThoai"],
-                        "email"=>$row["email"]
+                        "email"=>$row["email"],
+                        "hinhThucKhamList" => $row["danhSachHinhThucKham"]
                     ];
                 }
             }

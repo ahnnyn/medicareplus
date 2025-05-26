@@ -9,11 +9,17 @@ import { findChuyenKhoaByTen } from "../../../services/apiChuyenKhoaBacSi";
 import { fetchAllChuyenKhoa } from "../../../services/apiChuyenKhoaBacSi"; // Đảm bảo hàm này được nhập khẩu đúng
 import { useNavigate } from "react-router-dom";
 import SearchComponent from "../../../components/TrangChu/SearchComponent/SearchComponent";
+import { useLocation } from "react-router-dom";
+
 
 const ChuyenKhoa = () => {
   const [dataAllDoctor, setDataAllDoctor] = useState([]);
   const navigate = useNavigate();
   const [dataSearch, setDataSearch] = useState("");
+  const location = useLocation(); // Lấy location
+  const queryParams = new URLSearchParams(location.search);
+  const hinhThucKham = queryParams.get("hinhThucKham");
+  console.log("Hình thức khám:", hinhThucKham); // Kiểm tra giá trị của hinhThucKham
 
   useEffect(() => {
     fetchListDoctor(dataSearch);
@@ -44,9 +50,13 @@ const ChuyenKhoa = () => {
     }
   };
 
-  const handleRedirectChuyenKhoa = (item) => {
-    navigate(`/chi-tiet-chuyen-khoa?maKhoa=${item}`);
-  };
+const handleRedirectChuyenKhoa = (maKhoa) => {
+  if (hinhThucKham) {
+    navigate(`/chi-tiet-chuyen-khoa?maKhoa=${maKhoa}&hinhThucKham=${encodeURIComponent(hinhThucKham)}`);
+  } else {
+    navigate(`/chi-tiet-chuyen-khoa?maKhoa=${maKhoa}`);
+  }
+};
 
   const onSearch = (value) => {
     console.log("Giá trị tìm kiếm:", value); // Thêm log này
