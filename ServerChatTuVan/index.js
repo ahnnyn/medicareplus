@@ -1,7 +1,7 @@
-const express = require('express');
-const http = require('http');
-const cors = require('cors');
-const { Server } = require('socket.io');
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
+const { Server } = require("socket.io");
 
 const app = express();
 app.use(cors());
@@ -10,9 +10,9 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3003"],
-    methods: ["GET", "POST"]
-  }
+    origin: ["http://localhost:3003", "http://localhost:3000"], // Thêm các origin bạn cần
+    methods: ["GET", "POST"],
+  },
 });
 
 let onlineUsers = new Map();
@@ -20,13 +20,14 @@ let onlineUsers = new Map();
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // Nhận userId để lưu trữ mapping
   socket.on("addUser", (userId) => {
     onlineUsers.set(userId, socket.id);
     console.log("Current online users:", onlineUsers);
+    
+    // Gửi danh sách user đã online cho client để xác định thứ tự
+    io.to(socket.id).emit("onlineUsersList", Array.from(onlineUsers.keys()));
   });
 
-  // Nhận tin nhắn và gửi cho người nhận nếu online
   socket.on("sendMessage", ({ senderId, receiverId, text, img }) => {
     const receiverSocketId = onlineUsers.get(receiverId);
     const message = {
@@ -38,6 +39,28 @@ io.on("connection", (socket) => {
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("receiveMessage", message);
+    }
+  });
+
+  // WebRTC signaling
+  socket.on("webrtc-offer", ({ to, from, offer }) => {
+    const receiverSocketId = onlineUsers.get(to);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("webrtc-offer", { from, offer });
+    }
+  });
+
+  socket.on("webrtc-answer", ({ to, from, answer }) => {
+    const receiverSocketId = onlineUsers.get(to);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("webrtc-answer", { from, answer });
+    }
+  });
+
+  socket.on("webrtc-ice-candidate", ({ to, from, candidate }) => {
+    const receiverSocketId = onlineUsers.get(to);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("webrtc-ice-candidate", { from, candidate });
     }
   });
 

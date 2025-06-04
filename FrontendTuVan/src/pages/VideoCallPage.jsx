@@ -1,113 +1,229 @@
-// import React, { useEffect, useRef, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import io from "socket.io-client";
-// import IncomingCallModal from "../components/IncommingCallModal";
+import React, { useEffect, useRef, useState } from "react";
+import { FaPhone, FaPhoneSlash, FaMicrophone, FaMicrophoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
+import { fetchOneAccKH, fetchBacSiByMaBS } from "../services/api";
 
-// const socket = io("http://localhost:5000");
+import { useSearchParams } from "react-router-dom";
+import io from "socket.io-client";
+import "./VideoCall.css";
 
-// const VideoCallPage = () => {
-//   const localVideoRef = useRef();
-//   const remoteVideoRef = useRef();
-//   const peerConnection = useRef(null);
-//   const { roomId } = useParams();
-//   const [incomingCallModal, setIncomingCallModal] = useState(null); // State for modal
+const VideoCallPage = () => {
+    const [searchParams] = useSearchParams();
+    const appointmentId = searchParams.get("appointmentId");
+    const patientId = searchParams.get("patientId");
+    const doctorId = searchParams.get("doctorId");
+    const currentUserID = searchParams.get("currentUserID");
+    const currentUserRole = searchParams.get("currentRole");
+    const [currentUserData, setCurrentUserData] = useState(null);
+    const [receiverUserData, setReceiverUserData] = useState(null);
 
-//   useEffect(() => {
-//     if (!roomId) {
-//       console.error("Room ID is required!");
-//       return;
-//     }
+    const myVideo = useRef(null);
+    const peerVideo = useRef(null);
+    const localStream = useRef(null);
+    const peerConnection = useRef(null);
+    const socket = useRef(null);
 
-//     // Join the room
-//     socket.emit("join", roomId);
+    const [cameraEnabled, setCameraEnabled] = useState(true);
+    const [micEnabled, setMicEnabled] = useState(true);
+    const [callStarted, setCallStarted] = useState(false);
 
-//     // Request user media (camera and microphone)
-//     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//       .then(stream => {
-//         localVideoRef.current.srcObject = stream;
+    const iceServers = {
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    };
 
-//         socket.on("joined", async () => {
-//           peerConnection.current = createPeerConnection();
-//           stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
+    const otherUserId = currentUserID === patientId ? doctorId : patientId;
 
-//           const offer = await peerConnection.current.createOffer();
-//           await peerConnection.current.setLocalDescription(offer);
-//           socket.emit("offer", { offer, room: roomId });
-//         });
+    const createPeerConnection = () => {
+        const pc = new RTCPeerConnection(iceServers);
 
-//         socket.on("offer", async (offer) => {
-//           peerConnection.current = createPeerConnection();
-//           await peerConnection.current.setRemoteDescription(offer);
-//           const answer = await peerConnection.current.createAnswer();
-//           await peerConnection.current.setLocalDescription(answer);
-//           socket.emit("answer", { answer, room: roomId });
-//         });
+        if (localStream.current) {
+        localStream.current.getTracks().forEach((track) => {
+            pc.addTrack(track, localStream.current);
+        });
+        }
 
-//         socket.on("answer", async (answer) => {
-//           await peerConnection.current.setRemoteDescription(answer);
-//         });
+        pc.ontrack = (event) => {
+        if (peerVideo.current) {
+            peerVideo.current.srcObject = event.streams[0];
+        }
+        };
 
-//         socket.on("ice-candidate", async (candidate) => {
-//           if (peerConnection.current) {
-//             await peerConnection.current.addIceCandidate(candidate);
-//           }
-//         });
+        pc.onicecandidate = (event) => {
+        if (event.candidate) {
+            socket.current.emit("webrtc-ice-candidate", {
+            candidate: event.candidate,
+            to: otherUserId,
+            from: currentUserID,
+            });
+        }
+        };
 
-//         socket.on("incomingCallFromDoctor", ({ from, roomId }) => {
-//           const audio = new Audio("/ringtone.mp3");
-//           audio.play().catch(e => console.warn("⚠️ Cannot play ringtone:", e));
+        return pc;
+    };
 
-//           // Show incoming call modal
-//           setIncomingCallModal({ isOpen: true, from, roomId });
-//         });
-//       })
-//       .catch(err => {
-//         console.error("Error accessing media devices:", err);
-//       });
-//   }, [roomId]);
+    // Lấy thông tin người dùng
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          if (currentUserRole === "benhnhan") {
+            const currentUser = await fetchOneAccKH(currentUserID);
+            const receiverUser = await fetchBacSiByMaBS(doctorId);
+            setCurrentUserData(currentUser.data);
+            setReceiverUserData(receiverUser.data);
+          } else if (currentUserRole === "bacsi") {
+            const currentUser = await fetchBacSiByMaBS(currentUserID);
+            const receiverUser = await fetchOneAccKH(patientId);
+            setCurrentUserData(currentUser.data);
+            setReceiverUserData(receiverUser.data);
+          }
+        } catch (error) {
+          console.error("Lỗi khi fetch người dùng:", error);
+        }
+      };
+  
+      fetchData();
+    }, [currentUserID, currentUserRole, doctorId, patientId]);
 
-//   const createPeerConnection = () => {
-//     const pc = new RTCPeerConnection();
-//     pc.onicecandidate = (event) => {
-//       if (event.candidate) {
-//         socket.emit("ice-candidate", { candidate: event.candidate, room: roomId });
-//       }
-//     };
-//     pc.ontrack = (event) => {
-//       remoteVideoRef.current.srcObject = event.streams[0];
-//     };
-//     return pc;
-//   };
+    useEffect(() => {
+        socket.current = io("http://localhost:5000");
 
-//   // Handle the acceptance of the call
-//   const handleAcceptCall = () => {
-//     socket.emit("answerCall", { roomId });
-//     setIncomingCallModal(null);
-//   };
+        socket.current.emit("addUser", currentUserID);
 
-//   // Handle the rejection of the call
-//   const handleRejectCall = () => {
-//     setIncomingCallModal(null); // Close the modal
-//   };
+        socket.current.on("webrtc-offer", async ({ from, offer }) => {
+        if (!peerConnection.current) {
+            peerConnection.current = createPeerConnection();
+        }
+        await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.current.createAnswer();
+        await peerConnection.current.setLocalDescription(answer);
 
-//   return (
-//     <div>
-//       <h2>Cuộc gọi video với bác sĩ</h2>
-//       <video ref={localVideoRef} autoPlay muted style={{ width: '100%' }} />
-//       <video ref={remoteVideoRef} autoPlay style={{ width: '100%' }} />
-      
-//       {/* Display Incoming Call Modal */}
-//       {incomingCallModal && (
-//         <IncomingCallModal
-//           visible={incomingCallModal.isOpen}
-//           from={incomingCallModal.from}
-//           roomId={incomingCallModal.roomId}
-//           onAccept={handleAcceptCall}
-//           onReject={handleRejectCall}
-//         />
-//       )}
-//     </div>
-//   );
-// };
+        socket.current.emit("webrtc-answer", {
+            to: from,
+            from: currentUserID,
+            answer,
+        });
 
-// export default VideoCallPage;
+        setCallStarted(true);
+        });
+
+        socket.current.on("webrtc-answer", async ({ answer }) => {
+        if (peerConnection.current) {
+            await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+        });
+
+        socket.current.on("webrtc-ice-candidate", async ({ candidate }) => {
+        try {
+            if (peerConnection.current) {
+            await peerConnection.current.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+        } catch (err) {
+            console.error("Lỗi add ICE candidate:", err);
+        }
+        });
+
+        return () => {
+        socket.current.disconnect();
+        if (peerConnection.current) peerConnection.current.close();
+        peerConnection.current = null;
+        };
+    }, [appointmentId, currentUserID, otherUserId]);
+
+    useEffect(() => {
+        navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+            localStream.current = stream;
+            if (myVideo.current) myVideo.current.srcObject = stream;
+        })
+        .catch((err) => console.error("Lỗi getUserMedia:", err));
+    }, []);
+
+    const startCall = async () => {
+        if (callStarted) return;
+        peerConnection.current = createPeerConnection();
+
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+
+        socket.current.emit("webrtc-offer", {
+        offer,
+        to: otherUserId,
+        from: currentUserID,
+        });
+
+        setCallStarted(true);
+    };
+
+    const toggleCamera = () => {
+        const videoTrack = localStream.current?.getVideoTracks()[0];
+        if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        setCameraEnabled(videoTrack.enabled);
+        }
+    };
+
+    const toggleMic = () => {
+        const audioTrack = localStream.current?.getAudioTracks()[0];
+        if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        setMicEnabled(audioTrack.enabled);
+        }
+    };
+
+    const leaveCall = () => {
+        if (peerConnection.current) {
+        peerConnection.current.close();
+        peerConnection.current = null;
+        }
+        localStream.current?.getTracks().forEach((track) => track.stop());
+        localStream.current = null;
+
+        if (myVideo.current) myVideo.current.srcObject = null;
+        if (peerVideo.current) peerVideo.current.srcObject = null;
+
+        socket.current.disconnect();
+        setCallStarted(false);
+    };
+
+    const LocalControls = () => (
+        <div className="video-controls">
+            {!callStarted && (
+                <button onClick={startCall} title="Bắt đầu gọi" className="btn blue">
+                <FaPhone size={20} />
+                </button>
+            )}
+            {callStarted && (
+                <button onClick={leaveCall} title="Rời cuộc gọi" className="btn red">
+                <FaPhoneSlash size={20} />
+                </button>
+            )}
+            <button onClick={toggleCamera} title={cameraEnabled ? "Tắt camera" : "Bật camera"} className="btn blue">
+                {cameraEnabled ? <FaVideo size={20} /> : <FaVideoSlash size={20} />}
+            </button>
+            <button onClick={toggleMic} title={micEnabled ? "Tắt mic" : "Bật mic"} className="btn blue">
+                {micEnabled ? <FaMicrophone size={20} /> : <FaMicrophoneSlash size={20} />}
+            </button>
+        </div>
+    );
+
+    return (
+        <div className="video-container">
+        <div className="video-box">
+            <video ref={myVideo} autoPlay playsInline muted className="video" />
+            <div className="label">Bạn ({currentUserRole === "benhnhan" ? "Bệnh nhân" : "Bác sĩ"})</div>
+            <LocalControls />
+        </div>
+
+        <div className="video-box">
+            <video ref={peerVideo} autoPlay playsInline className="video" />
+            <div className="label">
+                    {currentUserRole === "benhnhan" 
+                        ? `Bác sĩ (${receiverUserData?.hoTen || "Đang tải..."})` 
+                        : `Bệnh nhân (${receiverUserData?.hoTen || "Đang tải..."})`}
+                    </div>
+            </div>
+        </div>
+    );
+};
+
+export default VideoCallPage;

@@ -1,19 +1,13 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
+import VideoCallPage from "./pages/VideoCallPage";
 
-import io from "socket.io-client";
-
-const socket = io.connect("http://localhost:5000");
 const App = () => {
-
-
   return (
-    <div className="container">
-        <>
-           <ChatPage />
-           
-        </>
-
-    </div>
+      <Routes>
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/video-call" element={<VideoCallPage />} />
+      </Routes>
   );
 };
 

@@ -12,8 +12,7 @@ const ChatPage = () => {
     <div className="container">
         <>
             <List />
-            <Chat />
-            
+            <Chat />  
         </>
 
     </div>

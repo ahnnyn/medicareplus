@@ -163,6 +163,8 @@ const LichHenCard = () => {
     }
   };
 
+  
+
   return (
     <>
       <HeaderViewDoctor />
