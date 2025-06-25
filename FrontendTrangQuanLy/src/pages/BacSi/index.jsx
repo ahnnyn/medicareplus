@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
 import { message } from "antd";
-import Footer from "../../components/BacSi/Footer/Footer";
-import Header from "../../components/BacSi/Header/Header";
-import { handleLogouDoctort } from "../../services/loginAPI";
+import { handleLogouDoctort } from "services/auth/auth.services";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
-import { doLogoutAction } from "../../redux/account/accountSlice";
-import QuanLyLichHen from "../../components/BacSi/LichHen/QuanLyLichHen";
-import UpdateDoctor from "../../components/BacSi/ThongTin/UpdateDoctor";
-import { fetchAllDoctorByID } from "../../services/apiDoctor";
-import ModalDoiMK from "../../components/BacSi/ModalDoiMK/ModalDoiMK";
-import HoSoBenhNhan from "../../components/BacSi/HoSoBenhNhan/HoSoBenhNhan";
-import QuanLyLichLamViec from "../../components/BacSi/QuanLyLichLamViec/QuanLyLichLamViec";
+import { doLogoutAction } from "myredux/account/accountSlice";
+import QuanLyLichHen from "components/Doctor/LichHen/QuanLyLichHen";
+import UpdateDoctor from "components/Doctor/ThongTin/UpdateDoctor";
+import { fetchAllDoctorByID } from "services/doctor/doctors.services";
+import ModalDoiMK from "components/Doctor/ModalDoiMK/ModalDoiMK";
+import HoSoBenhNhan from "components/Doctor/HoSoBenhNhan/HoSoBenhNhan";
+import QuanLyLichLamViec from "components/Doctor/QuanLyLichLamViec/QuanLyLichLamViec";
 import "./home.css";
 
 const Home = () => {

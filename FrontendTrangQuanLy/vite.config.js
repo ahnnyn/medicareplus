@@ -1,27 +1,27 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
-import dns from 'dns';
-import path from 'path';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-// Set the DNS resolution order (nếu bạn cần)
-dns.setDefaultResultOrder('verbatim');
+// Fix __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-// Vite config
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      'config': path.resolve(__dirname, 'src/components'),
-      'controllers': path.resolve(__dirname, 'src/pages'),
-      'models': path.resolve(__dirname, 'src/redux'),
-      'routes': path.resolve(__dirname, 'src/utils'),
+      'components': path.resolve(__dirname, 'src/components'),
+      'pages': path.resolve(__dirname, 'src/pages'),
+      'myredux': path.resolve(__dirname, 'src/redux'),
+      'utils': path.resolve(__dirname, 'src/utils'),
       'services': path.resolve(__dirname, 'src/services'),
-    }
+    },
   },
   server: {
-    port: 3001,  // React app chạy port 3001
+    port: 3001,
     proxy: {
-      '/api': 'http://localhost:5000',  // Proxy API tới Node backend
+      '/api': 'http://localhost:5000',
     },
   },
 });

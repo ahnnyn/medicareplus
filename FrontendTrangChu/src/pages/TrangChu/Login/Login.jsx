@@ -6,8 +6,6 @@ import { callLogin, callLoginBenhNhan } from "../../../services/api";
 import RegisterPage from "./Register";
 import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../../redux/account/accountSlice";
-import { handleLoginSuccess } from "../../../utils/axios-customize";
-import { handleQuenPassword } from "../../../services/apiChuyenKhoaBacSi";
 import './login.scss';
 
 const LoginPage = (props) => {

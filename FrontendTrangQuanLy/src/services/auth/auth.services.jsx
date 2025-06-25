@@ -1,4 +1,4 @@
-import axios from "../utils/axios-customize"
+import axios from "utils/axios-customize"
 
 export const handleLoginDoctor = (username, password) => {
     const URL_BACKEND = '/api/user.php?action=login';

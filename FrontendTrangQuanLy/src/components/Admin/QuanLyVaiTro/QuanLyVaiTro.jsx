@@ -20,7 +20,7 @@ import {
   createVaiTro,
   updateVaiTro,
   deleteVaiTro,
-} from "../../../services/roleAPI";
+} from "services/admin/admin.services";
 import { RiEdit2Fill, RiDeleteBin5Line } from "react-icons/ri";
 import { AiFillDelete } from "react-icons/ai";
 import { PlusOutlined } from "@ant-design/icons";

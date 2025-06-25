@@ -2,7 +2,7 @@ import {
   Col, Form, Input, InputNumber, Modal, Radio, Row, Divider
 } from "antd";
 import { useEffect, useState } from "react";
-import { fetchOneAccKH } from "../../../services/apiDoctor";
+import { fetchOneAccKH } from "services/admin/admin.services";
 import "./style.css"
 const PatientViewModal = ({ open, patientId, onCancel }) => {
   const [form] = Form.useForm();

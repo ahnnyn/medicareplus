@@ -1,9 +1,8 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/BacSi";
-import AdminHome from "./pages/Admin";
-import Login from "./pages/Login";
-import Header from "./components/BacSi/Header/Header";
-import Footer from "./components/BacSi/Footer/Footer";
+import Home from "pages/BacSi";
+import AdminHome from "pages/Admin";
+import Login from "pages/Login";
+import Header from "components/Doctor/Header/Header";
 
 const App = () => {
   return (

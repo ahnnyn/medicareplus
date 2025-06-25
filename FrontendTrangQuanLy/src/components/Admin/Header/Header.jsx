@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Row, Col, Drawer, Button, message } from 'antd';
 import { MenuOutlined, SearchOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
-import { doLogoutAction } from "../../redux/account/accountSlice";
-import { handleLogouDoctort } from "../../services/loginAPI";
+import { doLogoutAction } from "myredux/account/accountSlice";
+import { handleLogouDoctort } from "services/auth/auth.services";
 import { Navigate, useNavigate } from "react-router-dom";
 import './css.css';
 

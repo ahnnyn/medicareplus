@@ -1,4 +1,5 @@
-import axios from "../utils/axios-customize"
+import axios from "utils/axios-customize"
+
 export const fetchAllVaiTro = async () => {
   const URL_BACKEND = `/api/vaitro.php?action=layDanhSachVaiTro`;
   return axios.get(URL_BACKEND);
@@ -13,4 +14,14 @@ export const updateVaiTro = async (maVaiTro, tenVaiTro) => {
 
 export const deleteVaiTro = async (maVaiTro) => {
   return axios.delete(`/api/vaitro.php?action=xoaVaiTro&maVaiTro=${ maVaiTro }`);
+};
+
+export const fetchAllBenhNhan = async () => {
+  const URL_BACKEND = `/api/benhnhan.php?action=getAllBenhNhan`;
+  return axios.get(URL_BACKEND);
+};
+
+export const fetchOneAccKH = (maBenhNhan) => {
+  const URL_BACKEND = `/api/benhnhan.php?action=getThongTinBenhNhan&maBenhNhan=${maBenhNhan}`;
+  return axios.get(URL_BACKEND);
 };

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Card, Table, Tag, Select, Modal, Row, Col, Input, Tooltip, Space, Popconfirm, message, Button, notification } from "antd";
-import { FaEye } from "react-icons/fa";
 import { RiEdit2Fill } from "react-icons/ri";
 import { AiFillDelete } from "react-icons/ai";
 import { PlusOutlined, FileExcelOutlined } from "@ant-design/icons";
-import { fetchAllDoctor, deleteBacSi } from "../../../services/apiDoctor";
+import { fetchAllDoctor, deleteBacSi } from "services/doctor/doctors.services";
 import UpdateDoctorModal from "./editBacSi";
 import CreateDoctor from "./ThemBacSi";
 

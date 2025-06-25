@@ -7,9 +7,8 @@ import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { useSelector } from "react-redux";
-import {
-  fetchBacSiByMaBS, fetchAllChuyenKhoa, updateDoctor, callUploadDoctorImg
-} from "../../../services/apiDoctor";
+
+import { fetchBacSiByMaBS, fetchAllChuyenKhoa,  updateDoctor, callUploadDoctorImg} from "services/doctor/doctors.services";
 
 const DoctorEditModal = ({ open, doctorId, onCancel, onUpdateSuccess }) => {
   const [form] = Form.useForm();

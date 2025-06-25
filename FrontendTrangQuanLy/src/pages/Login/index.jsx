@@ -10,8 +10,8 @@ import {
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { doLoginAction } from "../../redux/account/accountSlice";
-import { handleLoginDoctor, handleQuenPassword } from "../../services/loginAPI";
+import { doLoginAction } from "myredux/account/accountSlice";
+import { handleLoginDoctor, handleQuenPassword } from "services/auth/auth.services";
 import "./Login.css";
 
 const Login = () => {

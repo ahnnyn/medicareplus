@@ -4,7 +4,7 @@ import {
   Space, Button, notification
 } from "antd";
 import { FaEye } from "react-icons/fa";
-import { fetchAllBenhNhan } from "../../../services/apiDoctor";
+import { fetchAllBenhNhan } from "services/admin/admin.services";
 import PatientViewModal from "./XemBenhNhan";
 const { Search } = Input;
 

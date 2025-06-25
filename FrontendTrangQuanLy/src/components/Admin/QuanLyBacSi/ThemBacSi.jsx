@@ -5,8 +5,8 @@ import {
 import { useEffect, useState } from "react";
 import {
   callUploadDoctorImg, fetchAllChuyenKhoa, themBacSi
-} from "../../../services/apiDoctor";
-import { fetchAllVaiTro } from "../../../services/roleAPI";
+} from "services/doctor/doctors.services"
+import { fetchAllVaiTro } from "services/admin/admin.services";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";

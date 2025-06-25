@@ -12,10 +12,9 @@ import { useEffect, useState } from "react";
 import { FaSave } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import bcrypt from "bcryptjs-react";
-import { fetchBacSiByMaBS } from "../../../services/apiDoctor";
-import { doiThongTinDoctor } from "../../../services/loginAPI";
-import { doLogoutAction } from "../../../redux/account/accountSlice";
+import { fetchBacSiByMaBS } from "services/doctor/doctors.services";
+import { doiThongTinDoctor } from "services/auth/auth.services";
+import { doLogoutAction } from "myredux/account/accountSlice";
 
 const ModalDoiMK = () => {
   const dispatch = useDispatch();
@@ -43,46 +42,52 @@ const ModalDoiMK = () => {
     console.log("Gửi request đổi mật khẩu đến API...", values);
 
     try {
-        const res = await doiThongTinDoctor(values.idAcc, values.idBS, values.username, values.password, values.passwordMoi);
-        
-        console.log("API Full Response:", res); // Kiểm tra phản hồi API
+      const res = await doiThongTinDoctor(
+        values.idAcc,
+        values.idBS,
+        values.username,
+        values.password,
+        values.passwordMoi
+      );
 
-        if (!res) {
-            console.error(" API không trả về dữ liệu!");
-            notification.error({
-                message: "Lỗi hệ thống",
-                description: "API không phản hồi hoặc bị lỗi.",
-            });
-            return;
-        }
+      console.log("API Full Response:", res); // Kiểm tra phản hồi API
 
-        if (res.success) {
-            message.success("Đổi mật khẩu thành công!");
-            dispatch(doLogoutAction());
-            navigate("/login-doctor");
-        } else {
-            console.error("API không trả về success:", res);
-            notification.error({
-                message: " Đổi mật khẩu thất bại!",
-                description: res?.message || "Có lỗi xảy ra, vui lòng thử lại!",
-            });
-        }
-    } catch (error) {
-        console.error(" Lỗi khi gọi API:", error);
-
+      if (!res) {
+        console.error(" API không trả về dữ liệu!");
         notification.error({
-            message: "Lỗi hệ thống",
-            description: error.message || "Không thể kết nối đến máy chủ.",
+          message: "Lỗi hệ thống",
+          description: "API không phản hồi hoặc bị lỗi.",
         });
+        return;
+      }
+
+      if (res.success) {
+        message.success("Đổi mật khẩu thành công!");
+        dispatch(doLogoutAction());
+        navigate("/login-doctor");
+      } else {
+        console.error("API không trả về success:", res);
+        notification.error({
+          message: " Đổi mật khẩu thất bại!",
+          description: res?.message || "Có lỗi xảy ra, vui lòng thử lại!",
+        });
+      }
+    } catch (error) {
+      console.error(" Lỗi khi gọi API:", error);
+
+      notification.error({
+        message: "Lỗi hệ thống",
+        description: error.message || "Không thể kết nối đến máy chủ.",
+      });
     }
-};
+  };
 
   useEffect(() => {
     if (dataAccBS) {
       const init = {
         idBS: dataAccBS?.maBacSi,
         idAcc: dataAccBS?.maTaiKhoan,
-        username: user.username
+        username: user.username,
       };
       console.log("init: ", init);
       formDoiMK.setFieldsValue(init);
@@ -93,12 +98,14 @@ const ModalDoiMK = () => {
   }, [dataAccBS]);
 
   return (
-    
     <Form form={formDoiMK} layout="vertical" onFinish={onFinishDoiMK}>
       <Row>
-          <Col span={24} style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}>
-                <span style={{ fontWeight: "550", color: "navy" }}>ĐỔI MẬT KHẨU</span>
-          </Col>
+        <Col
+          span={24}
+          style={{ padding: "0 0 20px", fontSize: "20px", textAlign: "center" }}
+        >
+          <span style={{ fontWeight: "550", color: "navy" }}>ĐỔI MẬT KHẨU</span>
+        </Col>
       </Row>
       {/* <Divider /> */}
       <Row gutter={[20, 10]}>
@@ -130,10 +137,8 @@ const ModalDoiMK = () => {
             <Input placeholder="Nhập tên đăng nhập của bạn" />
           </Form.Item>
         </Col>
-        <Col span={12} md={12} sm={24} xs={24}>
-         
-        </Col>
-        
+        <Col span={12} md={12} sm={24} xs={24}></Col>
+
         <Col span={12} md={12} sm={24} xs={24}>
           <Form.Item
             label="Mật khẩu cũ"
@@ -149,7 +154,7 @@ const ModalDoiMK = () => {
             <Input.Password placeholder="Nhập mật khẩu cũ" />
           </Form.Item>
         </Col>
-        
+
         <Col span={12} md={12} sm={24} xs={24}>
           <Form.Item
             label="Mật khẩu mới"
@@ -171,7 +176,7 @@ const ModalDoiMK = () => {
             type="primary"
             size="large"
             icon={<FaSave size={25} />}
-            style={{ width: "200px", height: "50px", background:"#2A95BF"}} // Thay đổi kích thước tại đây
+            style={{ width: "200px", height: "50px", background: "#2A95BF" }} // Thay đổi kích thước tại đây
           >
             ĐỔI MẬT KHẨU
           </Button>
