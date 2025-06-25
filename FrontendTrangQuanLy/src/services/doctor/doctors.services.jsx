@@ -413,9 +413,6 @@ export const updateTTPhieuKhamBenh = (
 };
 
 
-export const deleteBacSi = async (maBacSi) => {
-  return axios.delete(`/api/bacsi.php?action=xoaBacSi&maBacSi=${maBacSi}`);
-};
 export const fetchAllBenhNhan = async () => {
   const URL_BACKEND = `/api/benhnhan.php?action=getAllBenhNhan`;
   return axios.get(URL_BACKEND);

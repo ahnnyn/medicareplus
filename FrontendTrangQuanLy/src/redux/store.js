@@ -1,5 +1,3 @@
-
-
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import accountReducer from '../redux/account/accountSlice';
 
