@@ -64,9 +64,10 @@ const QuanLyLichHen = () => {
     if (!user?.maBacSi) return;
     setLoadingOrder(true);
     try {
-      const res = await findAllLichKhamByBacSi(user.maBacSi); // API call
-      if (res && Array.isArray(res)) {
-        setOriginalData(res); // Gốc không đổi
+      const res = await findAllLichKhamByBacSi(user?.maBacSi); // API call
+      console.log("Dữ liệu lịch khám:", res); // Kiểm tra dữ liệu trả về
+      if (res?.data) {
+        setOriginalData(res?.data); // Gốc không đổi
         // Lọc lần đầu dựa vào trạng thái và tìm kiếm
         filterAndSetData(res, searchValue, selectedStatus);
         console.log(originalData); // Kiểm tra dữ liệu ban đầu

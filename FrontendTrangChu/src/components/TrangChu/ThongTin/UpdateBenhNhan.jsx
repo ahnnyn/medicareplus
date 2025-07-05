@@ -27,17 +27,17 @@ const ModalUpdateThongTin = ({ openUpdateBenhNhan, setOpenModalThongTinCaNhan })
         form.resetFields();
         setOpenModalThongTinCaNhan(false);
     };
-    console.log("Account ID:", acc?.user?.maBenhNhan);
+    console.log("Account ID:", acc?.maBenhNhan);
     
     const fetchOneAcc = async () => {
-        if (!acc?.user?.maBenhNhan) {
+        if (!acc?.maBenhNhan) {
             return notification.error({
                 message: "Lỗi dữ liệu",
                 description: "Không tìm thấy thông tin tài khoản!",
             });
         }
     
-        const query = { maBenhNhan: acc.user.maBenhNhan };
+        const query = { maBenhNhan: acc?.maBenhNhan };
         console.log("Fetching account data with query:", query); // Log query to check the request data
     
         try {
@@ -210,7 +210,7 @@ useEffect(() => {
                 // dispatch(doLogoutAction());
                 // navigate("/");
                 // setOpenModalThongTinCaNhan(false);
-                fetchOneAcc(acc.user.maBenhNhan);
+                fetchOneAcc(acc?.maBenhNhan);
 
             } else {
                 notification.error({

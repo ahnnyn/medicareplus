@@ -23,10 +23,11 @@ const PhieuKhamTable = ({ editingRecord }) => {
   const acc = useSelector((state) => state.account.user);
 
   const getProfile = async () => {
-    if (!acc?.user?.maBenhNhan) return;
+    if (!acc?.maBenhNhan) return;
     setLoading(true);
     try {
-      const res = await fetchHoSoBenhNhan(acc.user.maBenhNhan);
+      const res = await fetchHoSoBenhNhan(acc?.maBenhNhan);
+      console.log("Hồ sơ bệnh nhân:", res);
       if (res?.data?.maHoSo) {
         setMaHoSo(res.data.maHoSo);
       } else {
@@ -44,7 +45,7 @@ const PhieuKhamTable = ({ editingRecord }) => {
     setLoading(true);
     try {
       const res = await fetchAllPhieuKhamBenh(maHoSo);
-      setDataPhieuKham(Array.isArray(res) ? res : []);
+      setDataPhieuKham(res.data);
     } catch (err) {
       console.error("Lỗi lấy phiếu khám:", err);
       message.error("Lỗi khi lấy danh sách phiếu khám.");
@@ -56,7 +57,7 @@ const PhieuKhamTable = ({ editingRecord }) => {
 
   useEffect(() => {
     getProfile();
-  }, [acc?.user?.maBenhNhan]);
+  }, [acc?.maBenhNhan]);
 
   useEffect(() => {
     if (editingRecord?.maHoSo) {

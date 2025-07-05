@@ -1,77 +1,47 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-const isAuthenticatedFromStorage = localStorage.getItem('isAuthenticated') === 'true';
-const userFromStorage = JSON.parse(localStorage.getItem('user')) || {};
-
+// Khởi tạo state từ localStorage
 const initialState = {
-    isAuthenticated: isAuthenticatedFromStorage,
+    isAuthenticated: !!localStorage.getItem('access_token'),
     isLoading: true,
-    user: userFromStorage
+    user: JSON.parse(localStorage.getItem('user')) || {},
+    token: localStorage.getItem('access_token') || null,
 };
 
-
-export const accountSlide = createSlice({
+export const accountSlice = createSlice({
     name: 'account',
     initialState,
-    // The `reducers` field lets us define reducers and generate associated actions
     reducers: {
-        doLoginAction: (state, action) => {   
-            console.log("action: ", action);
-            console.log("action.payload: ", action.payload);
-                     
+        doLoginAction: (state, action) => {
             state.isAuthenticated = true;
-            state.isLoading = false;
-            state.user = action.payload
+            state.token = action.payload.token;
+            state.user = action.payload.user;
 
-            // Lưu thông tin vào localStorage
-            localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('user', JSON.stringify(action.payload));
+            // Lưu vào localStorage
+            localStorage.setItem('access_token', action.payload.token);
+            localStorage.setItem('user', JSON.stringify(action.payload.user));
         },
         doGetAccountAction: (state, action) => {
             state.isAuthenticated = true;
             state.isLoading = false;
-            state.user = action.payload.user
+            state.user = action.payload.user;
         },
-        doLogoutAction: (state, action) => {
-            localStorage.removeItem('access_tokenBenhNhan');
-            localStorage.removeItem('isAuthenticated');
-            // localStorage.setItem('isAuthenticated', 'false');
+        doLogoutAction: (state) => {
+            // Xóa khỏi localStorage
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+
+            // Reset redux state
             state.isAuthenticated = false;
-            state.user = {
-                email: "",
-                soDienThoai: "",
-                hoTen: "",
-                diaChi: "",
-                gioiTinh: "",
-                ngaySinh: "",
-                hinhAnh: "",
-                maBenhNhan: "",
-                maTaiKhoan: "",
-                tenVaiTro: ""
-            }
-            // Lưu thông tin vào localStorage
-            localStorage.setItem('user', JSON.stringify({
-                email: "",
-                soDienThoai: "",
-                hoTen: "",
-                diaChi: "",
-                gioiTinh: "",
-                ngaySinh: "",
-                hinhAnh: "",
-                maBenhNhan: "",
-                maTaiKhoan: "",
-                tenVaiTro: ""
-            }));
+            state.token = null;
+            state.user = {};
         },
-
-
-    },    
+    },
     extraReducers: (builder) => {
-
+        // Có thể bổ sung sau nếu dùng createAsyncThunk
     },
 });
 
-export const { doLoginAction, doGetAccountAction, doLogoutAction } = accountSlide.actions;
+export const { doLoginAction, doGetAccountAction, doLogoutAction } = accountSlice.actions;
 
-
-export default accountSlide.reducer;
+export default accountSlice.reducer;

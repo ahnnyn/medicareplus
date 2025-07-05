@@ -22,8 +22,9 @@ const HoSoBenhNhan = () => {
     setLoadingOrder(true);
     try {
       const res = await findAllLichKhamByBacSi(user.maBacSi);
-      if (Array.isArray(res) && res.length > 0) {
-        const filteredData = res.filter((item) => item.trangThai === "Đã khám");
+      if (res?.data) {
+        const result = res.data;
+        const filteredData = result.filter((item) => item.trangThai === "Đã khám");
         const groupedData = filteredData.reduce((acc, item) => {
           const { maBenhNhan } = item;
           if (!acc[maBenhNhan]) {

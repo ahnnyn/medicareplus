@@ -42,10 +42,10 @@ const HoSoBenhNhan = () => {
   const acc = useSelector((state) => state.account.user);
 
   const getProfile = async () => {
-    if (!acc?.user?.maBenhNhan) return;
+    if (!acc?.maBenhNhan) return;
     setLoading(true);
     try {
-      const res = await fetchHoSoBenhNhan(acc?.user?.maBenhNhan);
+      const res = await fetchHoSoBenhNhan(acc?.maBenhNhan);
       if (res?.data) {
         setProfile(res.data);
       } else {
@@ -60,7 +60,7 @@ const HoSoBenhNhan = () => {
 
   useEffect(() => {
     getProfile();
-  }, [acc?.user?.maBenhNhan]);
+  }, [acc?.maBenhNhan]);
 
   const showChiTiet = () => setIsModalVisible(true);
   const closeChiTiet = () => setIsModalVisible(false);

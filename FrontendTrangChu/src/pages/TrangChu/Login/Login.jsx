@@ -2,7 +2,7 @@ import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Col, Divider, Form, Input, message, Modal, notification, Row } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { callLogin, callLoginBenhNhan } from "../../../services/api";
+import { callLoginBenhNhan } from "../../../services/api";
 import RegisterPage from "./Register";
 import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../../redux/account/accountSlice";
@@ -46,9 +46,10 @@ const LoginPage = (props) => {
         try{
             const res = await callLoginBenhNhan(values.username, values.matKhau)
             console.log("API Response:", res);
+            const result = res.data;
     
-            if (res.success && res.token) {
-                dispatch(doLoginAction({user: res.user, token: res.token}));
+            if (result.success && result.token) {
+                dispatch(doLoginAction({user: result.user, token: result.token}));
                 
     
                 if (remember) {
@@ -71,24 +72,24 @@ const LoginPage = (props) => {
                     navigate("/");
                   }, 2000);
             } else {
-                if (res.errorField === "username") {
+                if (result.errorField === "username") {
                     formLogin.setFields([
                         {
                             name: "username",
-                            errors: [res.message || "Username không đúng!"]
+                            errors: [result.message || "Username không đúng!"]
                         }
                     ]);
-                } else if (res.errorField === "matKhau") {
+                } else if (result.errorField === "matKhau") {
                     formLogin.setFields([
                         {
                             name: "matKhau",
-                            errors: [res.message || "Mật khẩu không đúng!"]
+                            errors: [result.message || "Mật khẩu không đúng!"]
                         }
                     ]);
                 } else {
                     notification.error({
                         message: "Đăng nhập thất bại!",
-                        description: res.message || "Thông tin đăng nhập không đúng.",
+                        description: result.message || "Thông tin đăng nhập không đúng.",
                         duration: 5,
                     });
                 }

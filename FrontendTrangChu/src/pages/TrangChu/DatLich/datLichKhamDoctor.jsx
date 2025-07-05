@@ -95,7 +95,7 @@ const PageDatLichKham = () => {
 
   console.log(location.search); // Kiểm tra giá trị trong URL
 
-  const maBenhNhan = acc?.user?.maBenhNhan;
+  const maBenhNhan = acc?.maBenhNhan;
 
   useEffect(() => {
     fetchBacSiByID(doctorId);
@@ -272,7 +272,7 @@ const PageDatLichKham = () => {
   };
 
   const dateFormatList = ["DD/MM/YYYY", "DD/MM/YY", "DD-MM-YYYY", "DD-MM-YY"];
-  const idKH = acc?.user?.maBenhNhan;
+  const idKH = acc?.maBenhNhan;
 
   useEffect(() => {
     if (

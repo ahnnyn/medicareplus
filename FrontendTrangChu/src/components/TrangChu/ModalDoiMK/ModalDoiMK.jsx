@@ -22,7 +22,7 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
     };
 
     const fetchOneAcc = async () => {
-        if (!acc?.user?.maBenhNhan) {
+        if (!acc?.maBenhNhan) {
             return notification.error({
                 message: "Lỗi dữ liệu",
                 description: "Không tìm thấy thông tin tài khoản!",
@@ -30,7 +30,7 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
         }
 
         try {
-            const res = await fetchOneAccKH(acc.user.maBenhNhan);
+            const res = await fetchOneAccKH(acc?.maBenhNhan);
             if (res?.data) {
                 setDataAccKH(res.data);
             } else {
@@ -97,7 +97,7 @@ const ModalDoiMK = ({ openModalDoiMK, setOpenModalDoiMK }) => {
 
         try {
             setLoading(true);
-            const res = await doiMatKhau(_idAcc, idBN, acc.user.username, matKhau, matKhauMoi);
+            const res = await doiMatKhau(_idAcc, idBN, acc?.username, matKhau, matKhauMoi);
             if (res?.success) {
                 message.success("Đổi mật khẩu thành công!");
                 dispatch(doLogoutAction());

@@ -37,15 +37,15 @@ const HeaderViewDoctor = () => {
   console.log("acc: ", acc);
   useEffect(() => {
     const fetchBenhNhan = async () => {
-      if (acc?.user?.maBenhNhan) {
-        const res = await fetchOneAccKH(acc.user.maBenhNhan);
+      if (acc?.maBenhNhan) {
+        const res = await fetchOneAccKH(acc?.maBenhNhan);
         if (res?.data) {
           setDataAcc(res.data);
         }
       }
     };
     fetchBenhNhan();
-  }, [acc?.user?.maBenhNhan]);
+  }, [acc?.maBenhNhan]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -192,7 +192,7 @@ const HeaderViewDoctor = () => {
                       dataAcc?.hinhAnh
                         ? `${
                             import.meta.env.VITE_BACKEND_URL
-                          }/public/benhnhan/${acc.user.hinhAnh}`
+                          }/public/benhnhan/${acc?.hinhAnh}`
                         : null
                     }
                     style={{ cursor: "pointer" }}

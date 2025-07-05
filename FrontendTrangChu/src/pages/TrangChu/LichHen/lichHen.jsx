@@ -28,8 +28,8 @@ import Footer from "../../../components/TrangChu/Footer/Footer";
 import { RiEdit2Fill, RiDeleteBin5Line } from "react-icons/ri";
 import { fetchLichKham, deleteLichHen, taoVnPayUrl} from "../../../services/apiChuyenKhoaBacSi";
 
-import ModalXemChiTietLichHen from "./ModalXemChiTietLichHen";
-import ModalCapNhatLichHen from "./ModalCapNhatLichHen";
+import ModalXemChiTietLichHen from "./ModalXemChiTietLichHen.jsx";
+import ModalCapNhatLichHen from "./ModalCapNhatLichHen.jsx";
 
 const LichHenCard = () => {
   const navigate = useNavigate();
@@ -43,25 +43,25 @@ const LichHenCard = () => {
 
   const acc = useSelector((state) => state.account.user);
 
+  console.log("acc in LichHenCard: ", acc);
+
+  
   const fetchOrders = async () => {
-    if (!acc?.user?.maBenhNhan) return;
+    if (!acc?.maBenhNhan) return;
     setLoading(true);
     try {
-      const res = await fetchLichKham(acc.user.maBenhNhan);
-      console.log(res); // Log dữ liệu trả về từ API
+      const res = await fetchLichKham(acc?.maBenhNhan);
+      console.log("Lịch khám", res); // Log dữ liệu trả về từ API
 
-      if (res && Array.isArray(res)) {
-        // Sắp xếp: Hủy xuống cuối, mới nhất lên đầu
-        const sorted = res
-        .sort((a, b) => {
+      if (res?.data) {
+        const sorted = res.data.sort((a, b) => {
           if (a.trangThai === "Đã hủy" && b.trangThai !== "Đã hủy") return 1;
           if (a.trangThai !== "Đã hủy" && b.trangThai === "Đã hủy") return -1;
-          // Nếu cùng trạng thái thì so sánh ngày (mới -> cũ)
           return new Date(b.ngayKham) - new Date(a.ngayKham);
         });
 
         setDataOrder(sorted);
-        }
+      }
     } catch (error) {
       notification.error({
         message: "Lỗi tải dữ liệu",
@@ -73,7 +73,7 @@ const LichHenCard = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [acc?.user?.maBenhNhan]);
+  }, [acc?.maBenhNhan]);
 
   const handleEditClick = (record) => {
     setEditingRecord(record);
@@ -345,7 +345,7 @@ const LichHenCard = () => {
                             }}
                             onClick={() => {
                               if (item.trangThai === "Đã hủy") return;
-                              const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+                              const videoCallUrl = `http://localhost:3003/video-call?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.maBenhNhan}&currentRole=${acc?.tenVaiTro}`;
                               window.open(videoCallUrl, "_blank");
                             }}
                           />
@@ -362,7 +362,7 @@ const LichHenCard = () => {
                             }}
                             onClick={() => {
                               if (item.trangThai === "Đã hủy") return;
-                              const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.user?.maBenhNhan}&currentRole=${acc?.user?.tenVaiTro}`;
+                              const chatUrl = `http://localhost:3003/chat?appointmentId=${item.maLich}&patientId=${item.maBenhNhan}&doctorId=${item.maBacSi}&currentUserID=${acc?.maBenhNhan}&currentRole=${acc?.tenVaiTro}`;
                               window.open(chatUrl, "_blank");
                             }}
                           />

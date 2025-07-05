@@ -27,14 +27,14 @@ import {
     const navigate = useNavigate();
     const { Option } = Select;
     const onFinish = async (values) => {
-      if (!acc?.user?.maBenhNhan) {
+      if (!acc?.maBenhNhan) {
         message.error("Không tìm thấy mã bệnh nhân!");
         return;
       }
   
       const data = {
         ...values,
-        maBenhNhan: acc.user.maBenhNhan, // Sử dụng mã bệnh nhân từ redux
+        maBenhNhan: acc?.maBenhNhan, // Sử dụng mã bệnh nhân từ redux
         gioiTinh: parseInt(values.gioiTinh), // 0: Nam, 1: Nữ
         ngaySinh: values.ngaySinh.format("YYYY-MM-DD"),
       };

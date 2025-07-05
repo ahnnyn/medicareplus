@@ -74,8 +74,9 @@ useEffect(() => {
   try {
     const res = await handleLoginDoctor(values.username, values.password);
     console.log("Login Response:", res);
-    if (res.success && res.token) {
-      const { user, token } = res;
+    const result = res.data;
+    if (result.success && result.token) {
+      const { user, token } = result;
       const role = Number(user.maVaiTro);
 
       if (remember) {
